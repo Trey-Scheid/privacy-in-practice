@@ -6,7 +6,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn import preprocessing
 from autodp.calibrator_zoo import eps_delta_calibrator
 from sklearn.model_selection import train_test_split
-import numpy as np
 from autodp.autodp_core import Mechanism
 from autodp.mechanism_zoo import GaussianMechanism
 from autodp.transformer_zoo import ComposeGaussian
@@ -61,19 +60,13 @@ class GD():
             Mechanism.__init__(self)
             self.name = name
             self.params={'sigma':sigma,'coeff':coeff}
-            
-            # ----------- Implement noisy-GD here with "GaussianMechanism" and "ComposeGaussian" ----------------
-            
             gm = GaussianMechanism(sigma,name='Release_gradient')
-            # compose them with the transformation: ComposeGaussian.
             compose = ComposeGaussian() 
             mech = compose([gm], [coeff])
             
-            # ------------- return a Mechanism object named 'mech' --------------------
             
             self.set_all_representation(mech)      
     def gradient(self,theta):
-        # -----------  Implement the gradient of f(theta) ----------- 
         grad = np.zeros(shape=(self.dim,))
         
         phat = np.exp(self.X@theta)/(1+np.exp(self.X@theta))
@@ -169,8 +162,10 @@ class GD():
         plt.xlabel('Epsilon')
         plt.ylabel('Error')
         plt.title('Error vs. Epsilon for Different NoisyGD Configurations')
-
+        plt.tight_layout()
+        plt.savefig('plots/GDNoise.png')
         plt.show()
+        
     def diffLearningRatesPlot(self,epsilon):
         sigma = 300.0
         delta = 1e-6
@@ -197,7 +192,7 @@ class GD():
         plt.plot(self.eps_GD1, self.err_trivial * np.ones_like(self.eps_GD1), 'r--')
 
         plt.legend(
-            ['NoisyGD', 'NoisyGD-lr*10', 'NoisyGD-lr/10', 'NoisyGD-lr*100', 'Nonprivate', 'Trivial'], 
+            ['NoisyGD', 'NoisyGD-lr*10', 'NoisyGD-lr/10', 'NoisyGD-lr*100', 'Nonprivate-sklearn', 'Trivial'], 
             fontsize='x-small', 
             loc='center left',               # Place it to the left of the anchor point
             bbox_to_anchor=(1, 0.5),         # Anchor the legend to the right of the plot
@@ -206,6 +201,8 @@ class GD():
         plt.xlabel('Epsilon')
         plt.ylabel('Error')
         plt.title('Error vs. Epsilon for Noisy GD Variants')
-
+        plt.tight_layout()
+        plt.savefig('plots/GDLearningRates.png')
         plt.show()
+        
     
