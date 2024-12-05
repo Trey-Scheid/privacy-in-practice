@@ -12,7 +12,7 @@ from scipy.optimize import root_scalar
 
 
 class ObjPert:
-    def __init__(self, fp):
+    def __init__(self, fp, eps: List[float] = [], delta: float = None):
         self.fp = fp
         (
             self.X_train,
@@ -23,8 +23,8 @@ class ObjPert:
             self.n,
             self.x_bound,
         ) = self.clean_data()
-        self.eps = []
-        self.delta = None
+        self.eps = eps
+        self.delta = delta
         self.df = None
 
     def clean_data(self):
@@ -234,6 +234,9 @@ class ObjPert:
         plt.xlabel("Lambda (log scale)")
         plt.ylabel(f"Test {y_axis} (log scale)")
         plt.title(f"Test {y_axis} vs Lambda for Different Epsilon Values")
+
+        plt.tight_layout()
+        plt.savefig(f"plots/ObjPert{y_axis}.png")
         plt.show()
         return plot
 
@@ -258,8 +261,19 @@ class ObjPert:
         plt.xlabel("Lambda (log scale)")
         plt.ylabel("Sigma (log scale)")
         plt.title("Sigma vs Lambda for Different Epsilon Values")
+
+        plt.tight_layout()
+        plt.savefig(f"plots/ObjPert_SigLamb.png")
         plt.show()
         return plot
+
+    def run_all_plots(self):
+        self.demo_data()
+        self.plot("error")
+        self.plot("loss")
+        self.sigma_lambda_plot
+
+        return self.epsilon_error_df()
 
     def setEps(self, eps):
         if type(eps) == float:
