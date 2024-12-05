@@ -84,10 +84,6 @@ class SGD():
     def stochastic_gradient(self,theta, X_batch, y_batch):
         phat = np.exp(X_batch @ theta) / (1 + np.exp(X_batch @ theta))
         grad = X_batch.T @ (phat - y_batch)
-        #grad_norm = np.linalg.norm(grad)
-        #if grad_norm > 1:
-        #    grad = grad / grad_norm 
-        #
         return grad
     def GS_bound(self,theta):
         """
@@ -164,11 +160,6 @@ class SGD():
         niter = int(np.floor(mech.params['niter']))
         return niter
     def theoretical_lr_choice(self,beta_L,f0_minus_fniter_bound,dim,sigma,niter):
-        # beta_L is the gradient lipschitz constant for the whole objective function
-        # sigma is the variance of the gradient noise in each coordinate
-        # niter is the intended number of iterations (the LR is optimized for the point we get when finishing all niter)
-        
-        
         return np.minimum(1/beta_L,np.sqrt(2*f0_minus_fniter_bound / (dim * sigma**2 *beta_L*niter)))
     def diffNoisePlot(self,epsilon):
         beta = 1/4*self.n
@@ -215,7 +206,10 @@ class SGD():
         plt.title('Error vs. Epsilon for Different NoisySGD Configurations')
 
         # Show plot
+        plt.tight_layout()
+        plt.savefig('plots/SGDNoise.png')
         plt.show()
+        
     def diffLearningRatesPlot(self,epsilon):
         sigma = 30.0
         delta = 1e-6
@@ -244,7 +238,7 @@ class SGD():
 
         # Add legend, labels, and title
         plt.legend(
-            ['NoisySGD', 'NoisySGD-lr*10', 'NoisySGD-lr/10', 'NoisySGD-lr*100', 'Nonprivate', 'Trivial'], 
+            ['NoisySGD', 'NoisySGD-lr*10', 'NoisySGD-lr/10', 'NoisySGD-lr*100', 'Nonprivate-sklearn', 'Trivial'], 
             fontsize='x-small', 
             loc='center left',               # Place it to the left of the anchor point
             bbox_to_anchor=(1, 0.5),         # Anchor the legend to the right of the plot
@@ -255,7 +249,10 @@ class SGD():
         plt.title('Error vs. Epsilon for Noisy SGD Variants')
 
         # Show and save the plot
+        plt.tight_layout()
+        plt.savefig('plots/SGDLearningRates.png')
         plt.show()
+        
     def run_NoisySGD_end(self,X, y, sigma, lr, niter, batch_size, log_gap=10):
         """
         Run stochastic gradient descent with noise for privacy and only one privacy mech at the end
