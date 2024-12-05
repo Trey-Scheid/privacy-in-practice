@@ -25,16 +25,8 @@ def main(targets):
     for method, obj in zip(all_methods, all_objects):
         if method not in target_methods:
             continue
-        specific_params = {
-            "fp": params["fp"],
-            "epsilons": params["epsilons"],
-            "delta": params["delta"],
-        }
-        if method == "objpert":
-            specific_params["trials"] = params["ObjPert_trials"]
-            specific_params["repeats"] = params["ObjPert_repeats"]
 
-        run = obj(**specific_params)
+        run = obj(**params)
         combine_df = run.run_all_plots()
         combined_df.append(combine_df)
 
