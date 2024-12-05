@@ -12,7 +12,7 @@ from scipy.optimize import root_scalar
 
 
 class ObjPert:
-    def __init__(self, fp, eps: List[float] = [], delta: float = None):
+    def __init__(self, fp, epsilons: List[float] = [], delta: float = None):
         self.fp = fp
         (
             self.X_train,
@@ -23,7 +23,7 @@ class ObjPert:
             self.n,
             self.x_bound,
         ) = self.clean_data()
-        self.eps = eps
+        self.eps = epsilons
         self.delta = delta
         self.df = None
 
@@ -267,8 +267,8 @@ class ObjPert:
         plt.show()
         return plot
 
-    def run_all_plots(self):
-        self.demo_data()
+    def run_all_plots(self, trials: int = 50, repeats: int = 10):
+        self.demo_data(trials, repeats)
         self.plot("error")
         self.plot("loss")
         self.sigma_lambda_plot
