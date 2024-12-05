@@ -164,7 +164,56 @@ class ObjPert:
             ),
         )
 
+        self.df["Epsilon"] = self.df["epsilon"].astype(str)
+
         return self.df
+
+    def epsilon_error_df(self):
+        if self.df is None:
+            raise ValueError("Run the demo_data method first to run model")
+
+        lamb = cp.Parameter(nonneg=True)
+        sigma = cp.Parameter(nonneg=True)
+        theta = cp.Variable(self.dim)
+
+        best = []
+        best_params = self.tune_hypterparameters()
+        noise = np.random.normal(0, 1, self.dim)
+        for ep in self.eps:
+            lamb.value = best_params[str(ep)]
+            sigma.value = ObjPert.sigma_(ep, self.delta, self.beta, lamb.value, self.L)
+            objpert_rand = (noise * sigma.value) @ theta
+            problem = cp.Problem(
+                cp.Maximize(
+                    cp.sum(
+                        cp.multiply(self.y_train, self.X_train @ theta)
+                        - cp.logistic(self.X_train @ theta)
+                    )
+                    - lamb / 2 * cp.norm(theta, 2) ** 2
+                    - objpert_rand
+                )
+            )
+
+            try:
+                problem.solve(solver=cp.ECOS)
+            except cp.error.SolverError:
+                continue
+            if theta.value is None:
+                continue
+
+            test_error = ObjPert.error((self.X_test @ theta.value), self.y_test)
+            best.append([ep, test_error, "Objective Perturbation"])
+
+        return pd.DataFrame(best, columns=["epsilon", "error", "method"])
+
+    def tune_hypterparameters(self):
+        return dict(
+            self.df.groupby(["epsilon", "lambda"])
+            .mean()
+            .groupby("epsilon")
+            .idxmin()
+            .values
+        )
 
     def plot(self, kind=Literal["error", "loss"]):
         if self.df is None:
