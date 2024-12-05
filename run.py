@@ -26,9 +26,12 @@ def main(targets):
         if method not in target_methods:
             continue
 
+        print(f"Running {method}")
         run = obj(**params)
-        combine_df = run.run_all_plots()
+        combine_df = run.run_all_plots(trials=3, repeats=3)
         combined_df.append(combine_df)
+
+    print(combined_df)
 
 
 if __name__ == "__main__":
