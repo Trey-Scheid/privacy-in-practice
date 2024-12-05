@@ -25,13 +25,13 @@ class SGD():
         self.err_nonprivate = self.err_yhat(yhat)
         self.err_trivial = min(np.mean(self.y), 1-np.mean(self.y) )
 
-    def __init__(self):
-        #switch below with parent 
-        df=pd.read_csv('data/dataset.csv')
+    def __init__(self,fp,epsilons,delta):
+        df=pd.read_csv(fp)
         warnings.filterwarnings("ignore", category=RuntimeWarning)
         self.clean(df)
-        #switch below with parent
-        self.delta=1e-6
+        self.delta=delta
+        self.filepath=fp
+        self.epsilon=max(epsilons)
         self.GS=1
         self.regSGD()
         
@@ -205,10 +205,9 @@ class SGD():
         plt.ylabel('Error')
         plt.title('Error vs. Epsilon for Different NoisySGD Configurations')
 
-        # Show plot
+        #save
         plt.tight_layout()
         plt.savefig('plots/SGDNoise.png')
-        plt.show()
         
     def diffLearningRatesPlot(self,epsilon):
         sigma = 30.0
@@ -248,10 +247,9 @@ class SGD():
         plt.ylabel('Error')
         plt.title('Error vs. Epsilon for Noisy SGD Variants')
 
-        # Show and save the plot
+        #save the plot
         plt.tight_layout()
         plt.savefig('plots/SGDLearningRates.png')
-        plt.show()
         
     def run_NoisySGD_end(self,X, y, sigma, lr, niter, batch_size, log_gap=10):
         """
@@ -290,8 +288,8 @@ class SGD():
                 eps_list.append(eps)
 
             # Compute the average across all runs
-            avg_err = np.mean(err_list, axis=0)
-            avg_eps = np.mean(eps_list, axis=0)
+            avg_err = np.mean(err_list, axis=0)[0]
+            avg_eps = np.mean(eps_list, axis=0)[0]
             return avg_err, avg_eps
 
         # Number of runs to average
@@ -302,9 +300,15 @@ class SGD():
         err_SGD_1point0, eps_SGD_1point0 = average_runs(num_runs, self.X, self.y, 1.0, self.delta, 64)
         err_SGD_1point5, eps_SGD_1point5 = average_runs(num_runs, self.X, self.y, 1.5, self.delta, 64)
         err_SGD_2point0, eps_SGD_2point0 = average_runs(num_runs, self.X, self.y, 2.0, self.delta, 64)
-        return [err_SGD_point5,err_SGD_1point0,err_SGD_1point5,err_SGD_2point0]
-
+        df=pd.DataFrame({"Epsilon":[.5,1,1.5,2],"Error":[err_SGD_point5,err_SGD_1point0,err_SGD_1point5,err_SGD_2point0],"Method":["SGD","SGD","SGD","SGD"]})
+        df.index=df["Epsilon"]
+        df = df.drop("Epsilon", axis=1)
+        return df
 
 
 
                             
+    def run_all_plots(self):
+        self.diffNoisePlot(self.epsilon)
+        self.diffLearningRatesPlot(self.epsilon)
+        return self.epsPoints()
