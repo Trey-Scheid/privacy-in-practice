@@ -28,7 +28,7 @@ class ObjPert:
         self.df = None
 
     def clean_data(self):
-        dataset = pd.read_csv("satellite.csv")
+        dataset = pd.read_csv(self.fp)
         X = dataset.iloc[:, 5:].values
         y = dataset.iloc[:, 1].values
 
@@ -76,7 +76,6 @@ class ObjPert:
         if self.delta is None:
             raise ValueError("Delta value not set")
 
-        print("Starting objective perturbation")
         np.random.seed(0)
 
         L = self.x_bound
@@ -164,7 +163,7 @@ class ObjPert:
             ),
         )
 
-        self.df["Epsilon"] = self.df["epsilon"].astype(str)
+        self.df["epsilon"] = self.df["epsilon"].astype(str)
 
         return self.df
 
@@ -176,12 +175,15 @@ class ObjPert:
         sigma = cp.Parameter(nonneg=True)
         theta = cp.Variable(self.dim)
 
+        L = self.x_bound
+        beta = self.x_bound**2 / 4
+
         best = []
         best_params = self.tune_hypterparameters()
         noise = np.random.normal(0, 1, self.dim)
         for ep in self.eps:
             lamb.value = best_params[str(ep)]
-            sigma.value = ObjPert.sigma_(ep, self.delta, self.beta, lamb.value, self.L)
+            sigma.value = ObjPert.sigma_(ep, self.delta, beta, lamb.value, L)
             objpert_rand = (noise * sigma.value) @ theta
             problem = cp.Problem(
                 cp.Maximize(
@@ -204,11 +206,11 @@ class ObjPert:
             test_error = ObjPert.error((self.X_test @ theta.value), self.y_test)
             best.append([ep, test_error, "Objective Perturbation"])
 
-        return pd.DataFrame(best, columns=["epsilon", "error", "method"])
+        return pd.DataFrame(best, columns=["Epsilon", "Error", "Method"])
 
     def tune_hypterparameters(self):
         return dict(
-            self.df.groupby(["epsilon", "lambda"])
+            self.df.groupby(["epsilon", "lambda"])["test_error"]
             .mean()
             .groupby("epsilon")
             .idxmin()
@@ -221,9 +223,9 @@ class ObjPert:
         plt.figure(figsize=(12, 8))
         y_axis = "Error" if kind == "error" else "Loss"
         plot = sns.lineplot(
-            x="Lambda",
-            y=y_axis,
-            hue="Epsilon",
+            x="lambda",
+            y=f"test_{kind}",
+            hue="epsilon",
             data=self.df,
             errorbar=("ci", 95),
             markers=True,
@@ -237,7 +239,6 @@ class ObjPert:
 
         plt.tight_layout()
         plt.savefig(f"plots/ObjPert{y_axis}.png")
-        plt.show()
         return plot
 
     def sigma_lambda_plot(self, max_lambda: float = 1e2, num_lambdas: int = 100):
@@ -264,11 +265,10 @@ class ObjPert:
 
         plt.tight_layout()
         plt.savefig(f"plots/ObjPert_SigLamb.png")
-        plt.show()
         return plot
 
     def run_all_plots(self, trials: int = 50, repeats: int = 10):
-        self.demo_data(trials, repeats)
+        self.demo_data()
         self.plot("error")
         self.plot("loss")
         self.sigma_lambda_plot
