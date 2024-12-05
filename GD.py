@@ -26,13 +26,12 @@ class GD():
         yhat = clf.predict(self.X)
         self.err_nonprivate = self.err_yhat(yhat)
         self.err_trivial = min(np.mean(self.y), 1-np.mean(self.y) )
-
-    def __init__(self):
-        #switch below with parent 
-        df=pd.read_csv('data/dataset.csv')
+    def __init__(self,fp,epsilons,delta):
+        df=pd.read_csv(fp)
         self.clean(df)
-        #switch below with parent
-        self.delta=1e-6
+        self.delta=delta
+        self.filepath=fp
+        self.epsilon=max(epsilons)
         self.GS=1
         self.regGD()
         
@@ -164,7 +163,6 @@ class GD():
         plt.title('Error vs. Epsilon for Different NoisyGD Configurations')
         plt.tight_layout()
         plt.savefig('plots/GDNoise.png')
-        plt.show()
         
     def diffLearningRatesPlot(self,epsilon):
         sigma = 300.0
@@ -203,6 +201,8 @@ class GD():
         plt.title('Error vs. Epsilon for Noisy GD Variants')
         plt.tight_layout()
         plt.savefig('plots/GDLearningRates.png')
-        plt.show()
-        
     
+    def run_all_plots(self):
+        self.diffNoisePlot(self.epsilon)
+        self.diffLearningRatesPlot(self.epsilon)
+        return pd.DataFrame()

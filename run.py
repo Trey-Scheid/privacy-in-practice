@@ -2,6 +2,9 @@
 
 import sys
 import json
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from GD import GD
 from SGD import SGD
@@ -10,7 +13,7 @@ from ObjectivePerturbation import ObjPert
 
 
 def main(targets):
-    with open("params.json") as fh:
+    with open("config.json") as fh:
         params = json.load(fh)
 
     all_methods = ["gd", "sgd", "ftrlm", "objpert", "outpert"]
@@ -25,18 +28,27 @@ def main(targets):
     for method, obj in zip(all_methods, all_objects):
         if method not in target_methods:
             continue
-        specific_params = {
-            "fp": params["fp"],
-            "epsilons": params["epsilons"],
-            "delta": params["delta"],
-        }
-        if method == "objpert":
-            specific_params["trials"] = params["ObjPert_trials"]
-            specific_params["repeats"] = params["ObjPert_repeats"]
 
-        run = obj(**specific_params)
+        print(f"Running {method}")
+        run = obj(**params)
         combine_df = run.run_all_plots()
         combined_df.append(combine_df)
+
+    combine_plot(combined_df)
+
+
+def combine_plot(combined_df):
+    big_df = pd.concat(combined_df)
+    plt.clf()
+    plot = sns.lineplot(
+        x="Epsilon", y="Error", hue="Method", style="Method", data=big_df, markers=True
+    )
+    plt.title("Test Error vs Epsilon")
+    plt.xlabel("Epsilon")
+    plt.ylabel("Error")
+
+    plt.tight_layout()
+    plt.savefig("plots/combined_plot.png")
 
 
 if __name__ == "__main__":
