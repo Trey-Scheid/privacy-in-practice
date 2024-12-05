@@ -17,28 +17,41 @@ from autodp import mechanism_zoo, calibrator_zoo
 from autodp.transformer_zoo import ComposeGaussian
 
 class FTRLM():
-    def __init__(self):
+    def __init__(self, fp, epsilons, delta):
         #switch below with parent 
-        df=pd.read_csv('data/dataset.csv', index_col='segment')
+        df=pd.read_csv(fp, index_col='segment')
         warnings.filterwarnings("ignore", category=RuntimeWarning)
         
+        self.epsilons = epsilons
+        self.delta = delta
+
         # Set the Seaborn style
-        sns.set_theme()
+        #sns.set_theme()
         # Get the "flare" palette
         self.color_palette = sns.color_palette("flare")
         
         df = self.clean(df)
+        
+        self.err_nonprivate = 0
+        self.err_trivial = 0
+        
         self.non_private_log_reg()
 
-        best_params, results = self.tune_hyperparameters()
-        self.best_params = best_params
-        self.results = results
+        self.lamda = 0.01
+        self.batch_size = 100
+        self.momentum = 0.85
+        self.epochs = 20
+        self.batch_size = 100
+        self.L = 1.0 # clip norm
 
-        self.plot_eps_performance()
+        #best_params, results = self.tune_hyperparameters()
+        #self.best_params = best_params
+        #self.results = results
 
-        
+        #self.plot_eps_performance()
 
-        #switch below with parent
+    def run_all_plots(self):
+        self.plot_eps_performance(self.lamda, self.batch_size, self.momentum)
         
 
     def clean(self, df):
@@ -136,13 +149,13 @@ class FTRLM():
                         best_error = final_error
                         best_params = {'batch_size': bs, 'momentum': m, 'lambda': lamb}
                         
-                    print(f"momentum: {m:.2f}, batch_size: {bs}, lambda: {lamb:.6f}, error: {final_error:.4f}")
+                    #print(f"momentum: {m:.2f}, batch_size: {bs}, lambda: {lamb:.6f}, error: {final_error:.4f}")
         
-        print("\nBest parameters:")
-        print(f"Momentum: {best_params['momentum']:.2f}")
-        print(f"batch_size: {best_params['batch_size']}")
-        print(f"Lambda: {best_params['lambda']:.6f}")
-        print(f"Best error: {best_error:.4f}")
+        #print("\nBest parameters:")
+        ##print(f"Momentum: {best_params['momentum']:.2f}")
+        #print(f"batch_size: {best_params['batch_size']}")
+        #print(f"Lambda: {best_params['lambda']:.6f}")
+        #print(f"Best error: {best_error:.4f}")
         
         return best_params, results
     
@@ -162,23 +175,22 @@ class FTRLM():
         )
         return best_params, results
     
-    def plot_eps_performance(self):
+    def plot_eps_performance(self, lamb, batch_size, momentum, epochs, L):
         best_errs = []
-        lamb = .01
-        epss = [0.25, 0.005, 0.01, 0.1, 0.5, 1, 1.5, 2]
+        epss = self.epsilons
         for test_eps in epss:
             # Initialize optimizer
             optimizer = DPFTRLM(
                 dim=self.dim,
                 num_examples=self.n,
-                batch_size=100,
+                batch_size=batch_size,
                 learning_rate=1 / (lamb * self.n), # 1 / lambda?
-                momentum=0.9,
-                l2_norm_clip=1.0,
+                momentum=momentum,
+                l2_norm_clip=L,
                 lambda_reg=lamb, # Add regularization strength
                 target_epsilon=test_eps,
-                target_delta=1e-5,
-                epochs=100,
+                target_delta=self.delta,
+                epochs=epochs,
                 loss_grad_fn=self.logistic_loss_grad
             )
 
@@ -189,8 +201,8 @@ class FTRLM():
                 #if epoch % 10 == 0:
                 #    print(f"Epoch {epoch}, ε = {eps}")
 
-            if abs(optimizer.get_eps()) > .01:
-                print(optimizer.get_eps())
+            #if abs(optimizer.get_eps()) > .01:
+                #print(optimizer.get_eps())
             
             best_errs.append(error)
 
@@ -200,9 +212,11 @@ class FTRLM():
         plt.plot(epss,self.err_trivial*np.ones_like(epss),self.color_palette[4])
 
         plt.legend(['DP_FTRLM','Nonprivate','trivial'])
-        plt.xlabel('epsilon')
+        plt.xlabel('Epsilon')
         plt.ylabel('Error')
-        plt.show()
+        plt.savefig(f"plots/FTRLM.png")
+
+        return pd.DataFrame({'Epsilon':epss, 'Error':best_errs, 'Method':['FTRLM' for _ in range(len(epss))]})
 
 class DPFTRLPrivacyEngine:
     """Privacy engine for DP-FTRL with tree restart"""
@@ -251,7 +265,7 @@ class DPTreeAggregator:
     def get_noisy_sum(self, step: int) -> np.ndarray:
         total = np.zeros(self.dim)
         idx = 2**(self.height - 1) + step
-        print(self.sigma)
+        #print(self.sigma)
         while idx > 0:
             parent = (idx - 1) // 2
             if idx % 2 == 1:
@@ -341,3 +355,10 @@ class DPFTRLM:
         error = self.err(X, y, theta)
         
         return theta, privacy_spent, error
+    
+
+
+
+
+#ftlrm_obj = FTRLM(fp=data['fp'], epsilons=data['epsilons'], delta=data['delta'])
+#objpert_df = ftlrm_obj.run_all_plots()
