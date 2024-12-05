@@ -70,7 +70,7 @@ class ObjPert:
         )
         return X_train, X_test, y_train, y_test, dim, n, x_bound
 
-    def demo_data(self):
+    def demo_data(self, trials: int = 50, repeats: int = 10):
         if self.eps == []:
             raise ValueError("Epsilon values not set")
         if self.delta is None:
@@ -94,8 +94,6 @@ class ObjPert:
 
         data = []
 
-        trials = 50
-        repeats = 10
         lambda_vals = np.logspace(np.log10(beta + 1e-4), np.log10(4), trials)
 
         for i in range(trials):
