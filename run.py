@@ -13,7 +13,7 @@ from ObjectivePerturbation import ObjPert
 
 
 def main(targets):
-    with open("params.json") as fh:
+    with open("config.json") as fh:
         params = json.load(fh)
 
     all_methods = ["gd", "sgd", "ftrlm", "objpert", "outpert"]
