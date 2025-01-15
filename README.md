@@ -1,21 +1,20 @@
-# Comparing DP Logistic Regression
+# Novel Techniques in Private Data Analysis
 
-This project repo highlights several different methods of achieving differentially private logistic regression.
-The models covered are **Noisy Gradient Descent**, **DP Stochastic Gradient Descent**, **DP Follow the Regularized Leader**, **Objective Perturbation**, and **Output Perturbation**.
+This project repo is a part of an HDSI Data Science Capstone prohject (link) by names ____. The goal of the project is to privatize common data tasks using an example domain: Telemetry!
 
-This repo builds several plots for comparing and assessing the privacy and utility of the different methods for differentially private machine learning.
+## Data Access:
 
-
-## Retrieving the data locally:
-
-(1) Download the `dataset.csv` data file for satellite telemetry, from the OSSAT-AD dataset here: https://zenodo.org/records/12588359
-
-(2) Edit the file: __config.json__ to include the path/location of the downloaded data in the value of the __fp__ key
+Much of the data is not accessible to the public domain due to confidentiality. You may run the project on a synthetic demo dataset (follow Demo), or view our resulting plots without running the code (follow 'run.py')
 
 
 ## Running the project
 
 * To install the dependencies, run the following command from the root directory of the project: `pip install -r requirements.txt`
+
+
+### Demo
+
+* To run the demo on your local machine...
 
   
 ### Building the project stages using `run.py`
