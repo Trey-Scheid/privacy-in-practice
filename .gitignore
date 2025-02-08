@@ -10,6 +10,7 @@ report.synctex.gz
 
 # avoid private data upload at any depth in the cloned repo
 **/private_data/
+**/out_[0-9]*.parquet
 
 ### macOS ###
 # General
