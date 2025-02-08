@@ -8,6 +8,8 @@ report.toc
 report.thm
 report.synctex.gz
 
+# avoid private data upload at any depth in the cloned repo
+**/private_data/
 
 ### macOS ###
 # General
