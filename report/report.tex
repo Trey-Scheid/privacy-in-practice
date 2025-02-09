@@ -100,9 +100,31 @@ This paper\footnote{needs citation not a footnote} investigates how privacy affe
 
 will add lots of detail about lasso, then talk about adapting franke-wolfe to be differentially private. 
 
+\subsubsection{K-Means (DP-Lloyd's)}
+K-Means clustering (Lloyd's Algorithm) is applied to group devices based on similarities in their usage patterns. The method leverages Z-scores for standardizing the usage data and calculates L1 distances between weekly usage patterns to identify trends over time. Lloyd's Algorithm clusters devices by assigning them to centroids based on their usage patterns, recalculating the centroids as the mean of assigned points after each iteration. 
+
+Differentially Private Lloyd's Algorithm (DP-Lloyd's)\footnote{linkneeded} modifies the standard K-Means clustering by adding Laplacian noise during the iterative centroid update step to ensure privacy. It introduces noise to both the sum of coordinates and the count of points within clusters, with the amount of noise controlled by the number of iterations and the sensitivity of the data. 
+\subsubsection{Z-score (Additive Noise)}
+As Z-score is computed before performing K-means clustering, 
+\[
+Z = \frac{X - \mu}{\sigma}
+\]
+One can privatize this clustering task by simply adding Laplacian noise to the Z-scores, though the privacy gurantee and performance between the two methods, DP-Lloyd's and Additive Noise are likely to be different.
+\[
+Z_{\text{private}} = \frac{X - \mu}{\sigma} + \text{Lap}\left(\frac{\Delta f}{\epsilon}\right)
+\]
+\begin{equation*}
+\begin{aligned}
+    \Delta f & \text{ is the global sensitivity of the Z-score computation,} \\
+    \epsilon & \text{ is the privacy parameter.}
+\end{aligned}
+\end{equation*}
+
+
+
 \subsection{Tyler task}
 
-\subsection{Bradley task}
+
 
 
 %%%%%%%%%%%%%%%%%%%
@@ -171,6 +193,11 @@ Trey Scheid
 Tyler Kurpanek
 
 Bradley Nathanson
+\begin{itemize}
+    \item Replicated K-means clustering using Z-scores from the Clustering Devices Together Using To Detect Change Patterns Paper
+    \item Implemented non-private K-means clustering 
+    \item [ ] Todo: Implementation of private K-means clustering using either private Lloyd's algorithm or privatizing Z-scores before clustering
+\end{itemize}
 
 Christopher Lum
 
@@ -201,6 +228,8 @@ We also would like to thank the authors of the papers we referenced in our liter
 \makereference
 
 \bibliographystyle{style/dsc180bibstyle}
+
+
 \bibliography{reference}
 % To edit the contents of the ``References" section, edit \texttt{reference.bib}. Many conference websites format citations in BibTeX that you can copy into \texttt{reference.bib} directly; you can also search for the paper on Google Scholar, click ``Cite", and then click ``BibTeX" (\href{https://scholar.google.com/scholar?hl=en&as_sdt=0%2C23&q=attention+is+all+you+need&btnG=#d=gs_cit&t=1700436667623&u=%2Fscholar%3Fq%3Dinfo%3A5Gohgn6QFikJ%3Ascholar.google.com%2F%26output%3Dcite%26scirp%3D0%26hl%3Den}{here}'s an example).
 
@@ -215,8 +244,9 @@ We also would like to thank the authors of the papers we referenced in our liter
 \subsection{Project Proposal}
 
 
-
-\input{project_proposal.tex}
+% Comment out when fixed
+%\input{project_proposal.tex}
+% Comment out when fixed
 
 
 \subsection{Appendix A: Additional Results}
