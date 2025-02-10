@@ -96,6 +96,16 @@ For each of the follow sections we will describe the task, the algorithm used, a
 
 This paper\footnote{needs citation not a footnote} investigates how privacy affects different mini-batch stochastic gradient descent algorithms for logistic regression classification. It is shown that privacy affects the batch size for optimal performance.
 
+\subsection{Correlation (via Logistic Regression Coefficient)}
+
+This paper \footnote{needs citation} seeks to identify whether a certain variable is disproportionately present for a certain outcome. 
+More specifically, it takes a close look at two variables, max temperature on a day and whether a corrected error was present on that day. 
+They would take one of those two variables and train a logistic regression model with maximum likelihood estimation to predict whether an uncorrected error was present.
+From the model, they use the coefficient of the variable and make a hypothesis test whether that variable is equal to zero.
+
+For our implementation, we focused only on whether there were corrected errors on a day, and not the variable max temperature on a day.
+We add privacy to the model by using DP-SGD when training the logistic regression model, where the hypothesis test is then private by means of post-processing.
+
 \subsubsection{LASSO Regression (DP-FW)}
 
 will add lots of detail about lasso, then talk about adapting franke-wolfe to be differentially private. 
