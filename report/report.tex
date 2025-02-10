@@ -135,7 +135,17 @@ Z_{\text{private}} = \frac{X - \mu}{\sigma} + \text{Lap}\left(\frac{\Delta f}{\e
 
 
 
-\subsection{Tyler task}
+\subsection{Probabilty (Additive Noise)}
+The probability of one or more uncorrected errors occurring on a system given the number of corrected errors it experienced during a specific time period is given as 
+\[
+P(Uncorrected|Corrected) = \frac{P(Corrected \cap Uncorrected)}{P(Corrected)}
+\]
+
+To privatize this mechanism, one can apply two methods, adding noise to the numerator and denominator, as well as clipping. The noise is sampled from a Laplace distribution with scale parameter $
+\frac{\nabla f}{\epsilon}$, where $\nabla f$ is the sensitivity and $\nabla f$ is the privacy paramater. The sensitivity in this case for both the numerator and denominator will be equal to 1 because the max change in probability is equal to 1. 
+
+In addition to the noise that is added we will regularize the data by adding a constant, $\lambda$. This constant will also be added to both the numerator and denominator so that the denominator does not get too close to 0. 
+Clipping the dataset involves capping the values of data points to a predefined range, preventing extreme values from disproportionately influencing analysis or model training. We will make sure that each GUID is limited in the amount of datapoints that it can contribute.
 
 
 
