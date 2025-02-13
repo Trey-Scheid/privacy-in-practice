@@ -6,7 +6,7 @@ from pathlib import Path
 abspath = os.path.dirname(os.path.abspath(__file__))
 src = Path(abspath).parent
 root = src.parent
-global_data = root / 'data'
+global_data = root / 'private_data'
 
 # Database URL (removed for security purposes)
 url = URL.create(
