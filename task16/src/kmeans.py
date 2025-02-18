@@ -1,81 +1,91 @@
-import pandas as pd
 import numpy as np
-from scipy.stats import zscore
-from sklearn.cluster import KMeans
-import duckdb
-"""
-TODO:
-- [ ] Add unit tests for the DeviceUsage class and its methods.
-- [ ] group proc_names into categories
-- [ ] Optimize the function and try to increase scope of the data (include more parquets/remove limit)
-"""
-class DeviceUsage:
-    def __init__(self, db_path, parquet_file, limit=1000000):
-        self.db_path = db_path
-        self.parquet_file = parquet_file
-        self.limit = limit
-        self.con = duckdb.connect(db_path)
-        self.data = None
-        self.filtered_data = None
-        self.proc_name_counts = None
-        self.valid_devices = None
-        self.weekwise_data = None
-        self.l1_distances = None
-        self.clusters = None
 
-    def load_data(self):
-        """Load data from the Parquet file into a Pandas DataFrame."""
-        query = f"SELECT interval_start_utc,proc_name,guid,duration FROM '{self.parquet_file}' LIMIT {self.limit}"
-        self.data = self.con.execute(query).fetchdf()
+class KMeans:
+    def __init__(self, k, max_iterations=300):
+        self.k = k
+        self.max_iterations = max_iterations
+        self.centroids = None
+    
+    # def initialize_centroids(self, data):
+    #     """Randomly initialize k centroids from the data points."""
+    #     n = data.shape[0]
+    #     random_indices = np.random.choice(n, self.k, replace=False)
+    #     self.centroids = data[random_indices]
+    def initialize_centroids(self, data):
+        """Initialize centroids using sphere packing."""
+        n, d = data.shape
+        a = 1  # Start with an initial guess for the radius a
+        centroids = []
+        max_attempts = 1000  # Maximum number of attempts to find valid centroids
+        
+        # Function to check if a new centroid satisfies the conditions
+        def is_valid(new_centroid, centroids, a, data_min, data_max):
+            # Check if centroid is at least 'a' away from the borders
+            if np.any(new_centroid <= data_min + a) or np.any(new_centroid >= data_max - a):
+                return False
+            # Check if centroid is at least '2a' away from other centroids
+            for centroid in centroids:
+                if np.linalg.norm(new_centroid - centroid) < 2 * a:
+                    return False
+            return True
+        
+        # Binary search for the largest valid radius 'a'
+        data_min = np.min(data, axis=0)
+        data_max = np.max(data, axis=0)
+        while True:
+            centroids = []
+            attempts = 0
+            for _ in range(self.k):
+                while attempts < max_attempts:
+                    # Randomly generate a new candidate centroid
+                    new_centroid = np.random.uniform(data_min + a, data_max - a, size=d)
+                    if is_valid(new_centroid, centroids, a, data_min, data_max):
+                        centroids.append(new_centroid)
+                        break
+                    attempts += 1
+                if attempts >= max_attempts:
+                    break
 
-    def extract_year_week(self):
-        """Extract year and week information from `interval_start_utc`."""
-        self.data["year"] = self.data["interval_start_utc"].dt.year
-        self.data["week"] = self.data["interval_start_utc"].dt.isocalendar().week
-
-    def count_proc_name_per_device(self):
-        """Count the occurrences of `proc_name` per `guid`."""
-        self.proc_name_counts = self.data.groupby("guid")["proc_name"].count().reset_index(name="proc_name_count")
-
-    def filter_valid_devices(self):
-        """Filter devices where `proc_name` count is greater than 10,000."""
-        self.valid_devices = self.proc_name_counts[self.proc_name_counts["proc_name_count"] > 10000]
-
-    def merge_filtered_data(self):
-        """Merge filtered devices with the original data."""
-        self.filtered_data = pd.merge(self.data, self.valid_devices[["guid"]], on="guid", how="inner")
-
-    def standardize_duration(self):
-        """Standardize the `duration` using Z-score per device."""
-        self.filtered_data["zscore_duration"] = self.filtered_data.groupby("guid")["duration"].transform(zscore)
-
-    def compute_l1_distances(self):
-        """Compute L1 distance for consecutive weeks per device."""
-        self.weekwise_data = self.filtered_data.pivot_table(index="guid", columns="week", values="zscore_duration", aggfunc="sum").fillna(0)
-        self.l1_distances = self.weekwise_data.diff(axis=1).abs().sum(axis=1)
-
-    def apply_kmeans_clustering(self, num_clusters=3):
-        """Apply K-Means clustering on L1 distances to group devices."""
-        kmeans = KMeans(n_clusters=num_clusters, random_state=42)
-        self.clusters = kmeans.fit_predict(self.l1_distances.values.reshape(-1, 1))
-
-    def get_clustered_devices(self):
-        """Return the clustered device data."""
-        return pd.DataFrame({
-            "device_id": self.l1_distances.index,
-            "L1_distance": self.l1_distances.values,
-            "cluster": self.clusters
-        })
-
-    def run_analysis(self):
-        """Run the full analysis pipeline."""
-        self.load_data()
-        self.extract_year_week()
-        self.count_proc_name_per_device()
-        self.filter_valid_devices()
-        self.merge_filtered_data()
-        self.standardize_duration()
-        self.compute_l1_distances()
-        self.apply_kmeans_clustering()
-        return self.get_clustered_devices()
+            # If we successfully picked all k centroids, we stop and use this radius 'a'
+            if len(centroids) == self.k:
+                self.centroids = np.array(centroids)
+                break
+            else:
+                # If we failed, try a smaller radius and try again
+                a /= 2  # Halve the radius
+    def fit(self, data):
+        """Perform standard k-means clustering."""
+        n, d = data.shape
+        
+        # Step 1: Initialize centroids randomly from data points
+        self.initialize_centroids(data)
+        
+        for iteration in range(self.max_iterations):
+            # Step 2: Assign points to the nearest centroid
+            clusters = [[] for _ in range(self.k)]
+            for i in range(n):
+                distances = [np.linalg.norm(data[i] - centroid) for centroid in self.centroids]
+                assigned_cluster = np.argmin(distances)
+                clusters[assigned_cluster].append(i)
+            
+            # Step 3: Update centroids
+            new_centroids = np.zeros((self.k, d))
+            for j in range(self.k):
+                if clusters[j]:  # Avoid division by zero
+                    new_centroids[j] = np.mean(data[clusters[j]], axis=0)
+            
+            # Convergence check: If centroids don't change, stop early
+            if np.allclose(self.centroids, new_centroids):
+                break
+            self.centroids = new_centroids
+        
+        return clusters, self.centroids
+    
+    def compute_inertia(self, data):
+        """Compute the inertia (sum of squared distances of samples to their closest centroid)."""
+        inertia = 0
+        for i in range(data.shape[0]):
+            distances = [np.linalg.norm(data[i] - centroid) for centroid in self.centroids]
+            inertia += np.min(distances) ** 2
+        return inertia
 
