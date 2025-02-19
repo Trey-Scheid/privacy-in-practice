@@ -10,6 +10,10 @@
 !.yarn/releases
 !.yarn/versions
 
+# Data
+**/private_data/
+**/out_[0-9]*.parquet
+
 # testing
 /coverage
 
