@@ -1,13 +1,8 @@
 import pandas as pd
 import statsmodels.api as sm
 import os
-import glob
 import re
-
-data_dir = "private_data/"
-data_dir = os.path.abspath(data_dir)
-data_fps = glob.glob(os.path.join(data_dir, "*.csv"))
-data_fps = [data_fp for data_fp in data_fps if "bugcheck" in data_fp]
+from utils import get_data_fps
 
 
 def get_lr_results(data_fp):
@@ -32,11 +27,15 @@ def get_lr_results(data_fp):
     return {
         "pvalue": result.pvalues.iloc[1],
         "coef": result.params.iloc[1],
-        "llf": result.llf,
+        "loss": -result.llf / len(y),
     }
 
 
 def get_all_lr_results():
+    data_dir = "private_data/"
+    data_dir = os.path.abspath(data_dir)
+    data_fps = get_data_fps(data_dir)
+
     results = {
         int(re.findall(r"bugcheck_(\d+)", data_fp)[0]): get_lr_results(data_fp)
         for data_fp in data_fps
