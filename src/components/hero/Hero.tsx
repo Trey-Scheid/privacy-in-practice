@@ -4,9 +4,15 @@ interface HeroProps {
   titleRef: (node?: Element | null | undefined) => void;
   scrollToSection: (ref: React.RefObject<HTMLElement | null>) => void;
   whatIsDPRef: React.RefObject<HTMLElement | null>;
+  methodsRef: React.RefObject<HTMLElement | null>;
 }
 
-export function Hero({ titleRef, scrollToSection, whatIsDPRef }: HeroProps) {
+export function Hero({
+  titleRef,
+  scrollToSection,
+  whatIsDPRef,
+  methodsRef,
+}: HeroProps) {
   return (
     <section
       ref={titleRef}
@@ -59,7 +65,10 @@ export function Hero({ titleRef, scrollToSection, whatIsDPRef }: HeroProps) {
           >
             1. What is Differential Privacy?
           </li>
-          <li className="hover:text-accent transition-colors cursor-pointer">
+          <li
+            onClick={() => scrollToSection(methodsRef)}
+            className="hover:text-accent transition-colors cursor-pointer"
+          >
             2. How We Applied DP
           </li>
           <li className="hover:text-accent transition-colors cursor-pointer">
@@ -74,4 +83,4 @@ export function Hero({ titleRef, scrollToSection, whatIsDPRef }: HeroProps) {
       </div>
     </section>
   );
-} 
+}

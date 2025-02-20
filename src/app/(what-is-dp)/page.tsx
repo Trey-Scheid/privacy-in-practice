@@ -32,14 +32,19 @@ export default function Home() {
       />
 
       {/* What is DP Section */}
-      <WhatIsDP
-        SplitViewRef={whatIsDPRef}
-        titleRef={titleRef}
-        scrollToSection={scrollToSection}
-      />
+      <div className="snap-start">
+        <WhatIsDP
+          SplitViewRef={whatIsDPRef}
+          titleRef={titleRef}
+          scrollToSection={scrollToSection}
+          methodsRef={methodsRef}
+        />
+      </div>
 
       {/* Our Methods Section */}
-      <OurMethods methodsRef={methodsRef} />
+      <div className="snap-start">
+        <OurMethods methodsRef={methodsRef} />
+      </div>
     </div>
   );
 }

@@ -9,12 +9,14 @@ interface SplitViewProps {
   SplitViewRef: React.RefObject<HTMLElement | null>;
   titleRef: (node?: Element | null | undefined) => void;
   scrollToSection: (ref: React.RefObject<HTMLElement | null>) => void;
+  methodsRef: React.RefObject<HTMLElement | null>;
 }
 
 export function SplitView({
   SplitViewRef,
   titleRef,
   scrollToSection,
+  methodsRef,
 }: SplitViewProps) {
   const [monaLisa, setMonaLisa] = useState("");
   const [noiseLevel, setNoiseLevel] = useState(0);
@@ -108,6 +110,7 @@ export function SplitView({
               titleRef={titleRef}
               scrollToSection={scrollToSection}
               whatIsDPRef={SplitViewRef}
+              methodsRef={methodsRef}
             />
           </section>
           {/* First Paragraph */}
