@@ -3,6 +3,7 @@ import { useInView } from "react-intersection-observer";
 import Link from "next/link";
 import { InlineMath, BlockMath } from "react-katex";
 import { MonaLisa } from "./MonaLisa";
+import { Hero } from "@/components/hero/Hero";
 
 interface WhatIsDPProps {
   monaLisa: string;
@@ -94,66 +95,11 @@ export function WhatIsDP({
             ref={titleRef}
             className="h-screen snap-start flex flex-col justify-center p-12"
           >
-            <h1 className="text-6xl font-bold mb-4">Privacy in Practice</h1>
-            <h2 className="text-2xl font-semibold mb-2">
-              The Feasibility of Differential Privacy for Telemetry Analysis
-            </h2>
-            <div className="mb-8">
-              <p className="text-primary-gray">
-                Tyler Kurpanek & Chris Lum & Bradley Nathanson & Trey Scheid
-              </p>
-              <p className="text-primary-gray">Mentor: Yu-Xiang Wang</p>
-              <p className="text-primary-gray mt-4">
-                <Link
-                  href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-accent transition-colors cursor-pointer decoration-dotted underline"
-                >
-                  Report
-                </Link>{" "}
-                |{" "}
-                <Link
-                  href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-accent transition-colors cursor-pointer decoration-dotted underline"
-                >
-                  Poster
-                </Link>{" "}
-                |{" "}
-                <Link
-                  href="https://github.com/Trey-Scheid/privacy-in-practice"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-accent transition-colors cursor-pointer decoration-dotted underline"
-                >
-                  Github
-                </Link>
-              </p>
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold mb-2">Table of Contents</h2>
-              <ul className="space-y-2">
-                <li
-                  onClick={() => scrollToSection(whatIsDPRef)}
-                  className="hover:text-accent transition-colors cursor-pointer"
-                >
-                  1. What is Differential Privacy?
-                </li>
-                <li className="hover:text-accent transition-colors cursor-pointer">
-                  2. How We Applied DP
-                </li>
-                <li className="hover:text-accent transition-colors cursor-pointer">
-                  3. The Feasibility of Applying DP
-                </li>
-              </ul>
-            </div>
-            <div className="mt-36">
-              <h2 className="text-xl font-semibold mb-2 text-accent">
-                ↓ What is Differential Privacy? ↓
-              </h2>
-            </div>
+            <Hero
+              titleRef={titleRef}
+              scrollToSection={scrollToSection}
+              whatIsDPRef={whatIsDPRef}
+            />
           </section>
           {/* First Paragraph */}
           <section
@@ -275,16 +221,33 @@ export function WhatIsDP({
               >
                 <div className="bg-primary-gray/5 p-6 rounded-lg border border-primary-gray/10">
                   <h3 className="text-lg font-semibold mb-4">
-                    <span><InlineMath math="\varepsilon\text{-}\delta" /></span> Differential
-                    Privacy
+                    <span>
+                      <InlineMath math="\varepsilon\text{-}\delta" />
+                    </span>{" "}
+                    Differential Privacy
                   </h3>
                   <p className="text-lg mb-4">
-                    A randomized algorithm <span><InlineMath math="\mathcal{M}" /></span>{" "}
-                    satisfies <span><InlineMath math="(\varepsilon,\delta)" /></span>
+                    A randomized algorithm{" "}
+                    <span>
+                      <InlineMath math="\mathcal{M}" />
+                    </span>{" "}
+                    satisfies{" "}
+                    <span>
+                      <InlineMath math="(\varepsilon,\delta)" />
+                    </span>
                     -differential privacy if for all neighboring datasets{" "}
-                    <span><InlineMath math="\mathcal{D}" /></span> and{" "}
-                    <span><InlineMath math="\mathcal{D}'" /></span> and for all possible
-                    outputs <span><InlineMath math="\mathcal{S}" /></span>:
+                    <span>
+                      <InlineMath math="\mathcal{D}" />
+                    </span>{" "}
+                    and{" "}
+                    <span>
+                      <InlineMath math="\mathcal{D}'" />
+                    </span>{" "}
+                    and for all possible outputs{" "}
+                    <span>
+                      <InlineMath math="\mathcal{S}" />
+                    </span>
+                    :
                   </p>
                   <div className="bg-primary-gray/10 p-2 rounded-lg my-6 flex justify-center">
                     <BlockMath math="P(\mathcal{M}(\mathcal{D}) \in \mathcal{S}) \leq e^\varepsilon \cdot P(\mathcal{M}(\mathcal{D}') \in \mathcal{S}) + \delta" />
@@ -292,13 +255,18 @@ export function WhatIsDP({
                   <p className="text-lg">Where:</p>
                   <ul className="list-disc ml-6 mt-2 space-y-2">
                     <li>
-                      <span><InlineMath math="\varepsilon" /></span> (epsilon) controls the
-                      privacy budget - smaller values mean stronger privacy and
-                      more noise
+                      <span>
+                        <InlineMath math="\varepsilon" />
+                      </span>{" "}
+                      (epsilon) controls the privacy budget - smaller values
+                      mean stronger privacy and more noise
                     </li>
                     <li>
-                      <span><InlineMath math="\delta" /></span> (delta) is the probability of
-                      the privacy guarantee failing
+                      <span>
+                        <InlineMath math="\delta" />
+                      </span>{" "}
+                      (delta) is the probability of the privacy guarantee
+                      failing
                     </li>
                   </ul>
                   <div className="mt-4 space-y-4">
@@ -315,7 +283,9 @@ export function WhatIsDP({
                                 : "text-primary-gray hover:text-accent"
                             } transition-colors`}
                           >
-                            <span><InlineMath math={`\\varepsilon=${epsilon}`} /></span>
+                            <span>
+                              <InlineMath math={`\\varepsilon=${epsilon}`} />
+                            </span>
                           </span>
                         ))}
                       </div>
