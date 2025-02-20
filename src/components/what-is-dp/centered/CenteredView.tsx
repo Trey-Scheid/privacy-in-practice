@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { HistogramViz } from "./histogram/index";
-
+import { HistogramViz } from "./histogram/HistogramViz";
+import { ConfidenceViz } from "./confidence/ConfidenceViz";
 export function CenteredView() {
   return (
     <div className="bg-primary-white">
@@ -77,6 +77,23 @@ export function CenteredView() {
       {/* Interactive Visualization Section */}
       <section className="h-screen snap-start flex flex-col justify-center p-12">
         <HistogramViz />
+      </section>
+
+      {/* Logit Viz Section */}
+      <section className="h-screen snap-start flex flex-col justify-center items-center p-12">
+        <div className="prose prose-lg max-w-3xl mx-auto text-center">
+          <p className="text-xl">
+            Differential Privacy can be used for more complex queries too, such
+            as training a machine learning model. A data scientist may do this
+            because they don&apos;t want to reveal if someone was in a training
+            set. The question then becomes, where can we effectively add noise
+            in order to preserve privacy but still get an accurate model?
+          </p>
+        </div>
+      </section>
+
+      <section className="h-screen snap-start flex flex-col justify-center p-12">
+        <ConfidenceViz />
       </section>
     </div>
   );

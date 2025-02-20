@@ -2,9 +2,7 @@
 
 import { useRef } from "react";
 import { useInView } from "react-intersection-observer";
-import { SplitView } from "../../components/what-is-dp/split/SplitView";
 import { NavBar } from "../../components/ui/NavBar";
-import { CenteredView } from "../../components/what-is-dp/centered/CenteredView";
 import { WhatIsDP } from "@/components/what-is-dp/what-is-dp";
 
 export default function Home() {

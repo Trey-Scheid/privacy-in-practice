@@ -34,7 +34,7 @@ export function HistogramViz() {
   };
 
   return (
-    <section className="h-screen snap-start flex flex-col justify-center p-12">
+    <>
       <div className="prose prose-lg max-w-3xl mx-auto mb-12 text-center">
         <p className="text-xl">
           Another simple way to privatize data is to add noise to each of the
@@ -137,6 +137,6 @@ export function HistogramViz() {
         {/* Right side - Chart */}
         <Chart data={data} />
       </div>
-    </section>
+    </>
   );
 } 
