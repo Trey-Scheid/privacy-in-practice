@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useInView } from "react-intersection-observer";
 import "katex/dist/katex.min.css";
 import { InlineMath, BlockMath } from "react-katex";
+import * as d3 from "d3";
 
 function addNoiseToAscii(ascii: string, noiseLevel: number = 0.2) {
   return ascii
@@ -47,6 +48,17 @@ function MonaLisa({
   );
 }
 
+interface DataRow {
+  raw: number;
+  noise: number;
+}
+
+interface ChartRef extends HTMLDivElement {
+  x: d3.ScaleBand<string>;
+  y: d3.ScaleLinear<number, number>;
+  innerHeight: number;
+}
+
 export default function Home() {
   const [monaLisa, setMonaLisa] = useState("");
   const [noiseLevel, setNoiseLevel] = useState(0);
@@ -57,6 +69,19 @@ export default function Home() {
     threshold: 0.5,
     triggerOnce: true,
   });
+  const { ref: titleRef, inView: isTitleVisible } = useInView({
+    threshold: 0.5,
+  });
+
+  // Refs for sections
+  const whatIsDPRef = useRef<HTMLElement>(null);
+  const chartRef = useRef<ChartRef>(null);
+
+  const scrollToSection = (ref: React.RefObject<HTMLElement | null>) => {
+    if (ref.current) {
+      ref.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   // Convert epsilon to probability (this is a simplified conversion for demonstration)
   const epsilonToProbability = (epsilon: number) => {
@@ -116,6 +141,189 @@ export default function Home() {
     setNoiseLevel(parseFloat(e.target.value));
   };
 
+  const [epsilon, setEpsilon] = useState(1);
+  const [data, setData] = useState<DataRow[]>([
+    { raw: 10, noise: 0 },
+    { raw: 20, noise: 0 },
+    { raw: 15, noise: 0 },
+  ]);
+
+  // Generate Laplace noise
+  const generateLaplaceNoise = (scale: number) => {
+    const u = Math.random() - 0.5;
+    return -scale * Math.sign(u) * Math.log(1 - 2 * Math.abs(u));
+  };
+
+  // Update noise when epsilon changes
+  useEffect(() => {
+    setData(
+      data.map((row) => ({
+        ...row,
+        noise: generateLaplaceNoise(1 / epsilon),
+      }))
+    );
+  }, [epsilon]);
+
+  // Update D3 visualization
+  const updateChart = () => {
+    if (!chartRef.current) return;
+
+    // Clear previous chart
+    d3.select(chartRef.current).selectAll("*").remove();
+
+    // Chart dimensions
+    const width = chartRef.current.clientWidth;
+    const height = 400;
+    const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+
+    // Create SVG
+    const svg = d3
+      .select(chartRef.current)
+      .append("svg")
+      .attr("width", width)
+      .attr("height", height)
+      .style("overflow", "visible"); // Allow content to overflow
+
+    const g = svg
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`)
+      .style("overflow", "visible"); // Allow content to overflow
+
+    // Scales
+    const x = d3
+      .scaleBand()
+      .domain(data.map((_, i) => `Bar ${i + 1}`))
+      .range([0, innerWidth])
+      .padding(0.3);
+
+    const y = d3.scaleLinear().domain([0, 30]).range([innerHeight, 0]);
+
+    // Add axes
+    g.append("g")
+      .attr("transform", `translate(0,${innerHeight})`)
+      .call(d3.axisBottom(x));
+
+    g.append("g").call(d3.axisLeft(y));
+
+    // Create initial bars
+    data.forEach((d, i) => {
+      // Raw data bars
+      g.append("rect")
+        .attr("class", "bar-raw")
+        .attr("x", x(`Bar ${i + 1}`) || 0)
+        .attr("width", x.bandwidth())
+        .attr("y", y(d.raw))
+        .attr("height", innerHeight - y(d.raw))
+        .attr("fill", "rgba(118, 171, 174, 0.5)");
+
+      // Private data bars
+      g.append("rect")
+        .attr("class", "bar-private")
+        .attr("x", x(`Bar ${i + 1}`) || 0)
+        .attr("width", x.bandwidth())
+        .attr("y", Math.min(y(0), y(d.raw + d.noise))) // Handle negative values
+        .attr("height", Math.abs(y(d.raw + d.noise) - y(0))) // Correct height for both positive and negative values
+        .attr("fill", "none")
+        .attr("stroke", "#76ABAE")
+        .attr("stroke-width", 2);
+    });
+
+    // Add legend
+    const legend = svg
+      .append("g")
+      .attr(
+        "transform",
+        `translate(${width - margin.right - 100}, ${margin.top})`
+      );
+
+    legend
+      .append("rect")
+      .attr("x", 0)
+      .attr("width", 15)
+      .attr("height", 15)
+      .attr("fill", "rgba(118, 171, 174, 0.5)");
+
+    legend
+      .append("rect")
+      .attr("x", 0)
+      .attr("y", 20)
+      .attr("width", 15)
+      .attr("height", 15)
+      .attr("fill", "none")
+      .attr("stroke", "#76ABAE")
+      .attr("stroke-width", 2);
+
+    legend
+      .append("text")
+      .attr("x", 20)
+      .attr("y", 12)
+      .text("Raw Data")
+      .attr("class", "text-sm");
+
+    legend
+      .append("text")
+      .attr("x", 20)
+      .attr("y", 32)
+      .text("Private Data")
+      .attr("class", "text-sm");
+
+    // Store scales for updates
+    chartRef.current.x = x;
+    chartRef.current.y = y;
+    chartRef.current.innerHeight = innerHeight;
+  };
+
+  // Initial chart creation
+  useEffect(() => {
+    updateChart();
+  }, []); // Empty dependency array means this only runs once
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      updateChart();
+      // Update bars with current data after resize
+      if (!chartRef.current) return;
+      const { x, y, innerHeight } = chartRef.current;
+      const g = d3.select(chartRef.current).select("svg g");
+      g.selectAll(".bar-private")
+        .data(data)
+        .attr("x", (d, i) => x(`Bar ${i + 1}`) || 0)
+        .attr("width", x.bandwidth())
+        .attr("y", (d) => Math.min(y(0), y(d.raw + d.noise)))
+        .attr("height", (d) => Math.abs(y(d.raw + d.noise) - y(0)));
+      
+      g.selectAll(".bar-raw")
+        .data(data)
+        .attr("x", (d, i) => x(`Bar ${i + 1}`) || 0)
+        .attr("width", x.bandwidth())
+        .attr("y", d => y(d.raw))
+        .attr("height", d => innerHeight - y(d.raw));
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [data]);
+
+  // Update bars when data changes
+  useEffect(() => {
+    if (!chartRef.current) return;
+    const { x, y, innerHeight } = chartRef.current;
+    const g = d3.select(chartRef.current).select("svg g");
+
+    g.selectAll(".bar-private")
+      .data(data)
+      .transition()
+      .duration(750)
+      .ease(d3.easeCubicOut)
+      .attr("x", (d, i) => x(`Bar ${i + 1}`) || 0)
+      .attr("width", x.bandwidth())
+      .attr("y", (d) => Math.min(y(0), y(d.raw + d.noise)))
+      .attr("height", (d) => Math.abs(y(d.raw + d.noise) - y(0)));
+  }, [data]);
+
   useEffect(() => {
     fetch("/monalisa.txt")
       .then((response) => response.text())
@@ -128,12 +336,42 @@ export default function Home() {
 
   return (
     <div className="h-screen overflow-y-scroll snap-y snap-mandatory bg-primary-white text-primary-black">
+      {/* Navigation Bar */}
+      <div
+        className={`fixed top-0 left-0 right-0 z-50 bg-primary-white border-b border-primary-gray/10 transition-all duration-300 ${
+          !isTitleVisible
+            ? "translate-y-0 opacity-100"
+            : "translate-y-[-100%] opacity-0"
+        }`}
+      >
+        <nav className="flex justify-between items-center px-12 py-4">
+          <h3 className="text-lg font-semibold">Privacy in Practice</h3>
+          <ul className="flex gap-8">
+            <li
+              onClick={() => scrollToSection(whatIsDPRef)}
+              className="text-accent hover:text-primary-gray transition-colors cursor-pointer"
+            >
+              1. What is Differential Privacy?
+            </li>
+            <li className="hover:text-accent transition-colors cursor-pointer">
+              2. How We Applied DP
+            </li>
+            <li className="hover:text-accent transition-colors cursor-pointer">
+              3. The Feasibility of Applying DP
+            </li>
+          </ul>
+        </nav>
+      </div>
+
       {/* Split view content */}
       <div className="flex">
         {/* Left side - content */}
         <div className="w-1/2">
           {/* Title Section */}
-          <section className="h-screen snap-start flex flex-col justify-center p-12">
+          <section
+            ref={titleRef}
+            className="h-screen snap-start flex flex-col justify-center p-12"
+          >
             <h1 className="text-6xl font-bold mb-4">Privacy in Practice</h1>
             <h2 className="text-2xl font-semibold mb-2">
               The Feasibility of Differential Privacy for Telemetry Analysis
@@ -173,11 +411,12 @@ export default function Home() {
               </p>
             </div>
             <div>
-              <h2 className="text-xl font-semibold mb-2">
-                Table of Contents
-              </h2>
+              <h2 className="text-xl font-semibold mb-2">Table of Contents</h2>
               <ul className="space-y-2">
-                <li className="hover:text-accent transition-colors cursor-pointer">
+                <li
+                  onClick={() => scrollToSection(whatIsDPRef)}
+                  className="hover:text-accent transition-colors cursor-pointer"
+                >
                   1. What is Differential Privacy?
                 </li>
                 <li className="hover:text-accent transition-colors cursor-pointer">
@@ -196,7 +435,10 @@ export default function Home() {
           </section>
 
           {/* First Paragraph */}
-          <section className="h-screen snap-start flex flex-col justify-center p-12">
+          <section
+            ref={whatIsDPRef}
+            className="h-screen snap-start flex flex-col justify-center p-12"
+          >
             <div className="prose prose-lg max-w-none">
               <h1 className="text-4xl font-bold mb-4">
                 What is Differential Privacy?
@@ -234,10 +476,10 @@ export default function Home() {
             <div className="prose prose-lg max-w-none">
               <p className="text-xl">...while maintaining the big picture!</p>
               <p className="text-xl mt-6">
-                But what just happened? We added noise to the image of Mona
-                Lisa by probabilistically flipping each pixel. This way, you
-                can still see the big picture, but the individual pixels&apos;
-                have some deniability as to what their original data was
+                But what just happened? We added noise to the image of Mona Lisa
+                by probabilistically flipping each pixel. This way, you can
+                still see the big picture, but the individual pixels&apos; have
+                some deniability as to what their original data was
               </p>
               <p className="text-xl mt-6">Try for yourself!</p>
               <div className="mt-8 flex items-center gap-4">
@@ -296,9 +538,7 @@ export default function Home() {
                 private algorithm should be similar. This paves the way for a{" "}
                 <span
                   className="text-accent hover:text-primary-gray cursor-pointer transition-colors underline decoration-dotted"
-                  onClick={() =>
-                    setShowTechnicalDetails(!showTechnicalDetails)
-                  }
+                  onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
                 >
                   mathematical measure of privacy
                 </span>{" "}
@@ -313,8 +553,8 @@ export default function Home() {
               >
                 <div className="bg-primary-gray/5 p-6 rounded-lg border border-primary-gray/10">
                   <h3 className="text-lg font-semibold mb-4">
-                    <InlineMath math="\varepsilon\text{-}\delta" />{" "}
-                    Differential Privacy
+                    <InlineMath math="\varepsilon\text{-}\delta" /> Differential
+                    Privacy
                   </h3>
                   <p className="text-lg mb-4">
                     A randomized algorithm <InlineMath math="\mathcal{M}" />{" "}
@@ -331,12 +571,12 @@ export default function Home() {
                   <ul className="list-disc ml-6 mt-2 space-y-2">
                     <li>
                       <InlineMath math="\varepsilon" /> (epsilon) controls the
-                      privacy budget - smaller values mean stronger privacy
-                      and more noise
+                      privacy budget - smaller values mean stronger privacy and
+                      more noise
                     </li>
                     <li>
-                      <InlineMath math="\delta" /> (delta) is the probability
-                      of the privacy guarantee failing
+                      <InlineMath math="\delta" /> (delta) is the probability of
+                      the privacy guarantee failing
                     </li>
                   </ul>
                   <div className="mt-4 space-y-4">
@@ -394,9 +634,139 @@ export default function Home() {
         <section className="h-screen snap-start flex flex-col justify-center items-center p-12">
           <div className="prose prose-lg max-w-3xl mx-auto text-center">
             <p className="text-xl">
-              Now that we understand what Differential Privacy is and how it works,
-              let's explore how we can apply it to real-world data analysis...
+              What&apos;s important to note is that Differential Privacy is a
+              property of an algorithm, not a property of the data. Another
+              intuitive{" "}
+              <a
+                href="https://en.wikipedia.org/wiki/Privacy-enhancing_technologies"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-accent cursor-pointer transition-colors underline decoration-dotted"
+              >
+                Privacy-Enhancing Technology
+              </a>{" "}
+              might be to anonymize data by removing personally identifiable
+              information, but this isn&apos;t enough to guarantee privacy on
+              its own.
             </p>
+          </div>
+        </section>
+
+        {/* Seventh Paragraph - Full Width Centered */}
+        <section className="h-screen snap-start flex justify-between items-center p-12 mx-12">
+          <div className="w-1/2 prose prose-lg max-w-none">
+            <p className="text-xl">
+              In 2006, Netflix created the{" "}
+              <a
+                href="https://en.wikipedia.org/wiki/Netflix_Prize"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-accent cursor-pointer transition-colors underline decoration-dotted"
+              >
+                Netflix Prize
+              </a>
+              , a competition to improve Netflix&apos;s movie recommendation
+              algorithm. The dataset used in the competition contained 100
+              million ratings from 480,000 users on 17,770 movies, anonymized by
+              removing personally identifiable information. One year later,
+              using iMDB ratings as a reference, two researchers from UT Austin
+              were able to{" "}
+              <a
+                href="https://arxiv.org/abs/cs/0610105"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-accent cursor-pointer transition-colors underline decoration-dotted"
+              >
+                deanonymize the 99% of the users in the dataset
+              </a>{" "}
+            </p>
+          </div>
+          <div className="w-1/2 flex justify-center items-center">
+            <img
+              src="/netflix.svg"
+              alt="Netflix Logo"
+              className="w-2/3 h-auto"
+            />
+          </div>
+        </section>
+
+        {/* Eighth Paragraph - Interactive Visualization */}
+        <section className="h-screen snap-start flex flex-col justify-center p-12">
+          <div className="prose prose-lg max-w-3xl mx-auto mb-12 text-center">
+            <p className="text-xl">
+              Another simple way to privatize data is to add noise to each of
+              the values you plan to release. Here, we&apos;re releasing the raw
+              counts of each category by adding noise to each of the counts.
+            </p>
+          </div>
+          <div className="flex justify-between items-start gap-8">
+            {/* Left side - Table */}
+            <div className="w-1/2">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr>
+                    <th className="p-4 text-left border-b border-primary-gray/10">
+                      Raw Data
+                    </th>
+                    <th className="p-4 text-left border-b border-primary-gray/10">
+                      <div className="flex items-center gap-2">
+                        <div>Introduce Noise</div>
+                        <div className="relative group">
+                          <div className="w-5 h-5 rounded-full bg-primary-gray/10 flex items-center justify-center text-primary-gray cursor-help">
+                            ?
+                          </div>
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-primary-gray text-primary-white rounded-lg text-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                            The noise follows a Laplace distribution with scale
+                            proportional to 1/ε. This mechanism satisfies (ε,
+                            0)-differential privacy, meaning that the
+                            probability of the privacy guarantee failing is 0.
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-2">
+                        <input
+                          type="range"
+                          min="0.1"
+                          max="2"
+                          step="0.1"
+                          value={epsilon}
+                          onChange={(e) =>
+                            setEpsilon(parseFloat(e.target.value))
+                          }
+                          className="w-full h-2 bg-primary-gray rounded-lg appearance-none cursor-pointer accent-accent"
+                        />
+                        <div className="text-sm text-primary-gray mt-1">
+                          ε = {epsilon.toFixed(1)}
+                        </div>
+                      </div>
+                    </th>
+                    <th className="p-4 text-left border-b border-primary-gray/10">
+                      Privatized Data
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.map((row, i) => (
+                    <tr key={i}>
+                      <td className="p-4 border-b border-primary-gray/10">
+                        {row.raw}
+                      </td>
+                      <td className="p-4 border-b border-primary-gray/10">
+                        {row.noise.toFixed(2)}
+                      </td>
+                      <td className="p-4 border-b border-primary-gray/10">
+                        {(row.raw + row.noise).toFixed(2)}{" "}
+                        {row.raw + row.noise < 0 || row.raw + row.noise > 30
+                          ? "(!)"
+                          : ""}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {/* Right side - Chart */}
+            <div className="w-1/2" ref={chartRef} />
           </div>
         </section>
       </div>
