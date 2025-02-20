@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import * as d3 from "d3";
 
 interface DataRow {
@@ -26,7 +26,7 @@ export function Chart({ data }: ChartProps) {
   };
 
   // Update D3 visualization
-  const updateChart = () => {
+  const updateChart = useCallback(() => {
     if (!chartRef.current) return;
 
     // Clear previous chart
@@ -137,7 +137,7 @@ export function Chart({ data }: ChartProps) {
     chartRef.current.x = x;
     chartRef.current.y = y;
     chartRef.current.innerHeight = innerHeight;
-  };
+  }, [data]);
 
   // Initial chart creation and handle window resize
   useEffect(() => {
@@ -149,7 +149,7 @@ export function Chart({ data }: ChartProps) {
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [data]);
+  }, [updateChart]);
 
   return <div className="w-1/2" ref={chartRef} />;
 } 

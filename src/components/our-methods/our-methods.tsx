@@ -17,13 +17,13 @@ function OurMethods({ methodsRef }: OurMethodsProps) {
             How We Applied DP
           </h1>
           <p className="text-xl text-primary-gray">
-            FILLER TEXT Telemetry data is collected from the user's device and
+            FILLER TEXT Telemetry data is collected from the user&apos;s device and
             sent to the server. We apply DP to the telemetry data to protect the
-            user's privacy. FILLER TEXT Telemetry data is collected from the user's
+            user&apos;s privacy. FILLER TEXT Telemetry data is collected from the user&apos;s
             device and sent to the server. We apply DP to the telemetry data to
-            protect the user's privacy. FILLER TEXT Telemetry data is collected
-            from the user's device and sent to the server. We apply DP to the
-            telemetry data to protect the user's privacy.
+            protect the user&apos;s privacy. FILLER TEXT Telemetry data is collected
+            from the user&apos;s device and sent to the server. We apply DP to the
+            telemetry data to protect the user&apos;s privacy.
           </p>
         </div>
       </section>
