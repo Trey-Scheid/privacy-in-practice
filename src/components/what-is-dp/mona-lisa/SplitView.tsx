@@ -5,19 +5,19 @@ import { InlineMath, BlockMath } from "react-katex";
 import { MonaLisa } from "./MonaLisa";
 import { Hero } from "@/components/hero/Hero";
 
-interface WhatIsDPProps {
+interface SplitViewProps {
   monaLisa: string;
-  whatIsDPRef: React.RefObject<HTMLElement | null>;
+  SplitViewRef: React.RefObject<HTMLElement | null>;
   titleRef: (node?: Element | null | undefined) => void;
   scrollToSection: (ref: React.RefObject<HTMLElement | null>) => void;
 }
 
-export function WhatIsDP({
+export function SplitView({
   monaLisa,
-  whatIsDPRef,
+  SplitViewRef,
   titleRef,
   scrollToSection,
-}: WhatIsDPProps) {
+}: SplitViewProps) {
   const [noiseLevel, setNoiseLevel] = useState(0);
   const [showOriginal, setShowOriginal] = useState(false);
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
@@ -98,12 +98,12 @@ export function WhatIsDP({
             <Hero
               titleRef={titleRef}
               scrollToSection={scrollToSection}
-              whatIsDPRef={whatIsDPRef}
+              whatIsDPRef={SplitViewRef}
             />
           </section>
           {/* First Paragraph */}
           <section
-            ref={whatIsDPRef}
+            ref={SplitViewRef}
             className="h-screen snap-start flex flex-col justify-center p-12"
           >
             <div className="prose prose-lg max-w-none">
