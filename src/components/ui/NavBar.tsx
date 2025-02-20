@@ -2,12 +2,14 @@ interface NavBarProps {
   isTitleVisible: boolean;
   scrollToSection: (ref: React.RefObject<HTMLElement | null>) => void;
   whatIsDPRef: React.RefObject<HTMLElement | null>;
+  methodsRef: React.RefObject<HTMLElement | null>;
 }
 
 export function NavBar({
   isTitleVisible,
   scrollToSection,
   whatIsDPRef,
+  methodsRef,
 }: NavBarProps) {
   return (
     <div
@@ -22,11 +24,14 @@ export function NavBar({
         <ul className="flex gap-8">
           <li
             onClick={() => scrollToSection(whatIsDPRef)}
-            className="text-accent hover:text-primary-gray transition-colors cursor-pointer"
+            className="hover:text-accent transition-colors cursor-pointer"
           >
             1. What is Differential Privacy?
           </li>
-          <li className="hover:text-accent transition-colors cursor-pointer">
+          <li
+            onClick={() => scrollToSection(methodsRef)}
+            className="hover:text-accent transition-colors cursor-pointer"
+          >
             2. How We Applied DP
           </li>
           <li className="hover:text-accent transition-colors cursor-pointer">

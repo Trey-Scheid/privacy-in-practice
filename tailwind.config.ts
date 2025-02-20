@@ -15,6 +15,7 @@ const config: Config = {
           black: '#222831',
         },
         accent: '#76ABAE',
+        'accent-light': '#B2D0D2',
       },
     },
   },

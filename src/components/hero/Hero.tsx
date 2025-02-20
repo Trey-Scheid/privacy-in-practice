@@ -10,7 +10,7 @@ export function Hero({ titleRef, scrollToSection, whatIsDPRef }: HeroProps) {
   return (
     <section
       ref={titleRef}
-      className="h-screen snap-start flex flex-col justify-center"
+      className="h-screen snap-start flex flex-col justify-center p-12"
     >
       <h1 className="text-6xl font-bold mb-4">Privacy in Practice</h1>
       <h2 className="text-2xl font-semibold mb-2">
