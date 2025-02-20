@@ -6,18 +6,17 @@ import { MonaLisa } from "./MonaLisa";
 import { Hero } from "@/components/hero/Hero";
 
 interface SplitViewProps {
-  monaLisa: string;
   SplitViewRef: React.RefObject<HTMLElement | null>;
   titleRef: (node?: Element | null | undefined) => void;
   scrollToSection: (ref: React.RefObject<HTMLElement | null>) => void;
 }
 
 export function SplitView({
-  monaLisa,
   SplitViewRef,
   titleRef,
   scrollToSection,
 }: SplitViewProps) {
+  const [monaLisa, setMonaLisa] = useState("");
   const [noiseLevel, setNoiseLevel] = useState(0);
   const [showOriginal, setShowOriginal] = useState(false);
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
@@ -26,6 +25,16 @@ export function SplitView({
     threshold: 0.5,
     triggerOnce: true,
   });
+
+  useEffect(() => {
+    fetch("/monalisa.txt")
+      .then((response) => response.text())
+      .then((content) => setMonaLisa(content))
+      .catch((error) => {
+        console.error("Failed to load Mona Lisa:", error);
+        setMonaLisa("");
+      });
+  }, []);
 
   // Convert epsilon to probability
   const epsilonToProbability = (epsilon: number) => {
