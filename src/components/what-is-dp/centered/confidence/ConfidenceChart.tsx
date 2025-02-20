@@ -214,6 +214,7 @@ export function ConfidenceChart() {
         return value > 0.05 ? "white" : "#2C3333";
       })
       .tween("text", function (d) {
+        /* eslint-disable-next-line @typescript-eslint/no-this-alias */
         const node = this;
         const currentValue = parseFloat(node.textContent || "0") / 100;
         const targetValue = isPrivate ? d.private : d.nonPrivate;
