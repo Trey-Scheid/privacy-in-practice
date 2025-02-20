@@ -64,6 +64,9 @@
   * Optimize images and assets
   * Implement proper caching
 
+- [ ] Add mobile support
+  * Make mona lisa split screen vertically on mobile
+
 - [ ] Documentation
   * Create README.md
   * Add setup instructions
