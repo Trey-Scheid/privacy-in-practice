@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useInView } from "react-intersection-observer";
 import "katex/dist/katex.min.css";
 import { InlineMath, BlockMath } from "react-katex";
+import Image from "next/image";
 import * as d3 from "d3";
 
 function addNoiseToAscii(ascii: string, noiseLevel: number = 0.2) {
@@ -310,7 +311,7 @@ export default function Home() {
   // Update bars when data changes
   useEffect(() => {
     if (!chartRef.current) return;
-    const { x, y, innerHeight } = chartRef.current;
+    const { x, y } = chartRef.current;
     const g = d3.select(chartRef.current).select("svg g");
 
     g.selectAll(".bar-private")
@@ -444,7 +445,7 @@ export default function Home() {
                 What is Differential Privacy?
               </h1>
               <p className="text-xl">
-                In today's data-driven world, the need to protect individual
+                In today&apos;s data-driven world, the need to protect individual
                 privacy while maintaining the utility of data analysis has
                 become increasingly crucial. Differential Privacy (DP) emerges
                 as a mathematical framework that provides strong privacy
@@ -458,7 +459,7 @@ export default function Home() {
             <div className="prose prose-lg max-w-none">
               <p className="text-xl">
                 At its core, differential privacy ensures that the presence or
-                absence of any individual's data in a dataset does not
+                absence of any individual&apos;s data in a dataset does not
                 significantly affect the results of any analysis performed on
                 that dataset. This is achieved by carefully introducing random
                 noise into the computation process, making it virtually
@@ -682,7 +683,7 @@ export default function Home() {
             </p>
           </div>
           <div className="w-1/2 flex justify-center items-center">
-            <img
+            <Image
               src="/netflix.svg"
               alt="Netflix Logo"
               className="w-2/3 h-auto"
