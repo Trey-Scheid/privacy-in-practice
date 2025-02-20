@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import * as d3 from "d3";
 import { WhatIsDP } from "../../components/what-is-dp/mona-lisa/SplitView";
+import { NavBar } from "../../components/ui/NavBar";
 
 function addNoiseToAscii(ascii: string, noiseLevel: number = 0.2) {
   return ascii
@@ -285,31 +286,11 @@ export default function Home() {
   return (
     <div className="h-screen overflow-y-scroll snap-y snap-mandatory bg-primary-white text-primary-black">
       {/* Navigation Bar */}
-      <div
-        className={`fixed top-0 left-0 right-0 z-50 bg-primary-white border-b border-primary-gray/10 transition-all duration-300 ${
-          !isTitleVisible
-            ? "translate-y-0 opacity-100"
-            : "translate-y-[-100%] opacity-0"
-        }`}
-      >
-        <nav className="flex justify-between items-center px-12 py-4">
-          <h3 className="text-lg font-semibold">Privacy in Practice</h3>
-          <ul className="flex gap-8">
-            <li
-              onClick={() => scrollToSection(whatIsDPRef)}
-              className="text-accent hover:text-primary-gray transition-colors cursor-pointer"
-            >
-              1. What is Differential Privacy?
-            </li>
-            <li className="hover:text-accent transition-colors cursor-pointer">
-              2. How We Applied DP
-            </li>
-            <li className="hover:text-accent transition-colors cursor-pointer">
-              3. The Feasibility of Applying DP
-            </li>
-          </ul>
-        </nav>
-      </div>
+      <NavBar
+        isTitleVisible={isTitleVisible}
+        scrollToSection={scrollToSection}
+        whatIsDPRef={whatIsDPRef}
+      />
 
       {/* What is DP Section */}
       <WhatIsDP
