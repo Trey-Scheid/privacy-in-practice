@@ -5,6 +5,7 @@ import { useInView } from "react-intersection-observer";
 import "katex/dist/katex.min.css";
 import { InlineMath, BlockMath } from "react-katex";
 import Image from "next/image";
+import Link from "next/link";
 import * as d3 from "d3";
 
 function addNoiseToAscii(ascii: string, noiseLevel: number = 0.2) {
@@ -143,11 +144,13 @@ export default function Home() {
   };
 
   const [epsilon, setEpsilon] = useState(1);
-  const [data, setData] = useState<DataRow[]>([
-    { raw: 10, noise: 0 },
-    { raw: 20, noise: 0 },
-    { raw: 15, noise: 0 },
-  ]);
+  const [scale, setScale] = useState(1);
+  const baseData = [
+    { raw: 4, noise: 0 },
+    { raw: 8, noise: 0 },
+    { raw: 6, noise: 0 },
+  ];
+  const [data, setData] = useState<DataRow[]>(baseData);
 
   // Generate Laplace noise
   const generateLaplaceNoise = (scale: number) => {
@@ -155,15 +158,21 @@ export default function Home() {
     return -scale * Math.sign(u) * Math.log(1 - 2 * Math.abs(u));
   };
 
-  // Update noise when epsilon changes
+  // Update data when scale changes
   useEffect(() => {
     setData(
-      data.map((row) => ({
-        ...row,
-        noise: generateLaplaceNoise(1 / epsilon),
+      baseData.map((row) => ({
+        raw: row.raw * scale,
+        noise: generateLaplaceNoise(1 / (epsilon / 3)),
       }))
     );
-  }, [epsilon]);
+  }, [scale, epsilon]);
+
+  // Get max value for y-scale
+  const getYDomain = () => {
+    const maxRaw = Math.max(...data.map((d) => d.raw));
+    return maxRaw * 1.5; // Add 20% padding
+  };
 
   // Update D3 visualization
   const updateChart = () => {
@@ -185,12 +194,12 @@ export default function Home() {
       .append("svg")
       .attr("width", width)
       .attr("height", height)
-      .style("overflow", "visible"); // Allow content to overflow
+      .style("overflow", "visible");
 
     const g = svg
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`)
-      .style("overflow", "visible"); // Allow content to overflow
+      .style("overflow", "visible");
 
     // Scales
     const x = d3
@@ -199,7 +208,10 @@ export default function Home() {
       .range([0, innerWidth])
       .padding(0.3);
 
-    const y = d3.scaleLinear().domain([0, 30]).range([innerHeight, 0]);
+    const y = d3
+      .scaleLinear()
+      .domain([0, getYDomain()])
+      .range([innerHeight, 0]);
 
     // Add axes
     g.append("g")
@@ -295,22 +307,23 @@ export default function Home() {
         .attr("width", x.bandwidth())
         .attr("y", (d) => Math.min(y(0), y(d.raw + d.noise)))
         .attr("height", (d) => Math.abs(y(d.raw + d.noise) - y(0)));
-      
+
       g.selectAll(".bar-raw")
         .data(data)
         .attr("x", (d, i) => x(`Bar ${i + 1}`) || 0)
         .attr("width", x.bandwidth())
-        .attr("y", d => y(d.raw))
-        .attr("height", d => innerHeight - y(d.raw));
+        .attr("y", (d) => y(d.raw))
+        .attr("height", (d) => innerHeight - y(d.raw));
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [data]);
 
   // Update bars when data changes
   useEffect(() => {
     if (!chartRef.current) return;
+    updateChart();
     const { x, y } = chartRef.current;
     const g = d3.select(chartRef.current).select("svg g");
 
@@ -383,32 +396,32 @@ export default function Home() {
               </p>
               <p className="text-primary-gray">Mentor: Yu-Xiang Wang</p>
               <p className="text-primary-gray mt-4">
-                <a
+                <Link
                   href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-accent transition-colors cursor-pointer decoration-dotted underline"
                 >
                   Report
-                </a>{" "}
+                </Link>{" "}
                 |{" "}
-                <a
+                <Link
                   href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-accent transition-colors cursor-pointer decoration-dotted underline"
                 >
                   Poster
-                </a>{" "}
+                </Link>{" "}
                 |{" "}
-                <a
+                <Link
                   href="https://github.com/Trey-Scheid/privacy-in-practice"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-accent transition-colors cursor-pointer decoration-dotted underline"
                 >
                   Github
-                </a>
+                </Link>
               </p>
             </div>
             <div>
@@ -445,11 +458,12 @@ export default function Home() {
                 What is Differential Privacy?
               </h1>
               <p className="text-xl">
-                In today&apos;s data-driven world, the need to protect individual
-                privacy while maintaining the utility of data analysis has
-                become increasingly crucial. Differential Privacy (DP) emerges
-                as a mathematical framework that provides strong privacy
-                guarantees while allowing meaningful statistical analysis
+                In today&apos;s data-driven world, the need to protect
+                individual privacy while maintaining the utility of data
+                analysis has become increasingly crucial. Differential Privacy
+                (DP) emerges as a mathematical framework that provides strong
+                privacy guarantees while allowing meaningful statistical
+                analysis
               </p>
             </div>
           </section>
@@ -602,13 +616,13 @@ export default function Home() {
                   </div>
                   <p className="mt-4">
                     Read more:{" "}
-                    <a
+                    <Link
                       href="https://en.wikipedia.org/wiki/Differential_privacy"
                       target="_blank"
                       className="text-accent hover:text-primary-gray cursor-pointer transition-colors underline decoration-dotted"
                     >
                       Wikipedia
-                    </a>
+                    </Link>
                   </p>
                 </div>
               </div>
@@ -638,14 +652,14 @@ export default function Home() {
               What&apos;s important to note is that Differential Privacy is a
               property of an algorithm, not a property of the data. Another
               intuitive{" "}
-              <a
+              <Link
                 href="https://en.wikipedia.org/wiki/Privacy-enhancing_technologies"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-accent cursor-pointer transition-colors underline decoration-dotted"
               >
                 Privacy-Enhancing Technology
-              </a>{" "}
+              </Link>{" "}
               might be to anonymize data by removing personally identifiable
               information, but this isn&apos;t enough to guarantee privacy on
               its own.
@@ -658,36 +672,46 @@ export default function Home() {
           <div className="w-1/2 prose prose-lg max-w-none">
             <p className="text-xl">
               In 2006, Netflix created the{" "}
-              <a
+              <Link
                 href="https://en.wikipedia.org/wiki/Netflix_Prize"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-accent cursor-pointer transition-colors underline decoration-dotted"
               >
                 Netflix Prize
-              </a>
+              </Link>
               , a competition to improve Netflix&apos;s movie recommendation
               algorithm. The dataset used in the competition contained 100
               million ratings from 480,000 users on 17,770 movies, anonymized by
               removing personally identifiable information. One year later,
               using iMDB ratings as a reference, two researchers from UT Austin
               were able to{" "}
-              <a
+              <Link
                 href="https://arxiv.org/abs/cs/0610105"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-accent cursor-pointer transition-colors underline decoration-dotted"
               >
                 deanonymize the 99% of the users in the dataset
-              </a>{" "}
+              </Link>
+              . This is why the rigor of DP is so important.
             </p>
           </div>
           <div className="w-1/2 flex justify-center items-center">
-            <Image
-              src="/netflix.svg"
-              alt="Netflix Logo"
-              className="w-2/3 h-auto"
-            />
+            <div className="w-full h-full flex justify-center items-center">
+              <div className="relative w-[70%]">
+                <Image
+                  src="/netflix.svg"
+                  alt="Netflix Logo"
+                  className="w-full h-auto"
+                  width={0}
+                  height={0}
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  style={{ width: "100%", height: "auto" }}
+                  priority
+                />
+              </div>
+            </div>
           </div>
         </section>
 
@@ -707,7 +731,32 @@ export default function Home() {
                 <thead>
                   <tr>
                     <th className="p-4 text-left border-b border-primary-gray/10">
-                      Raw Data
+                      <div className="flex items-center gap-2">
+                        <div>Raw Data</div>
+                        <div className="relative group">
+                          <div className="w-5 h-5 rounded-full bg-primary-gray/10 flex items-center justify-center text-primary-gray cursor-hel">
+                            ?
+                          </div>
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-primary-gray text-primary-white rounded-lg text-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                            Notice how having more data means that the noise
+                            affects the big picture less.
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-2">
+                        <input
+                          type="range"
+                          min="1"
+                          max="10"
+                          step="0.5"
+                          value={scale}
+                          onChange={(e) => setScale(parseFloat(e.target.value))}
+                          className="w-full h-2 bg-primary-gray rounded-lg appearance-none cursor-pointer accent-accent"
+                        />
+                        <div className="text-sm text-primary-gray mt-1">
+                          Scale = {scale.toFixed(1)}x
+                        </div>
+                      </div>
                     </th>
                     <th className="p-4 text-left border-b border-primary-gray/10">
                       <div className="flex items-center gap-2">
@@ -728,7 +777,7 @@ export default function Home() {
                         <input
                           type="range"
                           min="0.1"
-                          max="2"
+                          max="3"
                           step="0.1"
                           value={epsilon}
                           onChange={(e) =>
@@ -756,10 +805,7 @@ export default function Home() {
                         {row.noise.toFixed(2)}
                       </td>
                       <td className="p-4 border-b border-primary-gray/10">
-                        {(row.raw + row.noise).toFixed(2)}{" "}
-                        {row.raw + row.noise < 0 || row.raw + row.noise > 30
-                          ? "(!)"
-                          : ""}
+                        {(row.raw + row.noise).toFixed(2)}
                       </td>
                     </tr>
                   ))}
