@@ -145,10 +145,11 @@ export default function Home() {
 
   const [epsilon, setEpsilon] = useState(1);
   const [scale, setScale] = useState(1);
+  const scaleValues = [1 / 16, 1 / 8, 1 / 4, 1 / 2, 1, 2, 4, 8, 16];
   const baseData = [
-    { raw: 4, noise: 0 },
-    { raw: 8, noise: 0 },
-    { raw: 6, noise: 0 },
+    { raw: 16, noise: 0 },
+    { raw: 32, noise: 0 },
+    { raw: 24, noise: 0 },
   ];
   const [data, setData] = useState<DataRow[]>(baseData);
 
@@ -375,7 +376,7 @@ export default function Home() {
             </li>
           </ul>
         </nav>
-      </div>
+        </div>
 
       {/* Split view content */}
       <div className="flex">
@@ -424,9 +425,9 @@ export default function Home() {
                 </Link>
               </p>
             </div>
-            <div>
-              <h2 className="text-xl font-semibold mb-2">Table of Contents</h2>
-              <ul className="space-y-2">
+        <div>
+          <h2 className="text-xl font-semibold mb-2">Table of Contents</h2>
+          <ul className="space-y-2">
                 <li
                   onClick={() => scrollToSection(whatIsDPRef)}
                   className="hover:text-accent transition-colors cursor-pointer"
@@ -593,7 +594,7 @@ export default function Home() {
                       <InlineMath math="\delta" /> (delta) is the probability of
                       the privacy guarantee failing
                     </li>
-                  </ul>
+          </ul>
                   <div className="mt-4 space-y-4">
                     <div className="flex items-center gap-2">
                       <span>Try changing epsilon!</span>
@@ -746,15 +747,21 @@ export default function Home() {
                       <div className="mt-2">
                         <input
                           type="range"
-                          min="1"
-                          max="10"
-                          step="0.5"
-                          value={scale}
-                          onChange={(e) => setScale(parseFloat(e.target.value))}
+                          min="0"
+                          max="8"
+                          step="1"
+                          value={scaleValues.indexOf(scale)}
+                          onChange={(e) =>
+                            setScale(scaleValues[parseInt(e.target.value)])
+                          }
                           className="w-full h-2 bg-primary-gray rounded-lg appearance-none cursor-pointer accent-accent"
                         />
                         <div className="text-sm text-primary-gray mt-1">
-                          Scale = {scale.toFixed(1)}x
+                          Scale ={" "}
+                          {scale < 1
+                            ? `1/${Math.round(1 / scale)}`
+                            : `${scale}`}
+                          x
                         </div>
                       </div>
                     </th>
