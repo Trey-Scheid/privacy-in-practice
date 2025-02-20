@@ -2,12 +2,9 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useInView } from "react-intersection-observer";
-import Link from "next/link";
-import Image from "next/image";
-import * as d3 from "d3";
-import { SplitView } from "../../components/what-is-dp/mona-lisa/SplitView";
+import { SplitView } from "../../components/what-is-dp/split/SplitView";
 import { NavBar } from "../../components/ui/NavBar";
-import { HistogramSection } from "../../components/what-is-dp/histogram";
+import { CenteredView } from "../../components/what-is-dp/centered/CenteredView";
 
 export default function Home() {
   const [monaLisa, setMonaLisa] = useState("");
@@ -52,7 +49,7 @@ export default function Home() {
       />
 
       {/* Histogram Section */}
-      <HistogramSection />
+      <CenteredView />
     </div>
   );
 }
