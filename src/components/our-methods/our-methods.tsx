@@ -1,7 +1,7 @@
 import { PaperDisplay } from "./paper-display/PaperDisplay";
 
 interface OurMethodsProps {
-  methodsRef: React.RefObject<HTMLElement | null>;
+  methodsRef: React.RefObject<HTMLElement>;
 }
 
 function OurMethods({ methodsRef }: OurMethodsProps) {
@@ -9,7 +9,7 @@ function OurMethods({ methodsRef }: OurMethodsProps) {
     <div className="bg-accent-light">
       {/* Title Section */}
       <section
-        ref={methodsRef}
+        ref={methodsRef as React.LegacyRef<HTMLElement>}
         className="flex flex-col p-12"
       >
         <div className="prose prose-lg max-w-3xl mx-auto mt-[33vh]">

@@ -3,8 +3,8 @@ import Link from "next/link";
 interface HeroProps {
   titleRef: (node?: Element | null | undefined) => void;
   scrollToSection: (ref: React.RefObject<HTMLElement | null>) => void;
-  whatIsDPRef: React.RefObject<HTMLElement | null>;
-  methodsRef: React.RefObject<HTMLElement | null>;
+  whatIsDPRef: React.RefObject<HTMLElement>;
+  methodsRef: React.RefObject<HTMLElement>;
 }
 
 export function Hero({

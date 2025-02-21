@@ -2,10 +2,10 @@ import { SplitView } from "./split/SplitView";
 import { CenteredView } from "./centered/CenteredView";
 
 interface WhatIsDPProps {
-  SplitViewRef: React.RefObject<HTMLElement | null>;
+  SplitViewRef: React.RefObject<HTMLElement>;
   titleRef: (node?: Element | null | undefined) => void;
   scrollToSection: (ref: React.RefObject<HTMLElement | null>) => void;
-  methodsRef: React.RefObject<HTMLElement | null>;
+  methodsRef: React.RefObject<HTMLElement>;
 }
 
 export function WhatIsDP({

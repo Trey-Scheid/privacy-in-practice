@@ -6,10 +6,10 @@ import { MonaLisa } from "./MonaLisa";
 import { Hero } from "@/components/hero/Hero";
 
 interface SplitViewProps {
-  SplitViewRef: React.RefObject<HTMLElement | null>;
+  SplitViewRef: React.RefObject<HTMLElement>;
   titleRef: (node?: Element | null | undefined) => void;
   scrollToSection: (ref: React.RefObject<HTMLElement | null>) => void;
-  methodsRef: React.RefObject<HTMLElement | null>;
+  methodsRef: React.RefObject<HTMLElement>;
 }
 
 export function SplitView({
@@ -103,7 +103,7 @@ export function SplitView({
         <div className="w-1/2">
           {/* Title Section */}
           <section
-            ref={titleRef}
+            ref={titleRef as React.LegacyRef<HTMLElement>}
             className="h-screen snap-start flex flex-col justify-center p-12"
           >
             <Hero
@@ -115,7 +115,7 @@ export function SplitView({
           </section>
           {/* First Paragraph */}
           <section
-            ref={SplitViewRef}
+            ref={SplitViewRef as React.LegacyRef<HTMLElement>}
             className="h-screen snap-start flex flex-col justify-center p-12"
           >
             <div className="prose prose-lg max-w-none">
