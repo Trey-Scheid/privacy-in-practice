@@ -2,6 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { HistogramViz } from "./histogram/HistogramViz";
 import { ConfidenceViz } from "./confidence/ConfidenceViz";
+import { getPublicPath } from "@/lib/utils";
+
 export function CenteredView() {
   return (
     <div className="bg-primary-white">
@@ -60,7 +62,7 @@ export function CenteredView() {
           <div className="w-full h-full flex justify-center items-center">
             <div className="relative w-[70%]">
               <Image
-                src="/netflix.svg"
+                src={getPublicPath("/netflix.svg")}
                 alt="Netflix Logo"
                 className="w-full h-auto"
                 width={0}

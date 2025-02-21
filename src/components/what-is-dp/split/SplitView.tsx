@@ -4,6 +4,7 @@ import Link from "next/link";
 import { InlineMath, BlockMath } from "react-katex";
 import { MonaLisa } from "./MonaLisa";
 import { Hero } from "@/components/hero/Hero";
+import { getPublicPath } from "@/lib/utils";
 
 interface SplitViewProps {
   SplitViewRef: React.RefObject<HTMLElement>;
@@ -29,7 +30,7 @@ export function SplitView({
   });
 
   useEffect(() => {
-    fetch("/monalisa.txt")
+    fetch(getPublicPath("/monalisa.txt"))
       .then((response) => response.text())
       .then((content) => setMonaLisa(content))
       .catch((error) => {
