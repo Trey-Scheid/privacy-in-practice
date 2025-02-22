@@ -5,6 +5,7 @@ interface HeroProps {
   scrollToSection: (ref: React.RefObject<HTMLElement | null>) => void;
   whatIsDPRef: React.RefObject<HTMLElement>;
   methodsRef: React.RefObject<HTMLElement>;
+  discussionRef: React.RefObject<HTMLElement>;
 }
 
 export function Hero({
@@ -12,6 +13,7 @@ export function Hero({
   scrollToSection,
   whatIsDPRef,
   methodsRef,
+  discussionRef,
 }: HeroProps) {
   return (
     <section
@@ -71,7 +73,10 @@ export function Hero({
           >
             2. How We Applied DP
           </li>
-          <li className="hover:text-accent transition-colors cursor-pointer">
+          <li
+            onClick={() => scrollToSection(discussionRef)}
+            className="hover:text-accent transition-colors cursor-pointer"
+          >
             3. The Feasibility of Applying DP
           </li>
         </ul>

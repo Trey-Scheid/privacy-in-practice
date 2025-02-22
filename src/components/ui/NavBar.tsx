@@ -3,6 +3,7 @@ interface NavBarProps {
   scrollToSection: (ref: React.RefObject<HTMLElement | null>) => void;
   whatIsDPRef: React.RefObject<HTMLElement | null>;
   methodsRef: React.RefObject<HTMLElement | null>;
+  discussionRef: React.RefObject<HTMLElement | null>;
 }
 
 export function NavBar({
@@ -10,6 +11,7 @@ export function NavBar({
   scrollToSection,
   whatIsDPRef,
   methodsRef,
+  discussionRef,
 }: NavBarProps) {
   return (
     <div
@@ -34,7 +36,10 @@ export function NavBar({
           >
             2. How We Applied DP
           </li>
-          <li className="hover:text-accent transition-colors cursor-pointer">
+          <li
+            onClick={() => scrollToSection(discussionRef)}
+            className="hover:text-accent transition-colors cursor-pointer"
+          >
             3. The Feasibility of Applying DP
           </li>
         </ul>

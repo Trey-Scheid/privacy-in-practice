@@ -6,6 +6,7 @@ interface WhatIsDPProps {
   titleRef: (node?: Element | null | undefined) => void;
   scrollToSection: (ref: React.RefObject<HTMLElement | null>) => void;
   methodsRef: React.RefObject<HTMLElement>;
+  discussionRef: React.RefObject<HTMLElement>;
 }
 
 export function WhatIsDP({
@@ -13,6 +14,7 @@ export function WhatIsDP({
   titleRef,
   scrollToSection,
   methodsRef,
+  discussionRef,
 }: WhatIsDPProps) {
   return (
     <div>
@@ -21,6 +23,7 @@ export function WhatIsDP({
         titleRef={titleRef}
         scrollToSection={scrollToSection}
         methodsRef={methodsRef}
+        discussionRef={discussionRef}
       />
       
       <CenteredView />

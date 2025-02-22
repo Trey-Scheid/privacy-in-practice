@@ -11,6 +11,7 @@ interface SplitViewProps {
   titleRef: (node?: Element | null | undefined) => void;
   scrollToSection: (ref: React.RefObject<HTMLElement | null>) => void;
   methodsRef: React.RefObject<HTMLElement>;
+  discussionRef: React.RefObject<HTMLElement>;
 }
 
 export function SplitView({
@@ -18,6 +19,7 @@ export function SplitView({
   titleRef,
   scrollToSection,
   methodsRef,
+  discussionRef,
 }: SplitViewProps) {
   const [monaLisa, setMonaLisa] = useState("");
   const [noiseLevel, setNoiseLevel] = useState(0);
@@ -112,6 +114,7 @@ export function SplitView({
               scrollToSection={scrollToSection}
               whatIsDPRef={SplitViewRef}
               methodsRef={methodsRef}
+              discussionRef={discussionRef}
             />
           </section>
           {/* First Paragraph */}

@@ -5,6 +5,7 @@ import { useInView } from "react-intersection-observer";
 import { NavBar } from "../../components/ui/NavBar";
 import { WhatIsDP } from "@/components/what-is-dp/what-is-dp";
 import OurMethods from "@/components/our-methods/our-methods";
+import Discussion from "@/components/discussion/discussion";
 
 export default function Home() {
   const { ref: titleRef, inView: isTitleVisible } = useInView({
@@ -14,6 +15,7 @@ export default function Home() {
   // Refs for sections
   const whatIsDPRef = useRef<HTMLElement>(null);
   const methodsRef = useRef<HTMLElement>(null);
+  const discussionRef = useRef<HTMLElement>(null);
 
   const scrollToSection = (ref: React.RefObject<HTMLElement | null>) => {
     if (ref.current) {
@@ -29,6 +31,7 @@ export default function Home() {
         scrollToSection={scrollToSection}
         whatIsDPRef={whatIsDPRef}
         methodsRef={methodsRef}
+        discussionRef={discussionRef}
       />
 
       {/* What is DP Section */}
@@ -38,12 +41,18 @@ export default function Home() {
           titleRef={titleRef}
           scrollToSection={scrollToSection}
           methodsRef={methodsRef}
+          discussionRef={discussionRef}
         />
       </div>
 
       {/* Our Methods Section */}
       <div className="snap-start">
         <OurMethods methodsRef={methodsRef} />
+      </div>
+
+      {/* Discussion Section */}
+      <div className="snap-start">
+        <Discussion discussionRef={discussionRef} />
       </div>
     </div>
   );
