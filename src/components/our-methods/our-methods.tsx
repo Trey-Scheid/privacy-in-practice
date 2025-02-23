@@ -35,7 +35,7 @@ function OurMethods({ methodsRef }: OurMethodsProps) {
         <section className="mb-16">
           <div className="prose prose-lg max-w-3xl mx-auto">
             <h2 className="text-3xl font-bold mb-4 text-primary-gray">
-              Randomized Response
+              What is Telemetry Data?
             </h2>
             <p className="text-xl text-primary-gray">
               Something about telemetry here. Lorem ipsum dolor sit amet,
@@ -51,7 +51,7 @@ function OurMethods({ methodsRef }: OurMethodsProps) {
         <section className="mb-16">
           <div className="prose prose-lg max-w-3xl mx-auto">
             <h2 className="text-3xl font-bold mb-4 text-primary-gray">
-              Laplace Mechanism
+              Applying DP to Telemetry Data
             </h2>
             <p className="text-xl text-primary-gray">
               Additional content can go here and will scroll normally.
@@ -65,6 +65,32 @@ function OurMethods({ methodsRef }: OurMethodsProps) {
           <div className="prose prose-lg max-w-3xl mx-auto">
             <h2 className="text-3xl font-bold mb-4 text-primary-gray">
               Meta-Analysis
+            </h2>
+            <p className="text-xl text-primary-gray">
+              Additional content can go here and will scroll normally.
+              Additional content can go here and will scroll normally.
+              Additional content can go here and will scroll normally.
+              Additional content can go here and will scroll normally.
+              Additional content can go here and will scroll normally.
+              Additional content can go here and will scroll normally.
+              Additional content can go here and will scroll normally.
+              Additional content can go here and will scroll normally.
+              Additional content can go here and will scroll normally.
+              Additional content can go here and will scroll normally.
+              Additional content can go here and will scroll normally.
+              Additional content can go here and will scroll normally.
+              Additional content can go here and will scroll normally.
+              Additional content can go here and will scroll normally.
+              Additional content can go here and will scroll normally.
+              Additional content can go here and will scroll normally.
+            </p>
+          </div>
+        </section>
+
+        <section className="mb-16">
+          <div className="prose prose-lg max-w-3xl mx-auto">
+            <h2 className="text-3xl font-bold mb-4 text-primary-gray">
+              Conclusion
             </h2>
             <p className="text-xl text-primary-gray">
               Additional content can go here and will scroll normally.

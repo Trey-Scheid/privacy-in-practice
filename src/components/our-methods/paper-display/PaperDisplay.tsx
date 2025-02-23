@@ -52,7 +52,7 @@ export function PaperDisplay() {
                     : "border-transparent text-primary-gray hover:border-primary-gray/20"
                 }`}
               >
-                {paper.title}
+                {paper.shortTitle}
               </button>
             ))}
           </div>
@@ -90,7 +90,7 @@ export function PaperDisplay() {
                     alt={`${
                       papers[
                         (selectedPaper - 1 + papers.length) % papers.length
-                      ].title
+                      ].shortTitle
                     } Thumbnail`}
                     className="w-full h-full object-contain"
                   />
@@ -154,7 +154,7 @@ export function PaperDisplay() {
                   <div className="w-full h-full flex items-center justify-center text-primary-gray">
                     <img
                       src={getPublicPath(papers[selectedPaper].thumbnail)}
-                      alt={`${papers[selectedPaper].title} Thumbnail`}
+                      alt={`${papers[selectedPaper].shortTitle} Thumbnail`}
                       className="w-full h-full object-contain"
                     />
                   </div>
@@ -184,6 +184,13 @@ export function PaperDisplay() {
       {/* Right side - Scrollable content */}
       <div className="w-3/4 p-12 pt-28 mt-16" ref={contentRef}>
         <div className="max-w-3xl mx-auto space-y-16">
+          {/* Paper Title */}
+          <section>
+            <h1 className="text-4xl font-bold mb-4 text-primary-gray">
+              {papers[selectedPaper].title}
+            </h1>
+          </section>
+
           {/* Paper Analysis */}
           <section>
             <h2 className="text-3xl font-bold mb-4 text-primary-gray">
