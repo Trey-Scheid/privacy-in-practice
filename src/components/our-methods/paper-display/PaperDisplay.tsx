@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { getPublicPath } from "@/lib/utils";
 import papersData from "@/data/papers.json";
+import Image from "next/image";
 
 export function PaperDisplay() {
   const [selectedPaper, setSelectedPaper] = useState(0);
@@ -58,7 +59,7 @@ export function PaperDisplay() {
           </div>
 
           {/* Paper Stack */}
-          <div className="relative w-full aspect-[8.5/11] mx-auto mt-32 flex-2">
+          <div className="relative w-full max-w-[350px] aspect-[8.5/11] mx-auto mt-32 flex-2">
             {/* Static background papers */}
             {[3, 2, 1].map((offset) => (
               <div
@@ -81,7 +82,7 @@ export function PaperDisplay() {
             >
               <div className="w-full h-full bg-primary-white rounded-lg shadow-xl border border-primary-gray/10">
                 <div className="w-full h-full flex items-center justify-center text-primary-gray">
-                  <img
+                  <Image
                     src={getPublicPath(
                       papers[
                         (selectedPaper - 1 + papers.length) % papers.length
@@ -93,6 +94,9 @@ export function PaperDisplay() {
                       ].shortTitle
                     } Thumbnail`}
                     className="w-full h-full object-contain"
+                    width={510}
+                    height={660}
+                    priority
                   />
                 </div>
               </div>
@@ -152,10 +156,13 @@ export function PaperDisplay() {
               >
                 <div className="w-full h-full bg-primary-white rounded-lg shadow-xl border border-primary-gray/10">
                   <div className="w-full h-full flex items-center justify-center text-primary-gray">
-                    <img
+                    <Image
                       src={getPublicPath(papers[selectedPaper].thumbnail)}
                       alt={`${papers[selectedPaper].shortTitle} Thumbnail`}
                       className="w-full h-full object-contain"
+                      width={510}
+                      height={660}
+                      priority
                     />
                   </div>
                 </div>
