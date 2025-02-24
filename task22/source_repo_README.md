@@ -1,4 +1,6 @@
-# intel-cf-public
+# Structure of Source Repo (README.md)
+
+## intel-cf-public
 2023 Intel-HDSI Collaboration Project Carbon Footprint Public Repository
 
 ```
