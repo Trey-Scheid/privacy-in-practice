@@ -1,6 +1,9 @@
+import { ScrollProgress } from "./ScrollProgress";
+
 interface NavBarProps {
   isTitleVisible: boolean;
   scrollToSection: (ref: React.RefObject<HTMLElement | null>) => void;
+  topRef: React.RefObject<HTMLElement | null>;
   whatIsDPRef: React.RefObject<HTMLElement | null>;
   methodsRef: React.RefObject<HTMLElement | null>;
   discussionRef: React.RefObject<HTMLElement | null>;
@@ -9,20 +12,26 @@ interface NavBarProps {
 export function NavBar({
   isTitleVisible,
   scrollToSection,
+  topRef,
   whatIsDPRef,
   methodsRef,
   discussionRef,
 }: NavBarProps) {
   return (
     <div
-      className={`fixed top-0 left-0 right-0 z-50 bg-primary-white border-b border-primary-gray/10 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 bg-primary-white transition-all duration-300 ${
         !isTitleVisible
           ? "translate-y-0 opacity-100"
           : "translate-y-[-100%] opacity-0"
       }`}
     >
       <nav className="flex justify-between items-center px-12 py-4">
-        <h3 className="text-lg font-semibold">Privacy in Practice</h3>
+        <h3 
+          onClick={() => scrollToSection(topRef)}
+          className="text-lg font-semibold cursor-pointer hover:text-accent transition-colors"
+        >
+          Privacy in Practice
+        </h3>
         <ul className="flex gap-8">
           <li
             onClick={() => scrollToSection(whatIsDPRef)}
@@ -44,6 +53,7 @@ export function NavBar({
           </li>
         </ul>
       </nav>
+      <ScrollProgress />
     </div>
   );
 }

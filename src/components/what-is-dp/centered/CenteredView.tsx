@@ -97,6 +97,14 @@ export function CenteredView() {
       <section className="h-screen snap-start flex flex-col justify-center p-12">
         <ConfidenceViz />
       </section>
+
+      <section className="h-screen snap-start flex flex-col justify-center items-center p-12">
+        <div className="prose prose-lg max-w-3xl mx-auto text-center">
+          <p className="text-xl">
+            Conclusion + transition here!!!
+          </p>
+        </div>
+      </section>
     </div>
   );
 }

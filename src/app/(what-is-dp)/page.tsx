@@ -13,6 +13,7 @@ export default function Home() {
   });
 
   // Refs for sections
+  const topRef = useRef<HTMLDivElement>(null);
   const whatIsDPRef = useRef<HTMLElement>(null);
   const methodsRef = useRef<HTMLElement>(null);
   const discussionRef = useRef<HTMLElement>(null);
@@ -29,13 +30,17 @@ export default function Home() {
       <NavBar
         isTitleVisible={isTitleVisible}
         scrollToSection={scrollToSection}
+        topRef={topRef}
         whatIsDPRef={whatIsDPRef}
         methodsRef={methodsRef}
         discussionRef={discussionRef}
       />
 
+      {/* Top Section */}
+      <div ref={topRef} className="h-0" />
+
       {/* What is DP Section */}
-      <div className="snap-start">
+      <div className="snap-start" data-section="what-is-dp">
         <WhatIsDP
           SplitViewRef={whatIsDPRef}
           titleRef={titleRef}
@@ -46,12 +51,12 @@ export default function Home() {
       </div>
 
       {/* Our Methods Section */}
-      <div className="snap-start">
+      <div className="snap-start" data-section="methods">
         <OurMethods methodsRef={methodsRef} />
       </div>
 
       {/* Discussion Section */}
-      <div className="snap-start">
+      <div className="snap-start" data-section="discussion">
         <Discussion discussionRef={discussionRef} />
       </div>
     </div>

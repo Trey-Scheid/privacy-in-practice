@@ -12,7 +12,7 @@ function Discussion({ discussionRef }: DiscussionProps) {
       >
         <div className="prose prose-lg max-w-3xl mx-auto mt-[20vh]">
           <h1 className="text-4xl font-bold mb-4">
-            Discussion
+            The Feasibility of Applying DP
           </h1>
           <p className="text-xl">
             FILLER TEXT Telemetry data is collected from the user&apos;s device
@@ -32,9 +32,7 @@ function Discussion({ discussionRef }: DiscussionProps) {
         {/* First Section - Randomized Response */}
         <section className="mb-16">
           <div className="prose prose-lg max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold mb-4">
-              Randomized Response
-            </h2>
+            <h2 className="text-3xl font-bold mb-4">Header 1</h2>
             <p className="text-xl">
               Something about telemetry here. Lorem ipsum dolor sit amet,
               consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
@@ -48,9 +46,7 @@ function Discussion({ discussionRef }: DiscussionProps) {
         {/* Second Section */}
         <section className="mb-16">
           <div className="prose prose-lg max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold mb-4">
-              Laplace Mechanism
-            </h2>
+            <h2 className="text-3xl font-bold mb-4">Header 2</h2>
             <p className="text-xl">
               Additional content can go here and will scroll normally.
             </p>
@@ -59,9 +55,7 @@ function Discussion({ discussionRef }: DiscussionProps) {
 
         <section className="mb-16">
           <div className="prose prose-lg max-w-3xl mx-auto">
-                <h2 className="text-3xl font-bold mb-4">
-              Meta-Analysis
-            </h2>
+            <h2 className="text-3xl font-bold mb-4">Header 3</h2>
             <p className="text-xl">
               Additional content can go here and will scroll normally.
               Additional content can go here and will scroll normally.
