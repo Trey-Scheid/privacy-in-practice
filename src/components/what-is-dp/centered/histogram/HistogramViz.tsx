@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Chart } from "./Chart";
 
 interface DataRow {
@@ -32,6 +32,16 @@ export function HistogramViz() {
       }))
     );
   };
+
+  // Update data when scale changes
+  useEffect(() => {
+    setData(
+      baseData.map((row) => ({
+        raw: row.raw * scale,
+        noise: data.find((d) => d.raw === row.raw * scale / scale)?.noise || 0,
+      }))
+    );
+  }, [scale]);
 
   return (
     <>
@@ -70,7 +80,6 @@ export function HistogramViz() {
                       value={scaleValues.indexOf(scale)}
                       onChange={(e) => {
                         setScale(scaleValues[parseInt(e.target.value)]);
-                        updateData();
                       }}
                       className="w-full h-2 bg-primary-gray rounded-lg appearance-none cursor-pointer accent-accent"
                     />
@@ -121,7 +130,7 @@ export function HistogramViz() {
               {data.map((row, i) => (
                 <tr key={i}>
                   <td className="p-4 border-b border-primary-gray/10">
-                    {row.raw}
+                    {Math.round(row.raw * 100) / 100}
                   </td>
                   <td className="p-4 border-b border-primary-gray/10">
                     {row.noise.toFixed(2)}
