@@ -2,7 +2,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression, Lasso
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
-import model_build.frankWolfeLASSO as fw # how to do this relatively?
+import model_build.frankWolfeLASSOlaplace as fwl # how to do this relatively?
+import model_build.frankWolfeLASSOexponential as fwe # how to do this relatively?
 
 y_name = 'power_mean'
 
@@ -32,12 +33,20 @@ def train(feat, type='lstsq', tol=1e-4, l=1, max_iter=1000, epsilon=None, delta=
     if type_fw:
         #print("training frank wolfe model")
         #print(X_train.to_numpy().shape, y_train.to_numpy().shape)
-        model = fw.frankWolfeLASSO(X_train.to_numpy(), y_train.to_numpy(), l=l, tol=tol, K=max_iter, delta=delta, epsilon=epsilon) #l is alpha , diffx, k 
-        # k = The number of iterations made
-        # diffx = The difference between the last two iterations
+        model = fwl.frankWolfeLASSO(X_train.to_numpy(), y_train.to_numpy(), l=l, tol=tol, K=max_iter, delta=delta, epsilon=epsilon)
         y_pred = X_test.dot(model)
         mse = mean_squared_error(y_test, y_pred)
-        print(f'Test MSE FW-Alg: {mse:.2f} ({100*sum(model>0)/model.shape[0]:.1f}% sparse)')
+        print(f'Test MSE FW-Alg-L: {mse:.2f} ({100*sum(model>0)/model.shape[0]:.1f}% sparse)')
+        # Coefficient dictionary with feature name
+        coef_dict = dict(zip(X.columns, model))
+        
+        if epsilon is None:
+            model = fwe.frankWolfeLASSO(X_train.to_numpy(), y_train.to_numpy(), l=l, delta=delta, epsilon=1_000_000, K=max_iter)
+        else:
+            model = fwe.frankWolfeLASSO(X_train.to_numpy(), y_train.to_numpy(), l=l, delta=delta, epsilon=epsilon, K=max_iter)
+        y_pred = X_test.dot(model)
+        mse = mean_squared_error(y_test, y_pred)
+        print(f'Test MSE FW-Alg-E: {mse:.2f} ({100*sum(model>0)/model.shape[0]:.1f}% sparse)')
         # Coefficient dictionary with feature name
         coef_dict = dict(zip(X.columns, model))
     else:

@@ -22,7 +22,7 @@ url = URL.create(
 portable = ['Notebook', '2 in 1', 'Tablet']
 desktop = ['Desktop', 'Server/WS', 'Intel NUC/STK']
 
-# Table Names and File Names (Need to be in same order as raw_queries.sql)
+# Table Names and File Names (do not change, otherwise need to edit load_data.py sample_raw queries)
 table_names = [
     'sw_usage', # software usage
     'web_usage', # web usage
