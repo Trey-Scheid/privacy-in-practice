@@ -220,11 +220,18 @@ export function SplitView({
                 states that for any two datasets that differ in exactly one
                 record, the probability of getting the same output from an
                 private algorithm should be similar. This paves the way for a{" "}
-                <span
-                  className="text-accent hover:text-primary-gray cursor-pointer transition-colors underline decoration-dotted"
+                <button
+                  className="text-accent hover:text-primary-gray cursor-pointer transition-colors underline decoration-dotted inline-flex items-center gap-1 group"
                   onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
                 >
                   mathematical measure of privacy
+                </button>{" "}
+                <span
+                  className={`inline-block transition-transform duration-200 ${
+                    showTechnicalDetails ? "rotate-180" : ""
+                  }`}
+                >
+                  ▽
                 </span>{" "}
                 and a way to quantify the privacy of an algorithm.
               </p>
