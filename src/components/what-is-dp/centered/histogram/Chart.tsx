@@ -20,10 +20,10 @@ export function Chart({ data }: ChartProps) {
   const chartRef = useRef<ChartRef>(null);
 
   // Get max value for y-scale
-  const getYDomain = () => {
+  const getYDomain = useCallback(() => {
     const maxRaw = Math.max(...data.map((d) => d.raw));
     return maxRaw * 1.5; // Add 20% padding
-  };
+  }, [data]);
 
   // Update D3 visualization
   const updateChart = useCallback(() => {
@@ -137,7 +137,7 @@ export function Chart({ data }: ChartProps) {
     chartRef.current.x = x;
     chartRef.current.y = y;
     chartRef.current.innerHeight = innerHeight;
-  }, [data]);
+  }, [data, getYDomain]);
 
   // Initial chart creation and handle window resize
   useEffect(() => {

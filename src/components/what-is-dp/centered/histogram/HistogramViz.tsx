@@ -35,10 +35,10 @@ export function HistogramViz() {
 
   // Update data when scale changes
   useEffect(() => {
-    setData(
-      baseData.map((row) => ({
-        raw: row.raw * scale,
-        noise: data.find((d) => d.raw === row.raw * scale / scale)?.noise || 0,
+    setData((currentData) =>
+      baseData.map((baseRow, index) => ({
+        raw: baseRow.raw * scale,
+        noise: currentData[index].noise,
       }))
     );
   }, [scale]);
