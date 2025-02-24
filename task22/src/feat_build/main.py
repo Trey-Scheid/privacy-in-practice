@@ -2,7 +2,7 @@ import os
 from feat_build import load_data, process
 from feat_build.utils import global_data
 
-def generate_features(sample_guids_parquet, inv_data_dir):
+def generate_features(sample_guids_parquet, inv_data_dir, directories):
     """
     generate features for a given sample table
 
@@ -22,7 +22,7 @@ def generate_features(sample_guids_parquet, inv_data_dir):
     raw_data_dir = inv_data_dir / 'raw'
 
     # download raw data for chosen sample table
-    load_data.sample_raw(sample_guids_parquet, raw_data_dir)
+    load_data.sample_raw(sample_guids_parquet, raw_data_dir, directories)
 
     # process raw data
     process.main(inv_data_dir, proc_sysinfo=sysinfo_new)

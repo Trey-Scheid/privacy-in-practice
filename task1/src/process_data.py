@@ -114,7 +114,7 @@ def raw_to_aggregated(con, item_dir, header_dir, output_dir, checkpoint_file):
                 break
 
 
-def aggregated_to_final(con, output_dir, data_dir="data/"):
+def aggregated_to_final(con, output_dir, data_dir="private_data/"):
     """
     Convert aggregated data to final data. Top 30 most common bugcheck codes and downsampled to 5:1 ratio of no bugcheck:bugcheck
 
