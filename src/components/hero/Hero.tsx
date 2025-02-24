@@ -26,7 +26,7 @@ export function Hero({
       </h2>
       <div className="mb-8">
         <p className="text-primary-gray">
-          Tyler Kurpanek & Chris Lum & Bradley Nathanson & Trey Scheid
+          Tyler Kurpanek, Chris Lum, Bradley Nathanson, Trey Scheid
         </p>
         <p className="text-primary-gray">Mentor: Yu-Xiang Wang</p>
         <p className="text-primary-gray mt-4">
