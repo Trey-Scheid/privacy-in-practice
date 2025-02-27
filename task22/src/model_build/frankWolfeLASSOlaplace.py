@@ -35,7 +35,8 @@ def frankWolfeLASSO(A, y, l=500, tol=0.0001, K=15000, delta=1e-6, epsilon=None):
     rng = np.random.default_rng(seed=1)
 
     if not epsilon is None:
-        L1 = 2 * np.linalg.norm(A.T @ A, ord=2)
+        L1 = np.max(np.linalg.norm(A, ord=1, axis=0))
+        #L1 = 2 * np.linalg.norm(A.T @ A, ord=2) # update for op L1 norm
         tK = int((n * epsilon)**(2/3) / (L1 * l)**(2/3))
         K = max(min(tK, K), 1)
         t = K
