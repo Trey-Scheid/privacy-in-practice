@@ -81,7 +81,9 @@ def plot_histogram(df):
 def main():
     """Main execution function."""
     parquet_path_pattern = "D:/CapstoneTyler/*.parquet"
+    #parquet_path_pattern = r"C:\Users\Tyler\OneDrive\Desktop\180B\Novel-Techniques-in-Private-Data-Analysis\dummy_data\eventlog_header_hist_CONDPROB\header.parquet"
     
+
     try:
         df = load_and_query_parquet(parquet_path_pattern)
         plot_histogram(df)
