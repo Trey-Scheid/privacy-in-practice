@@ -12,22 +12,39 @@ def preprocess_data(cwd):
     """Preprocess raw device data and normalize it."""
     db_path = os.path.join(cwd, 'duckdb.db')
     pkl_path = os.path.join(cwd, 'src', 'software_data.pkl')
-    for file in os.listdir(os.path.join(cwd, 'private_data', 'raw')):
-        if file != ".DS_Store":
-            parquet_file = os.path.join(cwd, 'private_data', 'raw', file)
-            output_parquet_path = os.path.join(cwd, 'private_data', 'out', file)
-            analysis = src.DevicePreprocessor.DevicePreprocessor(
-                db_path=db_path, parquet_file=parquet_file, 
-                pkl_path=pkl_path, output_parquet_path=output_parquet_path
-            )
-            analysis.preprocess()
+    #originally 10000 in paper and used this value for png
+    count_parameter=10
+
+    """following commented out code is used in real data analysis"""
+    #count_parameter=10
+    # for file in os.listdir(os.path.join(cwd, 'private_data', 'raw')):
+    #     if file != ".DS_Store":
+    #         parquet_file = os.path.join(cwd, 'private_data', 'raw', file)
+    #         output_parquet_path = os.path.join(cwd, 'private_data', 'out', file)
+    #         analysis = src.DevicePreprocessor.DevicePreprocessor(
+    #             db_path=db_path, parquet_file=parquet_file, 
+    #             pkl_path=pkl_path, output_parquet_path=output_parquet_path,
+    #             count_parameter=count_parameter
+    #         )
+    #         analysis.preprocess()
+    # data_list = []
+
+    # for file in os.listdir(os.path.join(cwd, 'private_data', 'out')):
+    #     df = pd.read_parquet(os.path.join(cwd, 'private_data', 'out', file))
+    #     data_list.append(pd.DataFrame(df["l1_distance"]))
     
-    data_list = []
-    for file in os.listdir(os.path.join(cwd, 'private_data', 'out')):
-        df = pd.read_parquet(os.path.join(cwd, 'private_data', 'out', file))
-        data_list.append(pd.DataFrame(df["l1_distance"]))
-    
-    data = pd.concat(data_list, ignore_index=True)
+    # data = pd.concat(data_list, ignore_index=True)
+    parquet_file=os.path.join(cwd, '..', '..','dummy_data','frgnd_v2_hist','synthetic.parquet')
+    output_parquet_path = 'synthetic_out.parquet'
+    analysis = src.DevicePreprocessor.DevicePreprocessor(
+        db_path=db_path, parquet_file=parquet_file, 
+        pkl_path=pkl_path, output_parquet_path=output_parquet_path,
+        count_parameter=count_parameter
+    )
+    analysis.preprocess()
+    df= pd.read_parquet(output_parquet_path)
+    data=pd.DataFrame(df["l1_distance"])
+    os.remove(output_parquet_path)
     scaler = MinMaxScaler(feature_range=(-10, 10))
     return scaler.fit_transform(data)
 
@@ -49,12 +66,12 @@ def compute_dpkmeans_inertia(data, k, epsilons):
         inertias.append(dp_kmeans.compute_inertia(data) / data.shape[0])
     return inertias
 
-def plot_results(epsilons, inertias, train_loss, test_loss, output_path="dp_kmeans_inertia.png"):
+def plot_results(cwd,epsilons, inertias, train_loss, test_loss, output_path="dp_kmeans_inertia.png"):
     """Plot and save the DP-KMeans inertia along with train and test loss."""
     plt.figure(figsize=(12, 6))
     plt.plot(epsilons, inertias, marker='o', linestyle='-', color='b', label='DP-KMeans Inertia')
-    plt.axhline(y=train_loss, color='g', linestyle='--', label='Train Loss')
-    plt.axhline(y=test_loss, color='r', linestyle='--', label='Test Loss')
+    plt.axhline(y=train_loss, color='g', linestyle='--', label='Train Loss '+str(round(train_loss,2)))
+    plt.axhline(y=test_loss, color='r', linestyle='--', label='Test Loss '+str(round(test_loss,2)))
     
     plt.xlabel("Epsilon")
     plt.ylabel("Inertia")
@@ -62,7 +79,7 @@ def plot_results(epsilons, inertias, train_loss, test_loss, output_path="dp_kmea
     plt.legend()
     plt.grid(True)
     
-    plt.savefig(output_path)
+    plt.savefig(os.path.join(cwd, '..', '..','viz','KMEANS',output_path))
     print(f"Plot saved as {output_path}")
     plt.close()
 
@@ -77,7 +94,7 @@ def main():
     data = preprocess_data(cwd)
     train_loss, test_loss = compute_kmeans_loss(data, k, test_size, random_seed)
     inertias = compute_dpkmeans_inertia(data, k, epsilons)
-    plot_results(epsilons, inertias, train_loss, test_loss)
+    plot_results(cwd,epsilons, inertias, train_loss, test_loss,"synthetic_dp_kmeans_inertia")
 
 if __name__ == "__main__":
     main()
