@@ -8,10 +8,6 @@ I reference and replicate the paper PC Health Impact White Paper Tool 2: Cluster
 ```
 - [File Structure]
     .
-    ├── data                      
-    │   ├── out
-    │   └── raw
-    |        ├── 0007_part_09_limit_1000000 <-sample dataset, will use more parts for final submission
     ├── src
     │   ├── kmeans.py                 <- Data processing and K-means
     │   └── kmeans_private.py         <- Private K-means [TODO]
@@ -31,3 +27,5 @@ This project is organized into the following components:
 ## Environment Setup
 
 To recreate the development environment, you can use either **Conda** or **Docker**. 
+
+
