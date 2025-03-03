@@ -6,11 +6,6 @@ class KMeans:
         self.max_iterations = max_iterations
         self.centroids = None
     
-    # def initialize_centroids(self, data):
-    #     """Randomly initialize k centroids from the data points."""
-    #     n = data.shape[0]
-    #     random_indices = np.random.choice(n, self.k, replace=False)
-    #     self.centroids = data[random_indices]
     def initialize_centroids(self, data):
         """Initialize centroids using sphere packing."""
         n, d = data.shape
