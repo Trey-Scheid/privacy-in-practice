@@ -11,6 +11,7 @@ from utils import get_data_fps
 import argparse
 import concurrent.futures
 from functools import partial
+import glob
 
 
 class NoisyGD_mech(Mechanism):
@@ -209,7 +210,12 @@ def get_permutaiton_results(
 ):
     data_dir = os.path.abspath(data_dir)
     if data_fp is None:
+        done = glob.glob(os.path.join(data_dir, "permutation_results", "*.csv"))
         data_fps = get_data_fps(data_dir)
+        data_fps = [
+            fp for fp in data_fps if re.findall(r"bugcheck_(\d+)", fp)[0] not in done
+        ]
+        print(f"Running {len(data_fps)} permutations ", data_fps)
     else:
         data_fps = [data_fp]
 
