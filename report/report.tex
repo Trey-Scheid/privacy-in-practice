@@ -79,6 +79,9 @@ Differential privacy methods and guarantees are attractive for many domains. Tel
 
 We use a secure research database shared be Intel Corporation with consent of its users to generate real results....
 
+\subsubsection{Errors}
+
+In our paper, we will analyze two different types of errors. The Machine Check Architecture, or MCA, will detect an error and label it as either corrected or uncorrected. A corrected error means the system can observe and correct a detected error. Correction mechanisms include single error correction, double error correction, and more. An uncorrected error is one that was detected but not corrected or there was a computation delay long enough that the MCA treated it as an interrupted computation. \cite{add a citation}
 
 %%%%%%%%%%%%%%%%%%%
 %%%%  METHODS  %%%%%%%%
@@ -96,9 +99,54 @@ For each of the follow sections we will describe the task, the algorithm used, a
 
 This paper\footnote{needs citation not a footnote} investigates how privacy affects different mini-batch stochastic gradient descent algorithms for logistic regression classification. It is shown that privacy affects the batch size for optimal performance.
 
+\subsection{Correlation (via Logistic Regression Coefficient)}
+
+This paper \footnote{needs citation} seeks to identify whether a certain variable is disproportionately present for a certain outcome. 
+More specifically, it takes a close look at two variables, max temperature on a day and whether a corrected error was present on that day. 
+They would take one of those two variables and train a logistic regression model with maximum likelihood estimation to predict whether an uncorrected error was present.
+From the model, they use the coefficient of the variable and make a hypothesis test whether that variable is equal to zero.
+
+For our implementation, we focused only on whether there were corrected errors on a day, and not the variable max temperature on a day.
+We add privacy to the model by using DP-SGD when training the logistic regression model, where the hypothesis test is then private by means of post-processing.
+
 \subsubsection{LASSO Regression (DP-FW)}
 
 will add lots of detail about lasso, then talk about adapting franke-wolfe to be differentially private. 
+
+\subsubsection{K-Means (DP-Lloyd's)}
+K-Means clustering (Lloyd's Algorithm) is applied to group devices based on similarities in their usage patterns. The method leverages Z-scores for standardizing the usage data and calculates L1 distances between weekly usage patterns to identify trends over time. Lloyd's Algorithm clusters devices by assigning them to centroids based on their usage patterns, recalculating the centroids as the mean of assigned points after each iteration. 
+
+Differentially Private Lloyd's Algorithm (DP-Lloyd's)\footnote{linkneeded} modifies the standard K-Means clustering by adding Laplacian noise during the iterative centroid update step to ensure privacy. It introduces noise to both the sum of coordinates and the count of points within clusters, with the amount of noise controlled by the number of iterations and the sensitivity of the data. 
+
+\subsubsection{Z-score (Additive Noise)}
+As Z-score is computed before performing K-means clustering, 
+\[
+Z = \frac{X - \mu}{\sigma}
+\]
+One can privatize this clustering task by simply adding Laplacian noise to the Z-scores, though the privacy gurantee and performance between the two methods, DP-Lloyd's and Additive Noise are likely to be different.
+\[
+Z_{\text{private}} = \frac{X - \mu}{\sigma} + \text{Lap}\left(\frac{\Delta f}{\epsilon}\right)
+\]
+\begin{equation*}
+\begin{aligned}
+    \Delta f & \text{ is the global sensitivity of the Z-score computation,} \\
+    \epsilon & \text{ is the privacy parameter.}
+\end{aligned}
+\end{equation*}
+
+
+
+\subsubsection{Probabilty (Additive Noise)}
+The probability of one or more uncorrected errors occurring on a system given the number of corrected errors it experienced during a specific time period is given as 
+\[
+P(Uncorrected|Corrected) = \frac{P(Corrected \cap Uncorrected)}{P(Corrected)}
+\]
+
+To privatize this mechanism, one can apply two methods, adding noise to the numerator and denominator, as well as clipping. The noise is sampled from a Laplace distribution with scale parameter $
+\frac{\nabla f}{\epsilon}$, where $\nabla f$ is the sensitivity and $\nabla f$ is the privacy paramater. The sensitivity in this case for both the numerator and denominator will be equal to 1 because the max change in probability is equal to 1. 
+
+In addition to the noise that is added we will regularize the data by adding a constant, $\lambda$. This constant will also be added to both the numerator and denominator so that the denominator does not get too close to 0. 
+Clipping the dataset involves capping the values of data points to a predefined range, preventing extreme values from disproportionately influencing analysis or model training. We will make sure that each GUID is limited in the amount of datapoints that it can contribute. 
 
 \subsection{Tyler task}
 
@@ -111,6 +159,7 @@ will add lots of detail about lasso, then talk about adapting franke-wolfe to be
 
 \section{Results}
 
+Should we do a results section for each task separately again?
 Should we do a results section for each task separately again?
 
 
@@ -201,6 +250,8 @@ We also would like to thank the authors of the papers we referenced in our liter
 \makereference
 
 \bibliographystyle{style/dsc180bibstyle}
+
+
 \bibliography{reference}
 % To edit the contents of the ``References" section, edit \texttt{reference.bib}. Many conference websites format citations in BibTeX that you can copy into \texttt{reference.bib} directly; you can also search for the paper on Google Scholar, click ``Cite", and then click ``BibTeX" (\href{https://scholar.google.com/scholar?hl=en&as_sdt=0%2C23&q=attention+is+all+you+need&btnG=#d=gs_cit&t=1700436667623&u=%2Fscholar%3Fq%3Dinfo%3A5Gohgn6QFikJ%3Ascholar.google.com%2F%26output%3Dcite%26scirp%3D0%26hl%3Den}{here}'s an example).
 
@@ -218,6 +269,19 @@ We also would like to thank the authors of the papers we referenced in our liter
 Need to add project\_proposal.tex to folder then uncomment here. 
 
 % \input{project_proposal.tex}
+
+
+\subsection{Appendix A: Additional Results}
+example
+
+\subsection{Appendix B: Training Details}
+example
+\subsection{Project Proposal}
+
+
+% Comment out when fixed
+\input{project_proposal.tex}
+% Comment out when fixed
 
 
 \subsection{Appendix A: Additional Results}

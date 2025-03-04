@@ -1,0 +1,6 @@
+pyarrow
+numpy
+pandas
+matplotlib
+glob2
+duckdb

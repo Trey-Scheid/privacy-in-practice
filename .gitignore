@@ -167,7 +167,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+**/.env
 .venv
 env/
 venv/
@@ -241,3 +241,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+0007_part_09_limit_1000000.parquet
+
+# Task22 investigation with sensitive data
+**/inv/
