@@ -1,5 +1,5 @@
 import os
-from feat_build import load_data, process
+from feat_build import load_data, process, synthesize
 from feat_build.utils import global_data
 
 def generate_features(sample_guids_parquet, inv_data_dir, directories):
@@ -28,3 +28,11 @@ def generate_features(sample_guids_parquet, inv_data_dir, directories):
     process.main(inv_data_dir, proc_sysinfo=sysinfo_new)
 
     return True
+
+def generate_synthetic_data(dummy_data_dir):
+    if 'feat.parquet' not in os.listdir(dummy_data_dir):
+        synthesize.main(dummy_data_dir)
+        return True
+
+    print("feat.parquet already exists in the data directory. Skipping synthesis.")
+    return False

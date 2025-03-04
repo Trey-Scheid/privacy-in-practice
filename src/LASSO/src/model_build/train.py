@@ -20,33 +20,32 @@ def train(feat, type='lstsq', tol=1e-4, l=1, max_iter=1000, epsilon=None, delta=
         model = LinearRegression()
     elif type == 'lasso':
         model = Lasso(alpha=l, max_iter=max_iter, tol=tol)
-    elif type == 'fw-lasso':
+    elif type == 'fw-lasso-exp':
+        type_fw = True
+    elif type == 'fw-lasso-lap':
         type_fw = True
     else:
         raise ValueError('type must be "lstsq" or "lasso"')
+    
+    if epsilon is None:
+        epsilon = 1_000_000
 
     # Data split
     X, y = feat.drop(y_name, axis=1), feat[y_name]
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
 
-
     if type_fw:
         #print("training frank wolfe model")
         #print(X_train.to_numpy().shape, y_train.to_numpy().shape)
-        model = fwl.frankWolfeLASSO(X_train.to_numpy(), y_train.to_numpy(), l=l, tol=tol, K=max_iter, delta=delta, epsilon=epsilon)
-        y_pred = X_test.dot(model)
-        mse = mean_squared_error(y_test, y_pred)
-        print(f'Test MSE FW-Alg-L: {mse:.2f} ({100*sum(model>0)/model.shape[0]:.1f}% sparse)')
-        # Coefficient dictionary with feature name
-        coef_dict = dict(zip(X.columns, model))
         
-        if epsilon is None:
-            model = fwe.frankWolfeLASSO(X_train.to_numpy(), y_train.to_numpy(), l=l, delta=delta, epsilon=1_000_000, K=max_iter)
+        if type == 'fw-lasso-lap':
+            model = fwl.frankWolfeLASSO(X_train.to_numpy(), y_train.to_numpy(), l=l, delta=delta, epsilon=epsilon, K=max_iter)
         else:
             model = fwe.frankWolfeLASSO(X_train.to_numpy(), y_train.to_numpy(), l=l, delta=delta, epsilon=epsilon, K=max_iter)
+        
         y_pred = X_test.dot(model)
         mse = mean_squared_error(y_test, y_pred)
-        print(f'Test MSE FW-Alg-E: {mse:.2f} ({100*sum(model>0)/model.shape[0]:.1f}% sparse)')
+        print(f'Test MSE {type}: {mse:.2f} ({100*sum(model>0)/model.shape[0]:.1f}% sparse)')
         # Coefficient dictionary with feature name
         coef_dict = dict(zip(X.columns, model))
     else:

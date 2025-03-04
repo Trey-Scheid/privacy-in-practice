@@ -47,7 +47,8 @@ def frankWolfeLASSO(A, y, l=1.0, tol=1e-4, epsilon=0.1, delta=1e-6, K=15000):
         
     # Set number of iterations based on theory
 
-    L1 = 2 * np.linalg.norm(A.T @ A, ord=2)
+    L1 = np.max(np.linalg.norm(A, ord=1, axis=0))
+    #L1 = 2 * np.linalg.norm(A.T @ A, ord=2) # maximum columnwise: l1 norm of each column then max
     tK = int((L1**(2/3) * (n*epsilon)**(2/3)) / l**(2/3))
     K = max(min(tK, K), 1)
     t = K
