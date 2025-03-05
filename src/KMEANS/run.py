@@ -46,7 +46,8 @@ def preprocess_data(cwd):
     data=pd.DataFrame(df["l1_distance"])
     os.remove(output_parquet_path)
     scaler = MinMaxScaler(feature_range=(-10, 10))
-    return scaler.fit_transform(data)
+    data=scaler.fit_transform(data)
+    return data
 
 def compute_kmeans_loss(data, k, test_size, random_seed):
     """Compute train and test loss using standard KMeans."""
@@ -57,16 +58,33 @@ def compute_kmeans_loss(data, k, test_size, random_seed):
     test_loss = kmeans.compute_inertia(test_data) / test_data.shape[0]
     return train_loss, test_loss
 
-def compute_dpkmeans_inertia(data, k, epsilons):
+def compute_dpkmeans_inertia(data, k, epsilons,tau):
     """Compute DP-KMeans inertia for different epsilon values."""
     inertias = []
     for eps in epsilons:
-        dp_kmeans = src.DPKMeans.DPKMeans(k=k, eps=eps, iterations=10)
+        dp_kmeans = src.DPKMeans.DPKMeans(k=k, eps=eps,tau=tau, iterations=10)
         dp_kmeans.fit(data)
         inertias.append(dp_kmeans.compute_inertia(data) / data.shape[0])
     return inertias
+def compute_dpkmeans_loss(data, k, tau_values,epsilon,test_size, random_seed):
+    """Compute DP-KMeans train and test loss for different tau values."""
+    train_losses = []
+    test_losses = []
+    
+    for tau in tau_values:
+        dp_kmeans = src.DPKMeans.DPKMeans(k=k, eps=epsilon, tau=tau, iterations=10)
+        train_data, test_data = train_test_split(data, test_size=test_size, random_state=random_seed)
+        dp_kmeans.fit(train_data)
+        train_loss = dp_kmeans.compute_inertia(train_data) / train_data.shape[0]
+        test_loss = dp_kmeans.compute_inertia(test_data) / test_data.shape[0]
+        
+        train_losses.append(train_loss)
+        test_losses.append(test_loss)
+    print(train_losses)
+    print(test_losses)
+    return train_losses, test_losses
 
-def plot_results(cwd,epsilons, inertias, train_loss, test_loss, output_path="dp_kmeans_inertia.png"):
+def plot_results(cwd, epsilons, inertias, train_loss, test_loss, tau_values, dp_train_losses, dp_test_losses, output_path="dp_kmeans_inertia.png"):
     """Plot and save the DP-KMeans inertia along with train and test loss."""
     plt.figure(figsize=(12, 6))
     plt.plot(epsilons, inertias, marker='o', linestyle='-', color='b', label='DP-KMeans Inertia')
@@ -83,18 +101,43 @@ def plot_results(cwd,epsilons, inertias, train_loss, test_loss, output_path="dp_
     print(f"Plot saved as {output_path}")
     plt.close()
 
+    # Plot train/test loss vs tau
+    plt.figure(figsize=(12, 6))
+    plt.plot(tau_values, dp_train_losses, marker='o', linestyle='-', color='g', label='DP-KMeans Train Loss')
+    plt.plot(tau_values, dp_test_losses, marker='o', linestyle='-', color='r', label='DP-KMeans Test Loss')
+    plt.xlabel("Tau")
+    plt.ylabel("Loss")
+    plt.title("Effect of Tau on DP-KMeans Train and Test Loss")
+    plt.legend()
+    plt.grid(True)
+    plt.savefig(os.path.join(cwd, '..', '..', 'viz', 'KMEANS', 'dp_kmeans_tau_loss.png'))
+    print("Plot saved as dp_kmeans_tau_loss.png")
+    plt.close()
+
 def main():
     cwd = os.getcwd()
     k = 3
     test_size = 0.2
     random_seed = 42
-    epsilons = [x for x in range(1, 60, 1)]
+    epsilons =np.linspace(0.01, 100, 60)
+    epsilon=1
+    tau = 10
     np.random.seed(random_seed)
     
+    # Preprocess the data
     data = preprocess_data(cwd)
+    
+    # Compute standard KMeans train/test loss
     train_loss, test_loss = compute_kmeans_loss(data, k, test_size, random_seed)
-    inertias = compute_dpkmeans_inertia(data, k, epsilons)
-    plot_results(cwd,epsilons, inertias, train_loss, test_loss,"synthetic_dp_kmeans_inertia")
+    
+    # Compute DP-KMeans inertia for different epsilon values
+    inertias = compute_dpkmeans_inertia(data, k, epsilons, tau)
+    
+    # Compute DP-KMeans train/test loss for different tau values
+    tau_values = np.linspace(.01, 10, 30)
+    dp_train_losses, dp_test_losses = compute_dpkmeans_loss(data, k, tau_values, epsilon, test_size, random_seed)
+    
 
+    plot_results(cwd, epsilons, inertias, train_loss, test_loss, tau_values, dp_train_losses, dp_test_losses, "synthetic_dp_kmeans_inertia")
 if __name__ == "__main__":
     main()
