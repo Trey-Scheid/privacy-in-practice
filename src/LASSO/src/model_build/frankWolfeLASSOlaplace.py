@@ -20,7 +20,7 @@ def fwOracle(grad, l):
     s[i] = -np.sign(grad[i]) * l
     return s
 
-def frankWolfeLASSO(A, y, l=500, tol=0.0001, K=15000, delta=1e-6, epsilon=None):
+def frankWolfeLASSO(A, y, l=1.0, tol=0.0001, K=15000, delta=1e-6, epsilon=None, plot=False):
     if isinstance(A, pd.DataFrame):
         A = A.to_numpy()
     if isinstance(y, (pd.DataFrame, pd.Series)):

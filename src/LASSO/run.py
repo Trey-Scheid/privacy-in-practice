@@ -34,6 +34,7 @@ def main(targets):
         directories = None
         sample_guids_parquet = None
         model = None
+        feat_parquet = None
         directories = None
         sample_guids_parquet = None
     # set default values if not specified
@@ -62,7 +63,7 @@ def main(targets):
     # run model on each epsilon value
     epsresults = []
     for eps in epss:
-        test_mse, feat_dict, r2 = train.train(feat, model, tol=tol, l=l, epsilon=eps, max_iter=max_iter)
+        test_mse, feat_dict, r2 = train.train(feat, model, tol=tol, l=l, epsilon=eps, max_iter=max_iter, plot=Path(output_fp) / f'{model}_{eps}_convergence.png')
         
         epsresults.append(test_mse)
     
