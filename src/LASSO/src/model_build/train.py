@@ -37,7 +37,7 @@ def trivial(feat, correct_feats):
     
     return mse, coef_dict, r2, similarity
 
-def train(feat, correct_feats, method='lstsq', tol=1e-4, l=1, max_iter=1000, epsilon=None, delta=1e-6, plot=False):
+def train(feat, correct_feats, method='lstsq', tol=1e-4, l=1, max_iter=1000, epsilon=None, delta=1e-6, plot=False, normalize=False, clip_sd=None):
     """
     Train linear model for power usage
 
@@ -50,6 +50,8 @@ def train(feat, correct_feats, method='lstsq', tol=1e-4, l=1, max_iter=1000, eps
         model = LinearRegression()
     elif method == 'lasso':
         model = Lasso(alpha=l, max_iter=max_iter, tol=tol, fit_intercept=True)
+    elif method == "fw-lasso":
+        type_fw = True
     elif method == 'fw-lasso-exp':
         type_fw = True
     elif method == 'fw-lasso-lap':
@@ -62,13 +64,15 @@ def train(feat, correct_feats, method='lstsq', tol=1e-4, l=1, max_iter=1000, eps
         #print(X_train.to_numpy().shape, y_train.to_numpy().shape)
         X, y = feat.drop(y_name, axis=1), feat[y_name]
         ones_column = np.ones((X.shape[0], 1))
-        X_train, X_test, y_train, y_test = train_test_split(np.hstack((ones_column, X)), y, test_size=0.2, random_state=1)
+        X_train, X_test, y_train, y_test = train_test_split(np.hstack((ones_column, X)), y, test_size=0.85, random_state=1)
 
         should_trace = True if plot else False
         if method == 'fw-lasso-lap':
-            model = FWLasso.frankWolfeLASSOLaplace(X_train, y_train, l=l, delta=delta, epsilon=epsilon, K=max_iter, trace=should_trace)
+            model = FWLasso.LaplaceNoise(X_train, y_train, l=l, delta=delta, epsilon=epsilon, K=max_iter, trace=should_trace, normalize=normalize, clip_sd=clip_sd)
+        elif method == "fw-lasso":
+            model = FWLasso.FW_NonPrivate(X_train, y_train, l=l, tol=tol, K=max_iter, normalize=normalize, clip_sd=clip_sd, trace=should_trace)
         else:
-            model = FWLasso.frankWolfeLASSOexponential(X_train, y_train, l=l, delta=delta, epsilon=epsilon, K=max_iter, trace=should_trace)
+            model = FWLasso.ExponentialMechanism(X_train, y_train, l=l, delta=delta, epsilon=epsilon, K=max_iter, normalize=normalize, clip_sd=clip_sd, trace=should_trace)
         print(f'Train MSE fw: {mean_squared_error(y_train, X_train @ model.get("model")):.2f} ({100*sum(model.get("model")>0)/model.get("model").shape[0]:.1f}% sparse)')
         y_pred = X_test @ model.get("model")
         mse = mean_squared_error(y_test, y_pred)
