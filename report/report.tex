@@ -117,6 +117,7 @@ will add lots of detail about lasso, then talk about adapting franke-wolfe to be
 K-Means clustering (Lloyd's Algorithm) is applied to group devices based on similarities in their usage patterns. The method leverages Z-scores for standardizing the usage data and calculates L1 distances between weekly usage patterns to identify trends over time. Lloyd's Algorithm clusters devices by assigning them to centroids based on their usage patterns, recalculating the centroids as the mean of assigned points after each iteration. 
 
 Differentially Private Lloyd's Algorithm (DP-Lloyd's)\footnote{linkneeded} modifies the standard K-Means clustering by adding Laplacian noise during the iterative centroid update step to ensure privacy. It introduces noise to both the sum of coordinates and the count of points within clusters, with the amount of noise controlled by the number of iterations and the sensitivity of the data. 
+
 \subsubsection{Z-score (Additive Noise)}
 As Z-score is computed before performing K-means clustering, 
 \[
@@ -135,7 +136,7 @@ Z_{\text{private}} = \frac{X - \mu}{\sigma} + \text{Lap}\left(\frac{\Delta f}{\e
 
 
 
-\subsection{Probabilty (Additive Noise)}
+\subsubsection{Probabilty (Additive Noise)}
 The probability of one or more uncorrected errors occurring on a system given the number of corrected errors it experienced during a specific time period is given as 
 \[
 P(Uncorrected|Corrected) = \frac{P(Corrected \cap Uncorrected)}{P(Corrected)}
@@ -145,9 +146,11 @@ To privatize this mechanism, one can apply two methods, adding noise to the nume
 \frac{\nabla f}{\epsilon}$, where $\nabla f$ is the sensitivity and $\nabla f$ is the privacy paramater. The sensitivity in this case for both the numerator and denominator will be equal to 1 because the max change in probability is equal to 1. 
 
 In addition to the noise that is added we will regularize the data by adding a constant, $\lambda$. This constant will also be added to both the numerator and denominator so that the denominator does not get too close to 0. 
-Clipping the dataset involves capping the values of data points to a predefined range, preventing extreme values from disproportionately influencing analysis or model training. We will make sure that each GUID is limited in the amount of datapoints that it can contribute.
+Clipping the dataset involves capping the values of data points to a predefined range, preventing extreme values from disproportionately influencing analysis or model training. We will make sure that each GUID is limited in the amount of datapoints that it can contribute. 
 
+\subsection{Tyler task}
 
+\subsection{Bradley task}
 
 
 %%%%%%%%%%%%%%%%%%%
@@ -156,6 +159,7 @@ Clipping the dataset involves capping the values of data points to a predefined 
 
 \section{Results}
 
+Should we do a results section for each task separately again?
 Should we do a results section for each task separately again?
 
 
@@ -216,18 +220,8 @@ Trey Scheid
 Tyler Kurpanek
 
 Bradley Nathanson
-\begin{itemize}
-    \item Replicated K-means clustering using Z-scores from the Clustering Devices Together Using To Detect Change Patterns Paper
-    \item Implemented non-private K-means clustering 
-    \item [ ] Todo: Implementation of private K-means clustering using either private Lloyd's algorithm or privatizing Z-scores before clustering
-\end{itemize}
 
 Christopher Lum
-\begin{itemize}
-    \item Replicated Logistic Regression analysis using DP-SGD
-    \item Introduced methods for engineering data
-    \item [ ] Todo: Implement private Logistic Regression and compare to non-private model
-\end{itemize}
 
 Yu-Xiang Wang
 \begin{itemize}
@@ -269,6 +263,19 @@ We also would like to thank the authors of the papers we referenced in our liter
 \clearpage
 \makeappendix
 
+\subsection{Project Proposal}
+
+
+Need to add project\_proposal.tex to folder then uncomment here. 
+
+% \input{project_proposal.tex}
+
+
+\subsection{Appendix A: Additional Results}
+example
+
+\subsection{Appendix B: Training Details}
+example
 \subsection{Project Proposal}
 
 
