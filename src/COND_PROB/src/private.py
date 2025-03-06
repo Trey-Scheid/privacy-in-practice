@@ -200,7 +200,7 @@ def plot_histogram(parquet_path_pattern, epsilon, output_dir):
     plt.show()
 
     # Save figure
-    plot_filename = os.path.join(output_dir, "histogram_epsilon.png")
+    plot_filename = os.path.join(output_dir, "epsilon_vs_utility.png")
     plt.savefig(plot_filename, dpi=300, facecolor='white')
     plt.close()
 
@@ -214,7 +214,7 @@ def main():
 
 
     #This does 1 parquet
-    #parquet_path_pattern = "D:/CapstoneTyler/0007_part_00.parquet"
+    parquet_path_pattern = "D:/CapstoneTyler/0007_part_00.parquet"
 
 
     #This does all parquets in my hard drive
@@ -232,7 +232,7 @@ def main():
     try:
 
         #This calcualtes the utilty
-        #print(caluculate_utility(parquet_path_pattern, [0.01,.1,1,10,100]))
+        print(caluculate_utility(parquet_path_pattern, [0.01,.1,1,10,100]))
 
         #This plots the histogram at a certain epsilon
         #plot = plot_histogram(parquet_path_pattern, 1, output_dir=r"D:\CapstoneTyler\visualizations")
