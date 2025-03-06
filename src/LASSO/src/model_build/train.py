@@ -2,8 +2,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression, Lasso
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
-import model_build.frankWolfeLASSOlaplace as fwl # how to do this relatively?
-import model_build.frankWolfeLASSOexponential as fwe # how to do this relatively?
+import src.model_build.frankWolfeLASSOlaplace as fwl
+import src.model_build.frankWolfeLASSOexponential as fwe
 
 y_name = 'power_mean'
 
@@ -19,7 +19,7 @@ def train(feat, type='lstsq', tol=1e-4, l=1, max_iter=1000, epsilon=None, delta=
     if type == 'lstsq':
         model = LinearRegression()
     elif type == 'lasso':
-        model = Lasso(alpha=l, max_iter=max_iter, tol=tol)
+        model = Lasso(alpha=l, max_iter=max_iter, tol=tol, fit_intercept=False)
     elif type == 'fw-lasso-exp':
         type_fw = True
     elif type == 'fw-lasso-lap':
@@ -45,7 +45,7 @@ def train(feat, type='lstsq', tol=1e-4, l=1, max_iter=1000, epsilon=None, delta=
         
         y_pred = X_test.dot(model)
         mse = mean_squared_error(y_test, y_pred)
-        print(f'Test MSE {type}: {mse:.2f} ({100*sum(model>0)/model.shape[0]:.1f}% sparse)')
+        # print(f'Test MSE {type}: {mse:.2f} ({100*sum(model>0)/model.shape[0]:.1f}% sparse)')
         # Coefficient dictionary with feature name
         coef_dict = dict(zip(X.columns, model))
     else:
@@ -54,7 +54,7 @@ def train(feat, type='lstsq', tol=1e-4, l=1, max_iter=1000, epsilon=None, delta=
         # MSE calculation
         y_pred = model.predict(X_test)
         mse = mean_squared_error(y_test, y_pred)
-        print(f'Test MSE sklearn: {mse:.2f} ({100*sum(model.coef_>0)/model.coef_.shape[0]:.1f}% sparse)')
+        # print(f'Test MSE sklearn: {mse:.2f} ({100*sum(model.coef_>0)/model.coef_.shape[0]:.1f}% sparse)')
         # Coefficient dictionary with feature name
         coef_dict = dict(zip(X.columns, model.coef_))
 
