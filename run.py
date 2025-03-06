@@ -6,18 +6,18 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from GD import GD
-from SGD import SGD
-from FTRLM import FTRLM
-from ObjectivePerturbation import ObjPert
+from src.LASSO import run as runLasso
+from src.COND_PROB.src import private as runCondProb
+from src.KMEANS import run as runKMeans
+from src.LR_PVAL import run as runLRPval
 
 
 def main(targets):
     with open("config.json") as fh:
         params = json.load(fh)
 
-    all_methods = ["gd", "sgd", "ftrlm", "objpert", "outpert"]
-    all_objects = [GD, SGD, FTRLM, ObjPert]
+    all_methods = ["lasso", "cond_prob", "kmeans", "lr_pval"]
+    all_objects = [runLasso, runCondProb, runKMeans, runLRPval]
 
     # if no target is specified, run all methods
     target_methods = set(all_methods).intersection(set(targets))
@@ -30,25 +30,27 @@ def main(targets):
             continue
 
         print(f"Running {method}")
-        run = obj(**params)
-        combine_df = run.run_all_plots()
+        combine_df = obj.main(**params)
         combined_df.append(combine_df)
 
-    combine_plot(combined_df)
+    fp = params.get("output")
+    combine_plot(combined_df, fp)
 
 
-def combine_plot(combined_df):
+def combine_plot(combined_df, fp):
     big_df = pd.concat(combined_df)
     plt.clf()
     plot = sns.lineplot(
         x="Epsilon", y="Error", hue="Method", style="Method", data=big_df, markers=True
     )
-    plt.title("Test Error vs Epsilon")
-    plt.xlabel("Epsilon")
-    plt.ylabel("Error")
+    plt.xscale("log")
+    plt.ylim(0, 1)
+    plt.title("Utility vs Epsilon")
+    plt.xlabel("Epsilo (log scale)")
+    plt.ylabel("Normalized Utility")
 
     plt.tight_layout()
-    plt.savefig("plots/combined_plot.png")
+    plt.savefig(fp + "results.png")
 
 
 if __name__ == "__main__":
