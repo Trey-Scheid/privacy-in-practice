@@ -1,6 +1,6 @@
 import os
-from feat_build import load_data, process
-from feat_build.utils import global_data
+from src.feat_build import load_data, process
+from src.feat_build.utils import global_data
 
 import pandas as pd
 import numpy as np
@@ -29,6 +29,6 @@ def main(dummy_data_dir,  n_samples=1000):
     random_data["screensize_category"] = rng.integers(0, 10, size=n_samples)
     
     random_df = pd.DataFrame(random_data)
-    random_df.to_parquet(dummy_data_dir / 'synthetic_data.parquet')
+    random_df.to_parquet(dummy_data_dir / 'Lasso_Regression'/ 'synthetic_data.parquet')
 
     return True

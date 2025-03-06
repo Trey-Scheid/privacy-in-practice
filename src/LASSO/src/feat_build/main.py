@@ -1,6 +1,6 @@
 import os
-from feat_build import load_data, process, synthesize
-from feat_build.utils import global_data
+from src.feat_build import load_data, process, synthesize
+from src.feat_build.utils import global_data
 
 def generate_features(sample_guids_parquet, inv_data_dir, directories):
     """

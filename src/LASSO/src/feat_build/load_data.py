@@ -3,7 +3,7 @@ import os
 #from pathlib import Path
 import duckdb
 import pyarrow.parquet as pq
-from feat_build.utils import table_names, global_data
+from src.feat_build.utils import table_names, global_data
 
 def condense_parquet_files(input_directory, output_file):
     """Use if you have multiple parquet files in a directory that you want to combine into a single file, recommended for 16GB RAM to limit total parquet sizes to 5GB or less before condensing"""
