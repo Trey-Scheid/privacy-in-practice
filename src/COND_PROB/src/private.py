@@ -471,15 +471,12 @@ def main():
     #This does 1 parquet
     #parquet_path_pattern = "D:/CapstoneTyler/0007_part_00.parquet"
 
-
-    #This does all parquets in my hard drive
-    #parquet_path_pattern = "D:/CapstoneTyler/*.parquet"
-
     #This does the dummy parquets
     #parquet_path_pattern = r"C:\Users\Tyler\OneDrive\Desktop\180B\Novel-Techniques-in-Private-Data-Analysis\dummy_data\eventlog_header_hist_CONDPROB\header.parquet"
 
     #This does a select few parquets
-    parquet_path_pattern =  [r"D:\CapstoneTyler\0007_part_00.parquet",r"D:\CapstoneTyler\0007_part_36.parquet"]
+    parquet_path_pattern =  [r"D:\CapstoneTyler\0007_part_00.parquet",r"D:\CapstoneTyler\0007_part_36.parquet",r"D:\CapstoneTyler\0007_part_38.parquet",r"D:\CapstoneTyler\0007_part_39.parquet",r"D:\CapstoneTyler\0007_part_40.parquet",r"D:\CapstoneTyler\0007_part_42.parquet",
+                             r"D:\CapstoneTyler\0003_part_00.parquet",r"D:\CapstoneTyler\0003_part_36.parquet",r"D:\CapstoneTyler\0003_part_37.parquet",r"D:\CapstoneTyler\0003_part_38.parquet",r"D:\CapstoneTyler\0007_part_39.parquet",r"D:\CapstoneTyler\0007_part_40.parquet"]
 
     if isinstance(parquet_path_pattern, list):
        #This calcualtes the utilty
@@ -492,10 +489,10 @@ def main():
         try:
 
             #This calcualtes the utilty
-            print(caluculate_utility(parquet_path_pattern, [0.01,.1,1,10,100]))
+            #print(caluculate_utility(parquet_path_pattern, [0.01,.1,1,10,100]))
 
             #This plots the histogram at a certain epsilon
-            #plot = plot_histogram(parquet_path_pattern, 1, output_dir=r"D:\CapstoneTyler\visualizations")
+            plot = plot_histogram(parquet_path_pattern, 1, output_dir=r"D:\CapstoneTyler\visualizations")
 
         except FileNotFoundError as e:
             print(e)
