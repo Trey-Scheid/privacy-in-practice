@@ -1,10 +1,10 @@
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression, Lasso
 from sklearn.metrics import mean_squared_error, r2_score#, jaccard_score
-import src.model_build.frankWolfeLASSOlaplace as fwl
-import src.model_build.frankWolfeLASSOexponential as fwe
 import matplotlib.pyplot as plt
 import numpy as np
+
+from src.model_build import frankWolfeLASSO as FWLasso
 
 y_name = 'power_mean'
 
@@ -66,9 +66,9 @@ def train(feat, correct_feats, method='lstsq', tol=1e-4, l=1, max_iter=1000, eps
 
         should_trace = True if plot else False
         if method == 'fw-lasso-lap':
-            model = fwl.frankWolfeLASSO(X_train, y_train, l=l, delta=delta, epsilon=epsilon, K=max_iter, trace=should_trace)
+            model = FWLasso.frankWolfeLASSOLaplace(X_train, y_train, l=l, delta=delta, epsilon=epsilon, K=max_iter, trace=should_trace)
         else:
-            model = fwe.frankWolfeLASSO(X_train, y_train, l=l, delta=delta, epsilon=epsilon, K=max_iter, trace=should_trace)
+            model = FWLasso.frankWolfeLASSOexponential(X_train, y_train, l=l, delta=delta, epsilon=epsilon, K=max_iter, trace=should_trace)
         print(f'Train MSE fw: {mean_squared_error(y_train, X_train @ model.get("model")):.2f} ({100*sum(model.get("model")>0)/model.get("model").shape[0]:.1f}% sparse)')
         y_pred = X_test @ model.get("model")
         mse = mean_squared_error(y_test, y_pred)

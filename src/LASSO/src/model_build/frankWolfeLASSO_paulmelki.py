@@ -1,3 +1,5 @@
+# source: https://github.com/paulmelki/Frank-Wolfe-Algorithm-Python
+
 # IMPLEMENTATION OF THE FRANK-WOLFE ALGORITHM
 # In this file, we define the functions required for the implementation of the algorithm.
 import numpy as np
