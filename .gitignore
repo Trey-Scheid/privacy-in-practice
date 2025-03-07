@@ -245,3 +245,4 @@ $RECYCLE.BIN/
 
 # Task22 investigation with sensitive data
 **/inv/
+node_modules

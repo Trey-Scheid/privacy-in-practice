@@ -1,0 +1,6 @@
+task,epsilon,utility
+cond-prob,0.01,0
+cond-prob,0.1,0.6480710025
+cond-prob,1,0.9913813099
+cond-prob,10,0.999226651
+cond-prob,100,1

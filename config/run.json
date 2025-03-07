@@ -1,6 +1,7 @@
 {
-    "fp": "dummy_data",
-    "output": "viz",
+    "data": "dummy_data",
+    "output": ["viz", "static_output"],
+    "task":["cond_prob", "kmeans", "lasso", "lr_pval"],
     "epsilons": [0.01, 0.1, 1.0, 10, 100],
     "delta": 1e-6,
     "lasso-params": {
@@ -12,5 +13,17 @@
         "feat_parquet":"synthetic_data.parquet",
         "directories":["frgnd_backgrnd_apps_v4_hist", "web_cat_usage_v2","power_acdc_usage_v4_hist","os_c_state", "hw_pack_run_avg_pwr"],
         "sample_guids_parquet":"sample_guids.parquet"
+    },
+    "cond-prob-params": {
+        "a": 5,
+        "b": "example"
+    },
+    "kmeans-params": {
+        "a": 5,
+        "b": "example"
+    },
+    "lr-pval-params": {
+        "a": 5,
+        "b": "example"
     }
 }
