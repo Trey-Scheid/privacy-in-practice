@@ -47,12 +47,15 @@ the methods inputted into the target arguments.
 │  │  └─ src/            <- ETL and other .py
 │  ├─ Task LASSO
 │  │  ├─ run.py
+│  │  ├─ inv.ipynb
 │  │  └─ src/
 │  ├─ Task LR_PVAL
 │  │  ├─ run.py
+│  │  ├─ inv.ipynb
 │  │  └─ src/
 │  └─ Task COND_PROB
 │     ├─ run.py
+│     ├─ inv.ipynb
 │     └─ src/
 │
 ├─ report                <- Research paper, detailed methods + results
@@ -65,15 +68,17 @@ the methods inputted into the target arguments.
 │
 ├─ config/               <- parameters for run.py and each other .py
 │
-├─ dynamic_output/       <- Stores output plots and tables from run.py
-│
-├─ static_output/        <- Output plots/tables from Intel Telemetry Data 
+├─ viz
+│  ├─ dynamic_output/    <- Stores output plots and tables from run.py
+│  └─ static_output/     <- Output plots/tables from Intel Telemetry Data 
 │
 ├─ dummy_data/           <- parquets for each task, random noise in schema
 │  ├─ raw/               <- "read only" parquets used by tasks
 │  └─ processed/         <- results of etl work for faster re-runs
 │
-└─ models/               <- trained models from tasks
+├─ .github/workflows/nextjs.yml      <- Builds github.io website from branch│
+│
+└─ deliverable_assets/   <- website imgs, trained models from tasks etc
 ```
 
 Note that the website is deployed from the website branch.
