@@ -3,7 +3,7 @@
 # "Frank-Wolfe Algorithm in Python" by Le Anh DUNG and Paul MELKI (Toulouse School of Economics)
 # https://github.com/paulmelki/Frank-Wolfe-Algorithm-Python
 
-#%% Imports
+#%% Imports and filepaths
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -12,6 +12,12 @@ from src.model_build.frank_wolfe_deprecated import frankWolfeLASSO
 # Todo is edit FW_NonPrivate to have these same outputs!
 #from src.model_build.frankWolfeLASSO import FW_NonPrivate
 
+import os
+from pathlib import Path
+
+src = Path(os.path.dirname(os.path.abspath(__file__))).parent
+vis_dir = src.parent / 'viz' / 'dynamic_output' / 'LASSO'
+print("Save plots to", vis_dir)
 
 #%% First round of testing of our implementation:
 # We fix the number of obseverations (n) and the number of parameters (p)
@@ -92,7 +98,7 @@ plt.suptitle("Solving LASSO problem using Frank-Wolfe Algorithm", fontsize=16)
 plt.xlabel("Tolerance level")
 plt.ylabel("Number of iterations (k)")
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-plt.savefig("Iterations_l.png")
+plt.savefig(vis_dir / "Iterations_l.png")
 plt.show()
 
 
@@ -163,7 +169,7 @@ plt.suptitle("Solving LASSO problem using Frank-Wolfe Algorithm", fontsize=16)
 plt.xlabel("Tolerance level")
 plt.ylabel("Number of iterations (k)")
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-plt.savefig("Iterations_p.png")
+plt.savefig(vis_dir / "Iterations_p.png")
 plt.show()
 
 
@@ -236,5 +242,5 @@ plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 plt.suptitle("Solving LASSO problem using Frank-Wolfe Algorithm", fontsize=16)
 plt.xlabel("Tolerance level")
 plt.ylabel("Number of iterations (k)")
-plt.savefig("Iterations_n.png")
+plt.savefig(vis_dir / "Iterations_n.png")
 plt.show()
