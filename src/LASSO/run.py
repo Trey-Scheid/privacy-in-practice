@@ -9,17 +9,22 @@ from src.feat_build import main
 
 def main(targets):
     # read in parameters from command line
-    if 'data' in targets:
-        with open('data-params.json') as fh:
+    if '' in targets:
+        with open('config.json') as fh:
             data_params = json.load(fh)
             eps_vals = data_params["eps_vals"]
-            l = data_params.get("l")
-            tol = data_params.get("tol")
-            max_iter = data_params.get("max_iter")
-            c = data_params.get("c")
-            directories = data_params.get("directories")
-            sample_guids_parquet = data_params.get("sample_guids_parquet")
-            model = data_params.get("model")
+            data_fp = data_params.get("fp")
+            output_fp = data_params.get("output")
+
+            lasso_params = data_params["lasso-params"]
+            
+            l = lasso_params.get("l")
+            tol = lasso_params.get("tol")
+            max_iter = lasso_params.get("max_iter")
+            c = lasso_params.get("c")
+            directories = lasso_params.get("directories")
+            sample_guids_parquet = lasso_params.get("sample_guids_parquet")
+            model = lasso_params.get("model")
     else:
         eps_vals = None
         l = None
@@ -29,6 +34,7 @@ def main(targets):
         directories = None
         sample_guids_parquet = None
         model = None
+        feat_parquet = None
         directories = None
         sample_guids_parquet = None
     # set default values if not specified
@@ -38,25 +44,26 @@ def main(targets):
     if max_iter is None: max_iter=2500
     if c is None: c=0.1
     if model is None: model='fw-lasso-exp'
+    if feat_parquet is None: feat_parquet = 'feat.parquet'
     if directories is None: directories = ["frgnd_backgrnd_apps_v4_hist", "web_cat_usage_v2","power_acdc_usage_v4_hist","os_c_state", "hw_pack_run_avg_pwr"]
     if sample_guids_parquet is None: sample_guids_parquet = 'sample_guids.parquet'
 
-    inv_dir = Path(os.getcwd())
-    proj_dir = inv_dir.parent
+    inv_dir = Path(data_fp)
+    #proj_dir = inv_dir.parent
 
     # create feat.parquet if it doesn't exist
-    if 'feat.parquet' not in os.listdir(inv_dir / 'out'):
-        main.generate_features(sample_guids_parquet, inv_dir, directories)
+    if feat_parquet not in os.listdir(data_fp / 'out'):
+        main.generate_features(inv_dir / sample_guids_parquet, inv_dir, directories)
     else:
         print('Features already generated')
 
     # read data
-    feat = pd.read_parquet(os.path.join('out', 'feat.parquet'))
+    feat = pd.read_parquet(os.path.join(data_fp / 'out', feat_parquet))
 
     # run model on each epsilon value
     epsresults = []
     for eps in epss:
-        test_mse, feat_dict, r2 = train.train(feat, model, tol=tol, l=l, epsilon=eps, max_iter=max_iter)
+        test_mse, feat_dict, r2 = train.train(feat, model, tol=tol, l=l, epsilon=eps, max_iter=max_iter, plot=Path(output_fp) / f'{model}_{eps}_convergence.png')
         
         epsresults.append(test_mse)
     
@@ -75,5 +82,4 @@ def main(targets):
                          'utility': utility.tolist()})
 
 if __name__ == "__main__":
-    targets = sys.argv[1:]
-    main(targets)
+    main()
