@@ -13,7 +13,7 @@ def jaccard_similarity(set1, set2):
     union = len(set(set1).union(set2))
     return intersection / union
 
-def trivial(feat, correct_feats):
+def trivial(feat, correct_feats=None):
     # prep feature data and prediction array
     X, y = feat.drop(y_name, axis=1), feat[y_name]
     ones_column = np.ones((X.shape[0], 1))
@@ -33,11 +33,11 @@ def trivial(feat, correct_feats):
     
     r2 = r2_score(y_test, np.repeat(avg, y_test.shape[0]), force_finite=False)
     
-    similarity = jaccard_similarity(correct_feats, [k for k, v in coef_dict.items() if v > 0])
+    similarity = jaccard_similarity(correct_feats, [k for k, v in coef_dict.items() if v > 0]) if not correct_feats is None else None
     
     return mse, coef_dict, r2, similarity
 
-def train(feat, correct_feats, method='lstsq', tol=1e-4, l=1, max_iter=1000, epsilon=None, delta=1e-6, plot=False, normalize=False, clip_sd=None):
+def train(feat, correct_feats=None, method='lstsq', tol=1e-4, l=1, max_iter=1000, epsilon=None, delta=1e-6, plot=False, normalize=False, clip_sd=None):
     """
     Train linear model for power usage
 
@@ -60,7 +60,7 @@ def train(feat, correct_feats, method='lstsq', tol=1e-4, l=1, max_iter=1000, eps
         #print(X_train.to_numpy().shape, y_train.to_numpy().shape)
         X, y = feat.drop(y_name, axis=1), feat[y_name]
         ones_column = np.ones((X.shape[0], 1))
-        X_train, X_test, y_train, y_test = train_test_split(np.hstack((ones_column, X)), y, test_size=0.85, random_state=1)
+        X_train, X_test, y_train, y_test = train_test_split(np.hstack((ones_column, X)), y, test_size=0.5, random_state=1)
 
         should_trace = True if plot else False
         if method == 'fw-lasso-lap':
@@ -110,7 +110,7 @@ def train(feat, correct_feats, method='lstsq', tol=1e-4, l=1, max_iter=1000, eps
         coef_dict["Intercept"] = model.intercept_
 
     r2 = r2_score(y_test, y_pred, force_finite=False)
-    similarity = jaccard_similarity(correct_feats, [k for k, v in coef_dict.items() if v > 0])
+    similarity = jaccard_similarity(correct_feats, [k for k, v in coef_dict.items() if v > 0]) if not correct_feats is None else "No correct feature name vector passed to find similarity"
     
     if plot:
         trace = model.get("plot")
