@@ -111,7 +111,7 @@ def ExponentialMechanism(A, y, l=1.0, tol=1e-4, epsilon=None, delta=1e-6, K=1500
         x_new[selected_idx % p] += s*rho
         f_new = f(x_new, A, y)
         if trace:
-            convergence_criteria.append(abs(f_new - f_prev))#grad @ x_new)
+            convergence_criteria.append(f_new)#grad @ x_new)
         if  abs(f_new - f_prev) < tol:# or (grad @ x_new) < tol: #or np.linalg.norm(x_new - x_prev, ord=np.inf) < tol:
             t = k
             print(f"converged at: {t}")

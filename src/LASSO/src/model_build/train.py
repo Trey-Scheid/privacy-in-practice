@@ -50,11 +50,7 @@ def train(feat, correct_feats, method='lstsq', tol=1e-4, l=1, max_iter=1000, eps
         model = LinearRegression()
     elif method == 'lasso':
         model = Lasso(alpha=l, max_iter=max_iter, tol=tol, fit_intercept=True)
-    elif method == "fw-lasso":
-        type_fw = True
-    elif method == 'fw-lasso-exp':
-        type_fw = True
-    elif method == 'fw-lasso-lap':
+    elif method in set(["fw-lasso", 'fw-lasso-exp', 'fw-lasso-lap', 'compare-fw-plot']):
         type_fw = True
     else:
         raise ValueError('method must be "lstsq" or "lasso"')
@@ -71,6 +67,26 @@ def train(feat, correct_feats, method='lstsq', tol=1e-4, l=1, max_iter=1000, eps
             model = FWLasso.LaplaceNoise(X_train, y_train, l=l, delta=delta, epsilon=epsilon, K=max_iter, trace=should_trace, normalize=normalize, clip_sd=clip_sd)
         elif method == "fw-lasso":
             model = FWLasso.FW_NonPrivate(X_train, y_train, l=l, tol=tol, K=max_iter, normalize=normalize, clip_sd=clip_sd, trace=should_trace)
+        elif method == 'compare-fw-plot':
+            model1 = FWLasso.ExponentialMechanism(X_train, y_train, l=l, delta=delta, epsilon=epsilon, K=max_iter, normalize=normalize, clip_sd=clip_sd, trace=should_trace)
+            model2 = FWLasso.FW_NonPrivate(X_train, y_train, l=l, tol=tol, K=max_iter, normalize=normalize, clip_sd=clip_sd, trace=should_trace)
+            if plot:
+                trace1 = model1.get("plot")
+                trace2 = model2.get("plot")
+                plt.clf()
+                plt.figure(figsize=(4, 4))
+                plt.plot(range(len(trace1)), trace1 / max(trace1), "#76ABAE",
+                        range(len(trace2)), trace2 / max(trace2), "#31363F",
+                        lw=2)
+                plt.yscale('log')
+                # plt.xlabel('Number of iterations')
+                # plt.ylabel('Training Lasso Loss')
+                # plt.title(f'{method} Convergence')
+                # plt.xlim()
+                # plt.grid()
+                # plt.tight_layout()
+                plt.savefig(plot, dpi=300, facecolor='#EEEEEE', edgecolor='#EEEEEE', pad_inches=1)
+                return 0, 0, 0, 0
         else:
             model = FWLasso.ExponentialMechanism(X_train, y_train, l=l, delta=delta, epsilon=epsilon, K=max_iter, normalize=normalize, clip_sd=clip_sd, trace=should_trace)
         print(f'Train MSE fw: {mean_squared_error(y_train, X_train @ model.get("model")):.2f} ({100*sum(model.get("model")>0)/model.get("model").shape[0]:.1f}% sparse)')
@@ -99,7 +115,7 @@ def train(feat, correct_feats, method='lstsq', tol=1e-4, l=1, max_iter=1000, eps
     if plot:
         trace = model.get("plot")
         plt.clf()
-        plt.plot(range(len(trace)), trace / max(trace), color="#00C7FD", lw=2)
+        plt.plot(range(len(trace)), trace / max(trace), color="#31363F", lw=2)
         plt.yscale('log')
         plt.xlabel('Number of iterations')
         plt.ylabel('Delta f')
@@ -107,5 +123,5 @@ def train(feat, correct_feats, method='lstsq', tol=1e-4, l=1, max_iter=1000, eps
         # plt.xlim()
         plt.grid()
         plt.tight_layout()
-        plt.savefig(plot)
+        plt.savefig(plot, dpi=300, facecolor='#EEEEEE', edgecolor='#EEEEEE')
     return mse, coef_dict, r2, similarity
