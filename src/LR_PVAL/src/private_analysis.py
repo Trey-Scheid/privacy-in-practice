@@ -39,9 +39,6 @@ class private_analysis:
 
         self.global_sensitivity = 1
         self.epsilon = epsilon
-        proportion_fitting = 0.75
-        self.ep_fitting = self.epsilon * proportion_fitting
-        self.ep_pval = self.epsilon * (1 - proportion_fitting)
         self.delta = delta
         self.verbose = verbose
         self.process_data()
@@ -110,7 +107,7 @@ class private_analysis:
     def find_appropriate_niter(self, sigma):
         NoisyGD_fix_sigma = lambda x: NoisyGD_mech(sigma, x)
         calibrate = eps_delta_calibrator()
-        mech = calibrate(NoisyGD_fix_sigma, self.ep_fitting, self.delta, [0, 500000])
+        mech = calibrate(NoisyGD_fix_sigma, self.epsilon, self.delta, [0, 500000])
         niter = int(np.floor(mech.params["coeff"]))
         return niter
 
@@ -186,19 +183,37 @@ class private_analysis:
         return self.theta, loss, results
 
 
-def run_single_permutation(
-    raw_X, raw_y, epsilon, delta, verbose, log_gap, mid_results, seed
-):
-    """Run a single permutation with the given random seed"""
-    np.random.seed(seed)
+def run_single_permutation(raw_X, raw_y, epsilon, delta, verbose, log_gap, mid_results):
+    """Run a single permutation"""
     shuffled_y = np.random.permutation(raw_y)
     return private_analysis(
         X=raw_X, y=shuffled_y, epsilon=epsilon, delta=delta, verbose=verbose
     ).fit(log_gap=log_gap, mid_results=mid_results)[2]
 
 
+def save_progress(results, data_dir, bugcheck_id, is_final=False):
+    """Save results to either in-progress or final directory"""
+    results_df = pd.DataFrame(results)
+
+    if is_final:
+        # Save to final location
+        os.makedirs(os.path.join(data_dir, "permutation_results"), exist_ok=True)
+        final_path = os.path.join(data_dir, "permutation_results", f"{bugcheck_id}.csv")
+        results_df.to_csv(final_path, index=False)
+
+        # Remove in-progress file if it exists
+        in_progress_path = os.path.join(data_dir, "in_progress", f"{bugcheck_id}.csv")
+        if os.path.exists(in_progress_path):
+            os.remove(in_progress_path)
+    else:
+        # Save to in-progress location
+        os.makedirs(os.path.join(data_dir, "in_progress"), exist_ok=True)
+        in_progress_path = os.path.join(data_dir, "in_progress", f"{bugcheck_id}.csv")
+        results_df.to_csv(in_progress_path, index=False)
+
+
 def get_permutaiton_results(
-    epsilon=2,
+    epsilon=1.5,
     delta=1e-6,
     verbose=False,
     data_fp=None,
@@ -211,9 +226,12 @@ def get_permutaiton_results(
     data_dir = os.path.abspath(data_dir)
     if data_fp is None:
         done = glob.glob(os.path.join(data_dir, "permutation_results", "*.csv"))
+        done = [int(re.findall(r"(\d+)", fp)[0]) for fp in done]
         data_fps = get_data_fps(data_dir)
         data_fps = [
-            fp for fp in data_fps if re.findall(r"bugcheck_(\d+)", fp)[0] not in done
+            fp
+            for fp in data_fps
+            if int(re.findall(r"bugcheck_(\d+)", fp)[0]) not in done
         ]
         print(f"Running {len(data_fps)} permutations ", data_fps)
     else:
@@ -228,9 +246,8 @@ def get_permutaiton_results(
         raw_y = df["has_bugcheck"]
         bugcheck_id = int(re.findall(r"bugcheck_(\d+)", data_fp)[0])
 
-        # Create seeds for reproducibility
-        base_seed = bugcheck_id
-        seeds = [base_seed + i for i in range(n_permutations)]
+        if bugcheck_id == 0 or raw_X.shape[0] > 300000:
+            continue
 
         # Partial function with fixed parameters
         run_permutation = partial(
@@ -248,8 +265,7 @@ def get_permutaiton_results(
         # Use ProcessPoolExecutor for CPU parallelism
         with concurrent.futures.ProcessPoolExecutor(max_workers=n_workers) as executor:
             future_to_idx = {
-                executor.submit(run_permutation, seed): i
-                for i, seed in enumerate(seeds)
+                executor.submit(run_permutation): i for i in range(n_permutations)
             }
 
             completed = 0
@@ -259,25 +275,27 @@ def get_permutaiton_results(
                     result = future.result()
                     results.append(result)
                     completed += 1
-                    if completed % 10 == 0 or completed == n_permutations:
-                        print(f"Finished {completed} / {n_permutations}")
+
+                    # Save progress every 10 permutations
+                    if completed % 10 == 0:
+                        save_progress(results, data_dir, bugcheck_id, is_final=False)
+                        print(f"Saved progress: {completed} / {n_permutations}")
+                    elif completed == n_permutations:
+                        save_progress(results, data_dir, bugcheck_id, is_final=True)
+                        print(
+                            f"Finished all {n_permutations} permutations for bugcheck {bugcheck_id}"
+                        )
+
                 except Exception as e:
                     print(f"Permutation {idx} generated an exception: {e}")
 
-        results_df = pd.DataFrame(results)
-        os.makedirs(os.path.join(data_dir, "permutation_results"), exist_ok=True)
-        results_df.to_csv(
-            os.path.join(data_dir, "permutation_results", f"{bugcheck_id}.csv"),
-            index=False,
-        )
-        print(f"Finished {bugcheck_id}")
         all_results[bugcheck_id] = results
 
     return all_results
 
 
 def get_all_private_lr_results(
-    epsilon=2,
+    epsilon=1.5,
     delta=1e-6,
     verbose=False,
     log_gap=10,
