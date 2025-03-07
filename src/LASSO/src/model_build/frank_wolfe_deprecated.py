@@ -5,8 +5,6 @@
 
 import numpy as np
 
-
-
 # %% Define the function f(x)
 def f(x, A, y):
     """

@@ -112,7 +112,7 @@ def ExponentialMechanism(A, y, l=1.0, tol=1e-4, epsilon=None, delta=1e-6, K=1500
         f_new = f(x_new, A, y)
         if trace:
             convergence_criteria.append(f_new)#grad @ x_new)
-        if  abs(f_new - f_prev) < tol:# or (grad @ x_new) < tol: #or np.linalg.norm(x_new - x_prev, ord=np.inf) < tol:
+        if (k > 1) and (abs(f_new - f_prev) < tol):# or (grad @ x_new) < tol: #or np.linalg.norm(x_new - x_prev, ord=np.inf) < tol:
             t = k
             print(f"converged at: {t}")
             break
@@ -236,7 +236,7 @@ def LaplaceNoise(A, y, l=1.0, tol=0.0001, K=15000, delta=1e-6, epsilon=None, tra
         f_new = f(x_new, A, y)
         if trace:
             convergence_criteria.append(abs(f_new - f_prev))#grad @ x_new)
-        if  abs(f_new - f_prev) < tol:# or (grad @ x_new) < tol: #or np.linalg.norm(x_new - x_prev, ord=np.inf) < tol:
+        if  (k > 1) and (abs(f_new - f_prev) < tol):# or (grad @ x_new) < tol: #or np.linalg.norm(x_new - x_prev, ord=np.inf) < tol:
             t = k
             break
         
@@ -378,13 +378,15 @@ def FW_NonPrivate(A, y, l=1.0, K=15000, tol=1e-4, trace=True, normalize=True, cl
         # s = np.zeros_like(grad)
         # s[i] = -np.sign(grad[i]) * L1
 
-        s = 1 if selected_idx < p else -1
+        s = l if selected_idx < p else -l
+        if (grad != 0).sum() == 0:
+            s = 0
         x_new = (1 - rho) * x_prev #+ rho * s on next line
         x_new[selected_idx % p] += s*rho
         f_new = f(x_new, A, y)
         if trace:
             convergence_criteria.append(abs(f_new - f_prev))#grad @ x_new)
-        if  abs(f_new - f_prev) < tol:# or (grad @ x_new) < tol: #or np.linalg.norm(x_new - x_prev, ord=np.inf) < tol:
+        if (k > 1) and (abs(f_new - f_prev) < tol):# or (grad @ x_new) < tol: #or np.linalg.norm(x_new - x_prev, ord=np.inf) < tol:
             t = k
             print(f"converged at: {t}")
             break

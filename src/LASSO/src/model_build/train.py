@@ -64,11 +64,11 @@ def train(feat, correct_feats=None, method='lstsq', tol=1e-4, l=1, max_iter=1000
 
         should_trace = True if plot else False
         if method == 'fw-lasso-lap':
-            model = FWLasso.LaplaceNoise(X_train, y_train, l=l, delta=delta, epsilon=epsilon, K=max_iter, trace=should_trace, normalize=normalize, clip_sd=clip_sd)
+            model = FWLasso.LaplaceNoise(X_train, y_train, l=l,tol=tol, delta=delta, epsilon=epsilon, K=max_iter, trace=should_trace, normalize=normalize, clip_sd=clip_sd)
         elif method == "fw-lasso":
             model = FWLasso.FW_NonPrivate(X_train, y_train, l=l, tol=tol, K=max_iter, normalize=normalize, clip_sd=clip_sd, trace=should_trace)
         elif method == 'compare-fw-plot':
-            model1 = FWLasso.ExponentialMechanism(X_train, y_train, l=l, delta=delta, epsilon=epsilon, K=max_iter, normalize=normalize, clip_sd=clip_sd, trace=should_trace)
+            model1 = FWLasso.ExponentialMechanism(X_train, y_train, l=l, delta=delta, epsilon=epsilon, tol=tol, K=max_iter, normalize=normalize, clip_sd=clip_sd, trace=should_trace)
             model2 = FWLasso.FW_NonPrivate(X_train, y_train, l=l, tol=tol, K=max_iter, normalize=normalize, clip_sd=clip_sd, trace=should_trace)
             if plot:
                 trace1 = model1.get("plot")
@@ -88,7 +88,7 @@ def train(feat, correct_feats=None, method='lstsq', tol=1e-4, l=1, max_iter=1000
                 plt.savefig(plot, dpi=300, facecolor='#EEEEEE', edgecolor='#EEEEEE', pad_inches=1)
                 return 0, 0, 0, 0
         else:
-            model = FWLasso.ExponentialMechanism(X_train, y_train, l=l, delta=delta, epsilon=epsilon, K=max_iter, normalize=normalize, clip_sd=clip_sd, trace=should_trace)
+            model = FWLasso.ExponentialMechanism(X_train, y_train, l=l, tol=tol, delta=delta, epsilon=epsilon, K=max_iter, normalize=normalize, clip_sd=clip_sd, trace=should_trace)
         print(f'Train MSE fw: {mean_squared_error(y_train, X_train @ model.get("model")):.2f} ({100*sum(model.get("model")>0)/model.get("model").shape[0]:.1f}% sparse)')
         y_pred = X_test @ model.get("model")
         mse = mean_squared_error(y_test, y_pred)
