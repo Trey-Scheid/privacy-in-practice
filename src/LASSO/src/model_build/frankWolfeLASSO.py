@@ -337,7 +337,7 @@ def check_normalization(X):
 
 #### FOR NON PRIVATE ####
 
-def FW_NonPrivate(A, y, l=1.0, K=15000, tol=1e-4, trace=False, normalize=False, clip_sd=None):
+def FW_NonPrivate(A, y, l=1.0, K=15000, tol=1e-4, trace=False, normalize=False, clip_sd=None, epsilon=None, delta=None):
     if isinstance(A, pd.DataFrame):
         A = A.to_numpy()
     if isinstance(y, (pd.DataFrame, pd.Series)):
