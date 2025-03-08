@@ -6,18 +6,12 @@ import glob
 import os
 import json
 from dotenv import load_dotenv
-from utils import sample_table
-
-load_dotenv()
-
-ITEM_DIR = os.getenv("ITEM_DIR")
-HEADER_DIR = os.getenv("HEADER_DIR")
-CHECKPOINT_FILE = os.getenv("CHECKPOINT_FILE")
-DUCK_TEMP_DIR = os.getenv("DUCK_TEMP_DIR")
-OUTPUT_DIR = os.getenv("OUTPUT_DIR")
+from src.LR_PVAL.src.utils import sample_table
 
 
-def raw_to_aggregated(con, item_dir, header_dir, output_dir, checkpoint_file):
+def raw_to_aggregated(
+    con, item_dir, header_dir, output_dir, checkpoint_file, verbose=False
+):
     """
     Convert raw data from Intel Telemetry dataset to aggregated data with correct schema.
 
@@ -44,7 +38,8 @@ def raw_to_aggregated(con, item_dir, header_dir, output_dir, checkpoint_file):
     files_processed = len(processed_combinations)
 
     if files_processed >= count_to_process:
-        print(f"All {count_to_process} files have been processed.")
+        if verbose:
+            print(f"All {count_to_process} files have been processed.")
         return
 
     for item_file in item_files:
@@ -52,9 +47,10 @@ def raw_to_aggregated(con, item_dir, header_dir, output_dir, checkpoint_file):
             if (header_file, item_file) in processed_combinations:
                 continue
 
-            print(
-                f"Processing {files_processed} of {count_to_process}: {header_file} + {item_file}"
-            )
+            if verbose:
+                print(
+                    f"Processing {files_processed} of {count_to_process}: {header_file} + {item_file}"
+                )
 
             files_processed += 1
             # First check how many rows we'll get
@@ -82,7 +78,10 @@ def raw_to_aggregated(con, item_dir, header_dir, output_dir, checkpoint_file):
                 if not row_exists:
                     continue
 
-                output_file = f"{output_dir}/final_dataset_{os.path.basename(header_file)}_{os.path.basename(item_file)}.parquet"
+                output_file = os.path.join(
+                    output_dir,
+                    f"final_dataset_{os.path.basename(header_file)}_{os.path.basename(item_file)}.parquet",
+                )
 
                 # If we have rows, copy them to a file
                 copy_query = f"""
@@ -107,14 +106,15 @@ def raw_to_aggregated(con, item_dir, header_dir, output_dir, checkpoint_file):
                     ) TO '{output_file}' (FORMAT 'parquet')
                 """
                 con.execute(copy_query)
-                print(f"Saved results to {output_file}")
+                if verbose:
+                    print(f"Saved results to {output_file}")
 
             except Exception as e:
                 print(f"Error processing {header_file} + {item_file}: {e}")
                 break
 
 
-def aggregated_to_final(con, output_dir, data_dir="private_data/"):
+def aggregated_to_final(con, output_dir, data_dir, verbose=False):
     """
     Convert aggregated data to final data. Top 30 most common bugcheck codes and downsampled to 5:1 ratio of no bugcheck:bugcheck
 
@@ -142,7 +142,9 @@ def aggregated_to_final(con, output_dir, data_dir="private_data/"):
     for bugcheck_code in top_30:
         if bugcheck_code is None:
             continue
-        print("processing ", bugcheck_code)
+
+        if verbose:
+            print("processing ", bugcheck_code)
 
         filtered_table_true = table.filter(
             pyarrow.compute.equal(table["bugcheck_code"], bugcheck_code)
@@ -160,13 +162,44 @@ def aggregated_to_final(con, output_dir, data_dir="private_data/"):
         df_filtered.to_csv(output_file, index=False)
 
 
-def main():
-    con = duckdb.connect()
-    con.execute(f"PRAGMA temp_directory='{DUCK_TEMP_DIR}';")
+def main(
+    item_dir: str | None = None,
+    header_dir: str | None = None,
+    pq_output_dir: str | None = None,
+    csv_output_dir: str | None = None,
+    checkpoint_file: str | None = None,
+    duck_temp_dir: str | None = None,
+    verbose: bool = False,
+):
+    if (
+        item_dir is None
+        or header_dir is None
+        or pq_output_dir is None
+        or csv_output_dir is None
+        or checkpoint_file is None
+        or duck_temp_dir is None
+    ):
+        raise ValueError("All arguments must be provided")
 
-    raw_to_aggregated(con, ITEM_DIR, HEADER_DIR, OUTPUT_DIR, CHECKPOINT_FILE)
-    aggregated_to_final(con, OUTPUT_DIR)
+    con = duckdb.connect()
+    con.execute(f"PRAGMA temp_directory='{duck_temp_dir}';")
+
+    print(pq_output_dir)
+
+    raw_to_aggregated(
+        con, item_dir, header_dir, pq_output_dir, checkpoint_file, verbose
+    )
+    aggregated_to_final(con, pq_output_dir, csv_output_dir, verbose)
+    os.remove(checkpoint_file)
 
 
 if __name__ == "__main__":
-    main()
+    load_dotenv()
+
+    item_dir = os.getenv("ITEM_DIR")
+    header_dir = os.getenv("HEADER_DIR")
+    checkpoint_file = os.getenv("CHECKPOINT_FILE")
+    duck_temp_dir = os.getenv("DUCK_TEMP_DIR")
+    output_dir = os.getenv("OUTPUT_DIR")
+
+    main(item_dir, header_dir, output_dir, checkpoint_file, duck_temp_dir)

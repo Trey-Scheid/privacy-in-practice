@@ -3,7 +3,9 @@
     "output": ["viz", "static_output"],
     "task":["cond_prob", "kmeans", "lasso", "lr_pval"],
     "epsilons": [0.01, 0.1, 1.0, 10, 100],
+    "single_epsilon": 1,
     "delta": 1e-6,
+    "verbose": true,
     "lasso-params": {
         "l": 0.1,
         "tol": 1e-4,
@@ -23,7 +25,16 @@
         "b": "example"
     },
     "lr-pval-params": {
-        "a": 5,
-        "b": "example"
+        "item_dir": "dummy_data/raw/eventlog_item_hist",
+        "header_dir": "dummy_data/raw/eventlog_header_hist",
+        "pq_output_dir": "dummy_data/lr_pval/pq",
+        "csv_output_dir": "dummy_data/lr_pval/csv",
+        "checkpoint_file": "dummy_data/lr_pval/checkpoint",
+        "duck_temp_dir": "dummy_data/temp",
+        "max_epsilon": 2,
+        "log_gap": 2,
+        "mid_results": true,
+        "n_permutations": 8,
+        "n_workers": null
     }
 }
