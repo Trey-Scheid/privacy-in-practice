@@ -2,7 +2,8 @@ import pandas as pd
 import statsmodels.api as sm
 import os
 import re
-from utils import get_data_fps
+import json
+from src.LR_PVAL.src.utils import get_data_fps
 
 
 def get_lr_results(data_fp):
@@ -31,8 +32,7 @@ def get_lr_results(data_fp):
     }
 
 
-def get_all_lr_results():
-    data_dir = "private_data/"
+def get_all_lr_results(data_dir):
     data_dir = os.path.abspath(data_dir)
     data_fps = get_data_fps(data_dir)
 
@@ -45,5 +45,13 @@ def get_all_lr_results():
     return results
 
 
+def main(data_dir):
+    get_all_lr_results(data_dir)
+
+
 if __name__ == "__main__":
-    get_all_lr_results()
+    with open("config/run.json") as fh:
+        params = json.load(fh)
+
+    data_dir = params.get("lr-pval-params").get("csv_output_dir")
+    main(data_dir)

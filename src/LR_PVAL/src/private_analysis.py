@@ -7,7 +7,7 @@ from autodp.autodp_core import Mechanism
 from autodp.mechanism_zoo import GaussianMechanism
 from autodp.transformer_zoo import ComposeGaussian
 from autodp.calibrator_zoo import eps_delta_calibrator
-from utils import get_data_fps
+from src.LR_PVAL.src.utils import get_data_fps
 import argparse
 import concurrent.futures
 from functools import partial
@@ -200,7 +200,7 @@ def save_progress(results, data_dir, bugcheck_id):
     results_df.to_csv(final_path, index=False)
 
 
-def get_permutaiton_results(
+def get_permutation_results(
     epsilon=1.5,
     delta=1e-6,
     verbose=False,
@@ -283,13 +283,13 @@ def get_permutaiton_results(
 
 
 def get_all_private_lr_results(
+    data_dir,
     epsilon=1.5,
     delta=1e-6,
     verbose=False,
     log_gap=10,
     mid_results=True,
 ):
-    data_dir = "private_data/"
     data_dir = os.path.abspath(data_dir)
     data_fps = get_data_fps(data_dir)
 
@@ -348,7 +348,7 @@ if __name__ == "__main__":
             verbose=args.verbose, log_gap=args.log_gap, mid_results=args.mid_results
         )
     else:  # perm mode
-        get_permutaiton_results(
+        get_permutation_results(
             verbose=args.verbose,
             log_gap=args.log_gap,
             mid_results=args.mid_results,

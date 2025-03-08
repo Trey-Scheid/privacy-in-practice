@@ -184,10 +184,13 @@ def main(
     con = duckdb.connect()
     con.execute(f"PRAGMA temp_directory='{duck_temp_dir}';")
 
+    print(pq_output_dir)
+
     raw_to_aggregated(
         con, item_dir, header_dir, pq_output_dir, checkpoint_file, verbose
     )
     aggregated_to_final(con, pq_output_dir, csv_output_dir, verbose)
+    os.remove(checkpoint_file)
 
 
 if __name__ == "__main__":

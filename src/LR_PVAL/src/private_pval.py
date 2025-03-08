@@ -5,12 +5,14 @@ import re
 import glob
 import os
 import plotly.graph_objects as go
+import argparse
 
 
 def parse_private_results(
-    private_results_fp: str = "../private_data/private_analysis.json",
+    data_dir: str,
+    private_results_fp: str = "private_analysis.csv",
 ) -> pd.DataFrame:
-    results = pd.read_csv(private_results_fp)
+    results = pd.read_csv(os.path.join(data_dir, private_results_fp))
     results = results.set_index("Unnamed: 0")
     results = results[["2"]]
     results.columns = ["value"]
@@ -18,7 +20,7 @@ def parse_private_results(
     # First, let's reset the index to get the bugcheck_code as a column
     results = results.reset_index()
     results.columns = ["bugcheck_code", "value"]
-
+    results = results[results["bugcheck_code"] != 0]
     # Create an empty DataFrame to store the parsed results
     parsed_results = []
 
@@ -51,13 +53,19 @@ def parse_private_results(
 
     # Convert to DataFrame
     results_df = pd.DataFrame(parsed_results)
+    results_df["wald_statistic"] = results_df.apply(
+        lambda row: logistic_regression_wald_test_from_params(
+            get_X(row["bugcheck_code"], data_dir),
+            row[["param_0", "param_1"]].to_list(),
+        )["wald_statistic"],
+        axis=1,
+    )
     return results_df
 
 
-def get_perm_df(
-    bugcheck_id: int, data_dir: str = "../private_data/permutation_results/"
-):
-    perm_df = pd.read_csv(os.path.join(data_dir, f"{bugcheck_id}.csv"))
+def get_perm_df(bugcheck_id: int, data_dir: str):
+    perm_dir = os.path.join(data_dir, "permutation_results")
+    perm_df = pd.read_csv(os.path.join(perm_dir, f"{bugcheck_id}.csv"))
     perm_df = perm_df.unstack().reset_index()
     perm_df.columns = ["n_iter", "n_iter_idx", "value"]
 
@@ -84,7 +92,9 @@ def get_perm_df(
     return perm_df
 
 
-def get_X(bugcheck_id: int, data_dir: str = "../private_data"):
+def get_X(bugcheck_id: int, data_dir: str):
+    bugcheck_id = int(bugcheck_id)
+
     X = pd.read_csv(os.path.join(data_dir, f"bugcheck_{bugcheck_id}.csv"))
     X = X["has_corrected_error"]
     X = X.to_numpy()
@@ -109,6 +119,13 @@ def logistic_regression_wald_test_from_params(X: np.ndarray, params: np.ndarray)
     # Get coefficient we want to test
     beta = params[1]
 
+    if not np.any(X[:, 1] == 1):
+        return {
+            "coefficient": beta,
+            "std_error": 0,
+            "wald_statistic": 0,
+            "p_value": 1,
+        }
     # Calculate predicted probabilities
     z = X @ params  # Linear combination
     p = 1 / (1 + np.exp(-z))  # Logistic function
@@ -172,18 +189,20 @@ def get_pval(val, arr):
 
 
 def calculate_all_pvals(
-    results_df: pd.DataFrame, data_dir: str = "../private_data", verbose: bool = False
+    results_df: pd.DataFrame,
+    data_dir: str,
+    verbose: bool = False,
+    perm_fp: str = "permutation_results",
 ):
-    perm_dir = os.path.join(data_dir, "permutation_results")
-    fps = glob.glob(os.path.join(perm_dir, "*.csv"))
+    fps = glob.glob(os.path.join(data_dir, perm_fp, "*.csv"))
     bugcheck_ids = [int(fp.split("/")[-1].split(".")[0]) for fp in fps]
 
     results = {}
 
     for bugcheck_id in bugcheck_ids:
         try:
-            perm_df = get_perm_df(bugcheck_id)
-            X = get_X(bugcheck_id)
+            perm_df = get_perm_df(bugcheck_id, data_dir)
+            X = get_X(bugcheck_id, data_dir)
         except:
             raise Exception(f"Error getting perm_df for {bugcheck_id}")
         result_id = results_df[results_df["bugcheck_code"] == bugcheck_id]
@@ -213,9 +232,7 @@ def calculate_all_pvals(
             .to_dict()
         )
         if verbose:
-            print(
-                f"Completed {bugcheck_id}, eps = 2 pval = {results[bugcheck_id][10670]}"
-            )
+            print(f"Completed {bugcheck_id}")
 
     significant_raw = pd.DataFrame(results).T
     significant_raw = significant_raw.unstack().reset_index()
@@ -241,10 +258,10 @@ def calculate_all_pvals(
 
 
 def get_nonprivate_significant_set(
-    nonprivate_fp: str = "../private_data/nonprivate_analysis.csv",
-    data_dir: str = "../private_data",
+    data_dir: str,
+    nonprivate_fp: str = "nonprivate_analysis.csv",
 ):
-    nonprivate = pd.read_csv(nonprivate_fp)
+    nonprivate = pd.read_csv(os.path.join(data_dir, nonprivate_fp))
     nonprivate = nonprivate.rename(columns={"Unnamed: 0": "bugcheck_code"})
     nonprivate = nonprivate[nonprivate["bugcheck_code"] != 0]
     for bugcheck_code in nonprivate["bugcheck_code"].unique():
@@ -259,9 +276,9 @@ def get_nonprivate_significant_set(
 
 
 def get_private_significant_set(
+    data_dir: str,
     significant: pd.DataFrame | None = None,
-    pval_fp: str = "../private_data/private_analysis_pvals.csv",
-    data_dir: str = "../private_data",
+    pval_fp: str = "private_analysis_pvals.csv",
 ) -> pd.Series:
     if significant is None:
         significant = pd.read_csv(os.path.join(data_dir, pval_fp))
@@ -318,6 +335,8 @@ def get_confusion_matrix(
         columns=["Significant", "Not Significant"],
     )
 
+    print(confusion_matrix)
+
     return confusion_matrix
 
 
@@ -327,7 +346,7 @@ def plot_confusion_matrix(
     output_dir: str = "viz/static_output/LR_PVAL",
 ):
     if isinstance(confusion_matrix, pd.DataFrame):
-        confusion_matrix = confusion_matrix.to_numpy()
+        confusion_matrix = confusion_matrix.T.to_numpy()
 
     n_classes = confusion_matrix.shape[0]
 
@@ -398,24 +417,64 @@ def meta_analysis_csv(
     metaanalysis_df["task"] = "LR_PVAL"
     metaanalysis_df.columns = ["epsilon", "utility", "task"]
 
-    metaanalysis_df.to_csv(os.path.join(output_dir, "lr_pval_meta.csv"), index=False)
+    # metaanalysis_df.to_csv(os.path.join(output_dir, "lr_pval_meta.csv"), index=False)
 
     return metaanalysis_df
 
 
+def eps_to_niter(epsilon: float, results_df: pd.DataFrame) -> int:
+    """Find the iteration number that corresponds to the closest epsilon value in results_df.
+
+    Args:
+        epsilon: Target epsilon value
+        results_df: DataFrame containing 'n_iter' and 'epsilon' columns
+
+    Returns:
+        The iteration number with the closest epsilon value
+    """
+    # Get unique epsilon-niter pairs
+    eps_niter = results_df[["epsilon", "n_iter"]].drop_duplicates()
+
+    # Find the closest epsilon value
+    closest_eps = eps_niter.iloc[(eps_niter["epsilon"] - epsilon).abs().argsort()[0]]
+
+    return int(closest_eps["n_iter"])
+
+
 def main(
-    data_dir: str = "../private_data",
-    output_dir: str = "viz/static_output/LR_PVAL",
+    data_dir: str,
+    output_dir: str,
+    epsilon: float = 2.0,
+    verbose: bool = False,
 ):
-    results_df = parse_private_results(os.path.join(data_dir, "private_analysis.json"))
-    significant = calculate_all_pvals(results_df, data_dir)
+    os.makedirs(output_dir, exist_ok=True)
+
+    results_df = parse_private_results(data_dir)
+    significant = calculate_all_pvals(results_df, data_dir, verbose=verbose)
     nonprivate_set = get_nonprivate_significant_set(data_dir)
-    private_set = get_private_significant_set(significant, data_dir)
+    private_set = get_private_significant_set(
+        significant=significant, data_dir=data_dir
+    )
     ious = get_intersection_over_union_df(nonprivate_set, private_set, results_df)
 
-    plot_confusion_matrix(ious, output_dir=output_dir)
-    meta_analysis_csv(ious, output_dir=output_dir)
+    try:
+        private_set_vis = private_set.loc[eps_to_niter(epsilon, results_df)]
+    except KeyError:
+        private_set_vis = set()
+
+    confusion_matrix = get_confusion_matrix(
+        nonprivate_set,
+        private_set_vis,
+        set(results_df["bugcheck_code"].unique().tolist()),
+    )
+
+    plot_confusion_matrix(confusion_matrix, output_dir=output_dir)
+    return meta_analysis_csv(ious)
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--data_dir", type=str, required=True)
+    parser.add_argument("--output_dir", type=str, required=True)
+    args = parser.parse_args()
+    main(args.data_dir, args.output_dir, epsilon=1, verbose=True)
