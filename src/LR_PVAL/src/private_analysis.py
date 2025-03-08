@@ -191,25 +191,13 @@ def run_single_permutation(raw_X, raw_y, epsilon, delta, verbose, log_gap, mid_r
     ).fit(log_gap=log_gap, mid_results=mid_results)[2]
 
 
-def save_progress(results, data_dir, bugcheck_id, is_final=False):
+def save_progress(results, data_dir, bugcheck_id):
     """Save results to either in-progress or final directory"""
     results_df = pd.DataFrame(results)
 
-    if is_final:
-        # Save to final location
-        os.makedirs(os.path.join(data_dir, "permutation_results"), exist_ok=True)
-        final_path = os.path.join(data_dir, "permutation_results", f"{bugcheck_id}.csv")
-        results_df.to_csv(final_path, index=False)
-
-        # Remove in-progress file if it exists
-        in_progress_path = os.path.join(data_dir, "in_progress", f"{bugcheck_id}.csv")
-        if os.path.exists(in_progress_path):
-            os.remove(in_progress_path)
-    else:
-        # Save to in-progress location
-        os.makedirs(os.path.join(data_dir, "in_progress"), exist_ok=True)
-        in_progress_path = os.path.join(data_dir, "in_progress", f"{bugcheck_id}.csv")
-        results_df.to_csv(in_progress_path, index=False)
+    os.makedirs(os.path.join(data_dir, "permutation_results"), exist_ok=True)
+    final_path = os.path.join(data_dir, "permutation_results", f"{bugcheck_id}.csv")
+    results_df.to_csv(final_path, index=False)
 
 
 def get_permutaiton_results(
@@ -278,10 +266,10 @@ def get_permutaiton_results(
 
                     # Save progress every 10 permutations
                     if completed % 10 == 0:
-                        save_progress(results, data_dir, bugcheck_id, is_final=False)
+                        save_progress(results, data_dir, bugcheck_id)
                         print(f"Saved progress: {completed} / {n_permutations}")
                     elif completed == n_permutations:
-                        save_progress(results, data_dir, bugcheck_id, is_final=True)
+                        save_progress(results, data_dir, bugcheck_id)
                         print(
                             f"Finished all {n_permutations} permutations for bugcheck {bugcheck_id}"
                         )
