@@ -8,14 +8,6 @@ import json
 from dotenv import load_dotenv
 from utils import sample_table
 
-load_dotenv()
-
-ITEM_DIR = os.getenv("ITEM_DIR")
-HEADER_DIR = os.getenv("HEADER_DIR")
-CHECKPOINT_FILE = os.getenv("CHECKPOINT_FILE")
-DUCK_TEMP_DIR = os.getenv("DUCK_TEMP_DIR")
-OUTPUT_DIR = os.getenv("OUTPUT_DIR")
-
 
 def raw_to_aggregated(con, item_dir, header_dir, output_dir, checkpoint_file):
     """
@@ -160,13 +152,36 @@ def aggregated_to_final(con, output_dir, data_dir="private_data/"):
         df_filtered.to_csv(output_file, index=False)
 
 
-def main():
-    con = duckdb.connect()
-    con.execute(f"PRAGMA temp_directory='{DUCK_TEMP_DIR}';")
+def main(
+    item_dir: str | None = None,
+    header_dir: str | None = None,
+    output_dir: str | None = None,
+    checkpoint_file: str | None = None,
+    duck_temp_dir: str | None = None,
+):
+    if (
+        item_dir is None
+        or header_dir is None
+        or output_dir is None
+        or checkpoint_file is None
+        or duck_temp_dir is None
+    ):
+        raise ValueError("All arguments must be provided")
 
-    raw_to_aggregated(con, ITEM_DIR, HEADER_DIR, OUTPUT_DIR, CHECKPOINT_FILE)
-    aggregated_to_final(con, OUTPUT_DIR)
+    con = duckdb.connect()
+    con.execute(f"PRAGMA temp_directory='{duck_temp_dir}';")
+
+    raw_to_aggregated(con, item_dir, header_dir, output_dir, checkpoint_file)
+    aggregated_to_final(con, output_dir)
 
 
 if __name__ == "__main__":
-    main()
+    load_dotenv()
+
+    item_dir = os.getenv("ITEM_DIR")
+    header_dir = os.getenv("HEADER_DIR")
+    checkpoint_file = os.getenv("CHECKPOINT_FILE")
+    duck_temp_dir = os.getenv("DUCK_TEMP_DIR")
+    output_dir = os.getenv("OUTPUT_DIR")
+
+    main(item_dir, header_dir, output_dir, checkpoint_file, duck_temp_dir)

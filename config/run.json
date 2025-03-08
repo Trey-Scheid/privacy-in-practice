@@ -23,7 +23,10 @@
         "b": "example"
     },
     "lr-pval-params": {
-        "a": 5,
-        "b": "example"
+        "item_dir": "dummy_data/raw/eventlog_item_history",
+        "header_dir": "dummy_data/raw/eventlog_header_hist",
+        "output_dir": "dummy_data/lr_pval/data",
+        "checkpoint_file": "dummy_data/lr_pval/checkpoint",
+        "duck_temp_dir": "dummy_data/temp"
     }
 }

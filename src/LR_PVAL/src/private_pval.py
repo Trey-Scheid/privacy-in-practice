@@ -4,8 +4,6 @@ from scipy import stats
 import re
 import glob
 import os
-import json
-from utils import *
 import plotly.graph_objects as go
 
 
@@ -69,16 +67,13 @@ def get_perm_df(
     perm_df["loss"] = perm_df["value"].apply(
         lambda x: re.findall(r"'loss': np\.float64\((\d+\.\d+)\)", str(x))[0]
     )
-    perm_df["param_0"] = perm_df["value"].apply(
-        lambda x: re.search(
-            r"'params': array\(\[(-?\d+\.\d+).+ (-?\d+\.\d+)", str(x)
-        ).group(1)
-    )
-    perm_df["param_1"] = perm_df["value"].apply(
-        lambda x: re.search(
-            r"'params': array\(\[(-?\d+\.\d+).+ (-?\d+\.\d+)", str(x)
-        ).group(2)
-    )
+
+    def extract_param(x, group_num):
+        match = re.search(r"'params': array\(\[(-?\d+\.\d+).+ (-?\d+\.\d+)", str(x))
+        return match.group(group_num) if match else None
+
+    perm_df["param_0"] = perm_df["value"].apply(lambda x: extract_param(x, 1))
+    perm_df["param_1"] = perm_df["value"].apply(lambda x: extract_param(x, 2))
 
     perm_df = perm_df.drop(columns=["value"])
     perm_df[["epsilon", "loss", "param_0", "param_1"]] = perm_df[
@@ -99,7 +94,7 @@ def get_X(bugcheck_id: int, data_dir: str = "../private_data"):
     return X
 
 
-def logistic_regression_wald_test_from_params(X: np.array, params: np.array):
+def logistic_regression_wald_test_from_params(X: np.ndarray, params: np.ndarray):
     """
     Perform Wald test for a logistic regression coefficient using only parameters and X.
 
@@ -238,7 +233,9 @@ def calculate_all_pvals(
     )
     significant = significant_raw[significant_raw["p_val"] < 0.05]
 
-    pd.to_csv(significant, os.path.join(data_dir, "private_analysis_pvals.csv"))
+    significant.to_csv(
+        os.path.join(data_dir, "private_analysis_pvals.csv"), index=False
+    )
 
     return significant
 
@@ -406,15 +403,18 @@ def meta_analysis_csv(
     return metaanalysis_df
 
 
-def main(data_dir: str = "../private_data"):
+def main(
+    data_dir: str = "../private_data",
+    output_dir: str = "viz/static_output/LR_PVAL",
+):
     results_df = parse_private_results(os.path.join(data_dir, "private_analysis.json"))
     significant = calculate_all_pvals(results_df, data_dir)
     nonprivate_set = get_nonprivate_significant_set(data_dir)
     private_set = get_private_significant_set(significant, data_dir)
     ious = get_intersection_over_union_df(nonprivate_set, private_set, results_df)
 
-    plot_confusion_matrix(ious, data_dir)
-    meta_analysis_csv(ious, data_dir)
+    plot_confusion_matrix(ious, output_dir=output_dir)
+    meta_analysis_csv(ious, output_dir=output_dir)
 
 
 if __name__ == "__main__":
