@@ -1,13 +1,16 @@
 export function getPublicPath(path: string): string {
+  // Ensure path doesn't have leading slash for consistency
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+
   // Check if we're running on GitHub Pages
   const isGitHubPages = typeof window !== 'undefined' && window.location.hostname.includes('github.io');
   
-  // Get repository name from URL if on GitHub Pages
-  const basePath = isGitHubPages 
-    ? '/' + window.location.pathname.split('/')[1]
-    : '';
-    
-  // Ensure path starts with a forward slash and remove any double slashes
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-  return `${basePath}${normalizedPath}`.replace(/\/+/g, '/');
+  if (isGitHubPages) {
+    // Get repository name from URL
+    const repoName = window.location.pathname.split('/')[1];
+    return `/${repoName}/${cleanPath}`;
+  } else {
+    // Local development
+    return `/${cleanPath}`;
+  }
 } 

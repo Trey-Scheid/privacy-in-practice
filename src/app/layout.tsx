@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     title: "Privacy in Practice",
     description:
       "The Feasibility of Differential Privacy for Telemetry Analysis",
-    images: ["/og-image.png"],
+    images: ["og-image.png"],
   },
   authors: [
     { name: "Tyler Kurpanek" },

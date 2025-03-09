@@ -130,13 +130,13 @@ export function CenteredView() {
               </h3>
               <p className="text-lg mb-4">
                 When ChatGPT 3.5 was released, trained on many datasets publicly
-                and privately available. Clever prompters called &quot;Agents&quot;
-                were able to gather SSN&apos;s for individuals which the model would
-                produce with perfect accuracy! A differentially private
-                algorithm guarantees that model outputs are not significantly
-                different wether your SSN was in the training data or not, which
-                means that the model would not reveal any information about the
-                training data.
+                and privately available. Clever prompters called
+                &quot;Agents&quot; were able to gather SSN&apos;s for
+                individuals which the model would produce with perfect accuracy!
+                A differentially private algorithm guarantees that model outputs
+                are not significantly different wether your SSN was in the
+                training data or not, which means that the model would not
+                reveal any information about the training data.
               </p>
             </div>
           </div>
@@ -159,7 +159,7 @@ export function CenteredView() {
           </p>
           <p className="text-xl mt-4">
             A lot of the research in DP has been finding the best ways to add
-            noise while maintaining utilty, and our following study focuses on
+            noise while maintaining utilty and our following study focuses on
             how applicable it actually is in practice.
           </p>
         </div>

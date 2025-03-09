@@ -5,7 +5,7 @@
       "email": "tkurpane@ucsd.edu",
       "github": "https://github.com/tylerkurpanek",
       "linkedin": "https://linkedin.com/in/username",
-      "image": "/tyler-profile.jpg"
+      "image": "tyler-profile.jpg"
     },
     {
       "name": "Chris Lum",
@@ -13,21 +13,21 @@
       "github": "https://github.com/ch-lum",
       "linkedin": "https://linkedin.com/in/ch-lum",
       "website": "https://ch-lum.me",
-      "image": "/chris-profile.jpg"
+      "image": "chris-profile.jpg"
     },
     {
       "name": "Bradley Nathanson",
       "email": "bnathanson@ucsd.edu",
       "github": "https://github.com/Brqdley",
       "linkedin": "https://linkedin.com/in/username",
-      "image": "/bradley-profile.jpg"
+      "image": "bradley-profile.jpg"
     },
     {
       "name": "Trey Scheid",
       "email": "tkurpane@ucsd.edu",
       "github": "https://github.com/trey-scheid",
       "linkedin": "https://linkedin.com/in/username",
-      "image": "/trey-profile.jpg"
+      "image": "trey-profile.jpg"
     }
   ]
 } 
