@@ -2,7 +2,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { HistogramViz } from "./histogram/HistogramViz";
 import { ConfidenceViz } from "./confidence/ConfidenceViz";
-import { getPublicPath } from "@/lib/utils";
 import { useState } from "react";
 
 export function CenteredView() {
