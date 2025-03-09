@@ -57,13 +57,7 @@ export function NavBar({
   }, []);
 
   return (
-    <div
-      className={`fixed top-0 left-0 right-0 z-50 bg-primary-white transition-all duration-300 ${
-        !isTitleVisible
-          ? "translate-y-0 opacity-100"
-          : "translate-y-[-100%] opacity-0"
-      }`}
-    >
+    <div className="fixed top-0 left-0 right-0 z-50 bg-primary-white">
       <nav className="flex justify-between items-center px-12 py-4">
         <h3 
           onClick={() => scrollToSection(topRef)}
@@ -75,7 +69,7 @@ export function NavBar({
           <li
             onClick={() => scrollToSection(whatIsDPRef)}
             className={`transition-colors cursor-pointer ${
-              activeSection === "what-is-dp" 
+              activeSection === "what-is-dp" && !isTitleVisible
                 ? "text-accent font-medium" 
                 : "hover:text-accent"
             }`}

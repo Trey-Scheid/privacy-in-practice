@@ -14,15 +14,15 @@ interface ConfidenceData {
 }
 
 const data: { [key: string]: ConfidenceData[] } = {
-  "datum-1": [
+  "Image 1": [
     { label: "True", nonPrivate: 0.42, private: 0.48 },
     { label: "False", nonPrivate: 0.58, private: 0.52 },
   ],
-  "datum-2": [
+  "Image 2": [
     { label: "True", nonPrivate: 0.98, private: 0.61 },
     { label: "False", nonPrivate: 0.02, private: 0.39 },
   ],
-  "datum-3": [
+  "Image 3": [
     { label: "True", nonPrivate: 0.62, private: 0.58 },
     { label: "False", nonPrivate: 0.38, private: 0.42 },
   ],
@@ -36,7 +36,7 @@ const COLORS = {
 export function ConfidenceChart() {
   const chartRef = useRef<ChartRef>(null);
   const [isPrivate, setIsPrivate] = useState(true);
-  const [selectedDatum, setSelectedDatum] = useState("datum-1");
+  const [selectedDatum, setSelectedDatum] = useState("Image 1");
 
   // Initialize chart
   useEffect(() => {
@@ -44,7 +44,7 @@ export function ConfidenceChart() {
 
     const width = chartRef.current.clientWidth;
     const height = 300;
-    const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+    const margin = { top: 20, right: 20, bottom: 30, left: 60 };
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
@@ -69,6 +69,16 @@ export function ConfidenceChart() {
       .padding(0.3);
 
     const y = d3.scaleLinear().domain([0, 1]).range([innerHeight, 0]);
+
+    // Add y-axis label
+    svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", margin.left - 40)
+      .attr("x", -(height / 2))
+      .attr("text-anchor", "middle")
+      .attr("fill", "#2C3333")
+      .attr("font-size", "14px")
+      .text("Model Confidence");
 
     // Add horizontal reference lines
     const lines = g.append("g").attr("class", "reference-lines");
@@ -296,6 +306,11 @@ export function ConfidenceChart() {
             return chartRef.current!.y(value) + (chartRef.current!.y(0) - chartRef.current!.y(value)) / 2 + 5;
           }
         });
+
+      // Update y-axis label position
+      chartRef.current.svg.select("text")
+        .attr("y", margin.left - 35)
+        .attr("x", -(height / 2));
     };
 
     window.addEventListener("resize", handleResize);
@@ -304,6 +319,26 @@ export function ConfidenceChart() {
 
   return (
     <div className="flex flex-col items-center gap-8 pt-8">
+
+      {/* Datum Selection */}
+      <div className="flex gap-4 items-center">
+        {["Image 1", "Image 2", "Image 3"].map((datum) => (
+          <button
+            key={datum}
+            onClick={() => setSelectedDatum(datum)}
+            className={`px-4 py-2 rounded-lg transition-colors ${
+              selectedDatum === datum
+                ? "bg-primary-gray text-primary-white"
+                : "bg-primary-gray/10 text-primary-gray hover:bg-primary-gray/20"
+            }`}
+          >
+            {datum.replace("-", " ")}
+          </button>
+        ))}
+      </div>
+      {/* Chart */}
+      <div className="w-full" ref={chartRef} />
+
       {/* Privacy Toggle */}
       <div className="flex gap-4 items-center">
         <button
@@ -326,26 +361,6 @@ export function ConfidenceChart() {
         >
           Non-Private
         </button>
-      </div>
-
-      {/* Chart */}
-      <div className="w-full" ref={chartRef} />
-
-      {/* Datum Selection */}
-      <div className="flex gap-4 items-center">
-        {["datum-1", "datum-2", "datum-3"].map((datum) => (
-          <button
-            key={datum}
-            onClick={() => setSelectedDatum(datum)}
-            className={`px-4 py-2 rounded-lg transition-colors ${
-              selectedDatum === datum
-                ? "bg-primary-gray text-primary-white"
-                : "bg-primary-gray/10 text-primary-gray hover:bg-primary-gray/20"
-            }`}
-          >
-            {datum.replace("-", " ")}
-          </button>
-        ))}
       </div>
     </div>
   );

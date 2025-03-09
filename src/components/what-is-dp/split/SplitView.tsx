@@ -146,8 +146,7 @@ export function SplitView({
                 significantly affect the results of any analysis performed on
                 that dataset. This is achieved by carefully introducing random
                 noise into the computation process, making it virtually
-                impossible to reverse-engineer individual records while
-                preserving the overall statistical patterns in the data
+                impossible to reverse-engineer individual records...
               </p>
             </div>
           </section>
@@ -158,7 +157,7 @@ export function SplitView({
             className="h-screen snap-start flex flex-col justify-center p-12"
           >
             <div className="prose prose-lg max-w-none">
-              <p className="text-xl">...while maintaining the big picture!</p>
+              <p className="text-xl">...all while maintaining the big picture!</p>
               <p className="text-xl mt-6">
                 But what just happened? We added noise to the image of Mona Lisa
                 by probabilistically flipping each pixel. This way, you can
