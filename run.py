@@ -7,10 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 
-from src.LASSO import run as runLasso
-from src.COND_PROB.src import private as runCondProb
 from src.KMEANS import run as runKMeans
-from src.LR_PVAL import run as runLRPval
 
 
 
@@ -18,8 +15,8 @@ def main(targets):
     with open(os.path.join("config", "run.json")) as fh:
         params = json.load(fh)
 
-    all_methods = ["lasso", "cond_prob", "kmeans", "lr_pval"]
-    all_objects = [runLasso, runCondProb, runKMeans, runLRPval]
+    all_methods = ["kmeans"]
+    all_objects = [runKMeans]
 
     # if no target is specified, run all methods
     target_methods = set(all_methods).intersection(set(targets))
@@ -61,7 +58,7 @@ def combine_plot(combined_df, fp):
     plt.ylabel("Normalized Utility")
 
     plt.tight_layout()
-    plt.savefig(os.path.join(fp[0],fp[1], "results.png"))
+    plt.savefig(os.path.join(*fp, "results.png"))
 
 
 if __name__ == "__main__":
