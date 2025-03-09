@@ -381,7 +381,7 @@
 \newcommand{\tocless}[2]{\bgroup\let\addcontentsline=\nocontentsline#1{#2}\egroup}
 \providecommand{\maketoc}{}
 \renewcommand{\maketoc}{%
-    \etocsettocdepth{1}
+    \etocsettocdepth{2} % change back to 1 to remove subsections.
     \etocsettocstyle{\medskip}{\bigskip}
     \newlength{\npageW}
     \settowidth{\npageW}{9} % width of the page number box
@@ -394,6 +394,11 @@
     {}
     {\normalfont\noindent}
     {\hspace{0.5in}\llap{\makebox[\subnumberW][l]{\etocnumber}}\etocname\DotsAndPage}
+    {}
+    \etocsetstyle{subsection}
+    {}
+    {\normalfont\noindent}
+    {\hspace{1.0in}\llap{\makebox[\subnumberW][l]{\etocnumber}}\etocname\DotsAndPage}
     {}
     \localtableofcontents
 }
