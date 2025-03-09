@@ -194,14 +194,17 @@ export function PaperDisplay() {
           {/* Paper Title */}
           <section>
             <h1 className="text-4xl font-bold mb-4 text-primary-gray">
-              {papers[selectedPaper].title}
+              {papers[selectedPaper].id}. {papers[selectedPaper].title}
             </h1>
+            <p className="text-xl text-primary-gray">
+              Primary contributor: {papers[selectedPaper].author}
+            </p>
           </section>
 
           {/* Paper Analysis */}
           <section>
             <h2 className="text-3xl font-bold mb-4 text-primary-gray">
-              Paper&apos;s Analysis
+              {papers[selectedPaper].id}.1 Paper&apos;s Analysis
             </h2>
             <p className="text-xl text-primary-gray">
               {papers[selectedPaper].analysis}
@@ -211,7 +214,7 @@ export function PaperDisplay() {
           {/* Privatization Approach */}
           <section>
             <h2 className="text-3xl font-bold mb-4 text-primary-gray">
-              How We Privatized
+            {papers[selectedPaper].id}.2 How We Privatized
             </h2>
             <p className="text-xl text-primary-gray">
               {papers[selectedPaper].privatization}
@@ -221,7 +224,7 @@ export function PaperDisplay() {
           {/* Results */}
           <section>
             <h2 className="text-3xl font-bold mb-4 text-primary-gray">
-              Results Compared to Paper
+            {papers[selectedPaper].id}.3 Results Compared to Paper
             </h2>
             <p className="text-xl text-primary-gray">
               {papers[selectedPaper].results}
