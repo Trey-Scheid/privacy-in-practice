@@ -18,7 +18,8 @@ export const metadata: Metadata = {
   description: "The Feasibility of Differential Privacy for Telemetry Analysis",
   openGraph: {
     title: "Privacy in Practice",
-    description: "The Feasibility of Differential Privacy for Telemetry Analysis",
+    description:
+      "The Feasibility of Differential Privacy for Telemetry Analysis",
     type: "website",
     url: "https://trey-scheid.github.io/privacy-in-practice/",
     images: [
@@ -33,16 +34,23 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Privacy in Practice",
-    description: "The Feasibility of Differential Privacy for Telemetry Analysis",
+    description:
+      "The Feasibility of Differential Privacy for Telemetry Analysis",
     images: ["/og-image.png"],
   },
   authors: [
     { name: "Tyler Kurpanek" },
     { name: "Chris Lum" },
     { name: "Bradley Nathanson" },
-    { name: "Trey Scheid" }
+    { name: "Trey Scheid" },
   ],
-  keywords: ["Differential Privacy", "Privacy", "Data Analysis", "Telemetry", "Research"],
+  keywords: [
+    "Differential Privacy",
+    "Privacy",
+    "Data Analysis",
+    "Telemetry",
+    "Research",
+  ],
   icons: {
     icon: [
       { url: "/favicon.ico" },

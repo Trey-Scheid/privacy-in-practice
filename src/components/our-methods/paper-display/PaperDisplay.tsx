@@ -5,25 +5,6 @@ import { getPublicPath } from "@/lib/utils";
 import papersData from "@/data/papers.json";
 import Image from "next/image";
 
-interface ResultBlock {
-  type: "text" | "image";
-  content?: string;
-  src?: string;
-  alt?: string;
-  caption?: string;
-}
-
-interface Paper {
-  id: number;
-  shortTitle: string;
-  title: string;
-  author: string;
-  thumbnail: string;
-  analysis: string;
-  privatization: string;
-  results: ResultBlock[];
-}
-
 export function PaperDisplay() {
   const [selectedPaper, setSelectedPaper] = useState(0);
   const [direction, setDirection] = useState(1); // 1 for right, -1 for left
@@ -141,7 +122,7 @@ export function PaperDisplay() {
                     zIndex: 20,
                     transition: {
                       duration: 0.2,
-                    }
+                    },
                   },
                   settle: {
                     x: 0,
@@ -153,8 +134,8 @@ export function PaperDisplay() {
                       type: "spring",
                       stiffness: 300,
                       damping: 25,
-                    }
-                  }
+                    },
+                  },
                 }}
                 animate={["pull", "settle"]}
                 exit={{
@@ -165,7 +146,7 @@ export function PaperDisplay() {
                   zIndex: 0,
                   transition: {
                     duration: 0.2,
-                  }
+                  },
                 }}
                 className="absolute inset-0"
                 style={{
@@ -233,7 +214,7 @@ export function PaperDisplay() {
           {/* Privatization Approach */}
           <section>
             <h2 className="text-3xl font-bold mb-4 text-primary-gray">
-            {papers[selectedPaper].id}.2 How We Privatized
+              {papers[selectedPaper].id}.2 How We Privatized
             </h2>
             <p className="text-xl text-primary-gray">
               {papers[selectedPaper].privatization}
@@ -243,7 +224,7 @@ export function PaperDisplay() {
           {/* Results */}
           <section>
             <h2 className="text-3xl font-bold mb-4 text-primary-gray">
-            {papers[selectedPaper].id}.3 Results Compared to Paper
+              {papers[selectedPaper].id}.3 Results Compared to Paper
             </h2>
             <div className="space-y-8">
               {papers[selectedPaper].results.map((block, index) => {

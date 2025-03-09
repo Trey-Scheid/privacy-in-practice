@@ -130,8 +130,8 @@ export function CenteredView() {
               </h3>
               <p className="text-lg mb-4">
                 When ChatGPT 3.5 was released, trained on many datasets publicly
-                and privately available. Clever prompters called "Agents" were
-                able to gather SSN's for individuals which the model would
+                and privately available. Clever prompters called &quot;Agents&quot;
+                were able to gather SSN&apos;s for individuals which the model would
                 produce with perfect accuracy! A differentially private
                 algorithm guarantees that model outputs are not significantly
                 different wether your SSN was in the training data or not, which
@@ -153,9 +153,9 @@ export function CenteredView() {
             Overall, differential privacy is a powerful tool for protecting
             individual privacy while still allowing for useful data analysis.
             There exist many different ways to implement differential privacy,
-            which requires asking questions like, "Where should we add noise?"
-            or "Are two neighboring datasets defined by a single entry, or a
-            single user&apos;s worth of entries?"
+            which requires asking questions like, &quot;Where should we add
+            noise?&quot; or &quot;Are two neighboring datasets defined by a
+            single entry, or a single user&apos;s worth of entries?&quot;
           </p>
           <p className="text-xl mt-4">
             A lot of the research in DP has been finding the best ways to add
