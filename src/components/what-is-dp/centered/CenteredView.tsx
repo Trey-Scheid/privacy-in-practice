@@ -3,7 +3,6 @@ import Image from "next/image";
 import { HistogramViz } from "./histogram/HistogramViz";
 import { ConfidenceViz } from "./confidence/ConfidenceViz";
 import { useState } from "react";
-import { getPublicPath } from "@/lib/utils";
 
 export function CenteredView() {
   const [showRevealDetails, setShowRevealDetails] = useState(false);
