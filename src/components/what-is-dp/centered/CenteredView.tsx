@@ -88,8 +88,13 @@ export function CenteredView() {
             Differential Privacy can be used for more complex queries too, such
             as training a machine learning model. A data scientist may do this
             because they don&apos;t want to reveal if someone was in a training
-            set. The question then becomes, where can we effectively add noise
-            in order to preserve privacy but still get an accurate model?
+            set. The question then becomes:
+          </p>
+          <p className="text-xl font-bold text-accent mt-4">
+            When are differentially private methods practical and useful?
+          </p>
+          <p className="text-xl font-bold text-accent">
+            How effective is differential privacy when applied in practice?
           </p>
         </div>
       </section>
@@ -100,9 +105,7 @@ export function CenteredView() {
 
       <section className="h-screen snap-start flex flex-col justify-center items-center p-12">
         <div className="prose prose-lg max-w-3xl mx-auto text-center">
-          <p className="text-xl">
-            Conclusion + transition here!!!
-          </p>
+          <p className="text-xl">Conclusion + transition here!!!</p>
         </div>
       </section>
     </div>
