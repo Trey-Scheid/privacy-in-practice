@@ -61,7 +61,7 @@ def combine_plot(combined_df, fp):
     plt.ylabel("Normalized Utility")
 
     plt.tight_layout()
-    plt.savefig(os.path.join(fp[0], "results.png"))
+    plt.savefig(os.path.join(fp[0],fp[1], "results.png"))
 
 
 if __name__ == "__main__":
