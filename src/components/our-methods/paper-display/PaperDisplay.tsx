@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { getPublicPath } from "@/lib/utils";
@@ -10,30 +10,124 @@ export function PaperDisplay() {
   const [direction, setDirection] = useState(1); // 1 for right, -1 for left
   const papers = papersData.papers;
   const contentRef = useRef<HTMLDivElement>(null);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+
+  // Preload all thumbnail images
+  useEffect(() => {
+    const preloadImages = async () => {
+      console.log("Preloading images...");
+      
+      // Preload all paper thumbnails
+      const thumbnailPromises = papers.map((paper) => {
+        return new Promise<string>((resolve, reject) => {
+          const img = new window.Image();
+          const src = getPublicPath(paper.thumbnail);
+          console.log(`Preloading thumbnail: ${src}`);
+          img.src = src;
+          img.onload = () => {
+            console.log(`Loaded thumbnail: ${src}`);
+            resolve(src);
+          };
+          img.onerror = () => {
+            console.error(`Failed to load thumbnail: ${src}`);
+            reject(new Error(`Failed to load thumbnail: ${src}`));
+          };
+        });
+      });
+      
+      // Preload all result images
+      const resultImagePromises = papers.flatMap((paper) => 
+        paper.results
+          .filter(result => result.type === "image" && result.src)
+          .map(result => {
+            return new Promise<string>((resolve, reject) => {
+              const img = new window.Image();
+              const src = getPublicPath(result.src || "");
+              console.log(`Preloading result image: ${src}`);
+              img.src = src;
+              img.onload = () => {
+                console.log(`Loaded result image: ${src}`);
+                resolve(src);
+              };
+              img.onerror = () => {
+                console.error(`Failed to load result image: ${src}`);
+                reject(new Error(`Failed to load result image: ${src}`));
+              };
+            });
+          })
+      );
+      
+      try {
+        await Promise.all([...thumbnailPromises, ...resultImagePromises]);
+        console.log("All images preloaded successfully");
+        setImagesLoaded(true);
+      } catch (error) {
+        console.error("Error preloading images:", error);
+        // Continue even if some images failed to load
+        setImagesLoaded(true);
+      }
+    };
+    
+    preloadImages();
+  }, [papers]);
 
   const scrollToTop = () => {
-    contentRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Add a small delay to ensure state updates have completed
+    setTimeout(() => {
+      if (contentRef.current) {
+        console.log("Scrolling to top", contentRef.current);
+        
+        // Try scrollIntoView first
+        contentRef.current.scrollIntoView({ 
+          behavior: "smooth",
+          block: "start"
+        });
+        
+        // Fallback: also try to find the element by ID and scroll to it
+        const contentElement = document.getElementById('paper-content');
+        if (contentElement) {
+          // Scroll the parent container
+          const container = document.querySelector('.h-screen.overflow-y-auto');
+          if (container) {
+            const offsetTop = contentElement.offsetTop;
+            container.scrollTo({
+              top: offsetTop - 100, // Adjust for header/padding
+              behavior: 'smooth'
+            });
+          }
+        }
+      } else {
+        console.error("contentRef is not attached to any element");
+      }
+    }, 50);
   };
 
   const nextPaper = () => {
     setDirection(1);
-    setSelectedPaper((prev) => (prev + 1) % papers.length);
-    scrollToTop();
+    setSelectedPaper((prev) => {
+      const newIndex = (prev + 1) % papers.length;
+      // Use setTimeout to ensure state is updated before scrolling
+      setTimeout(() => scrollToTop(), 10);
+      return newIndex;
+    });
   };
 
   const previousPaper = () => {
     setDirection(-1);
-    setSelectedPaper((prev) => (prev - 1 + papers.length) % papers.length);
-    scrollToTop();
+    setSelectedPaper((prev) => {
+      const newIndex = (prev - 1 + papers.length) % papers.length;
+      // Use setTimeout to ensure state is updated before scrolling
+      setTimeout(() => scrollToTop(), 10);
+      return newIndex;
+    });
   };
 
   const selectPaper = (index: number) => {
     setDirection(index > selectedPaper ? 1 : -1);
     setSelectedPaper(index);
-    scrollToTop();
+    // Use setTimeout to ensure state is updated before scrolling
+    setTimeout(() => scrollToTop(), 10);
   };
-
-  console.log(papers[0].thumbnail);
 
   return (
     <div className="flex min-h-screen mb-16">
@@ -82,22 +176,30 @@ export function PaperDisplay() {
             >
               <div className="w-full h-full bg-primary-white rounded-lg shadow-xl border border-primary-gray/10">
                 <div className="w-full h-full flex items-center justify-center text-primary-gray">
-                  <Image
-                    src={getPublicPath(
-                      papers[
-                        (selectedPaper - 1 + papers.length) % papers.length
-                      ].thumbnail
-                    )}
-                    alt={`${
-                      papers[
-                        (selectedPaper - 1 + papers.length) % papers.length
-                      ].shortTitle
-                    } Thumbnail`}
-                    className="w-full h-full object-contain"
-                    width={510}
-                    height={660}
-                    priority
-                  />
+                  {imagesLoaded ? (
+                    <Image
+                      src={getPublicPath(
+                        papers[
+                          (selectedPaper - 1 + papers.length) % papers.length
+                        ].thumbnail
+                      )}
+                      alt={`${
+                        papers[
+                          (selectedPaper - 1 + papers.length) % papers.length
+                        ].shortTitle
+                      } Thumbnail`}
+                      className="w-full h-full object-contain"
+                      width={510}
+                      height={660}
+                      priority
+                    />
+                  ) : (
+                    <div className="animate-pulse flex flex-col items-center justify-center">
+                      <div className="w-32 h-32 bg-primary-gray/20 rounded-full mb-4"></div>
+                      <div className="h-2 w-24 bg-primary-gray/20 rounded mb-2"></div>
+                      <div className="h-2 w-16 bg-primary-gray/20 rounded"></div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -156,14 +258,22 @@ export function PaperDisplay() {
               >
                 <div className="w-full h-full bg-primary-white rounded-lg shadow-xl border border-primary-gray/10">
                   <div className="w-full h-full flex items-center justify-center text-primary-gray">
-                    <Image
-                      src={getPublicPath(papers[selectedPaper].thumbnail)}
-                      alt={`${papers[selectedPaper].shortTitle} Thumbnail`}
-                      className="w-full h-full object-contain"
-                      width={510}
-                      height={660}
-                      priority
-                    />
+                    {imagesLoaded ? (
+                      <Image
+                        src={getPublicPath(papers[selectedPaper].thumbnail)}
+                        alt={`${papers[selectedPaper].shortTitle} Thumbnail`}
+                        className="w-full h-full object-contain"
+                        width={510}
+                        height={660}
+                        priority
+                      />
+                    ) : (
+                      <div className="animate-pulse flex flex-col items-center justify-center">
+                        <div className="w-32 h-32 bg-primary-gray/20 rounded-full mb-4"></div>
+                        <div className="h-2 w-24 bg-primary-gray/20 rounded mb-2"></div>
+                        <div className="h-2 w-16 bg-primary-gray/20 rounded"></div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>
@@ -189,7 +299,7 @@ export function PaperDisplay() {
       </div>
 
       {/* Right side - Scrollable content */}
-      <div className="w-3/4 p-12 pt-28 mt-16" ref={contentRef}>
+      <div className="w-3/4 p-12 pt-28 mt-16" ref={contentRef} id="paper-content">
         <div className="max-w-3xl mx-auto space-y-16">
           {/* Paper Title */}
           <section>
@@ -237,15 +347,21 @@ export function PaperDisplay() {
                 } else if (block.type === "image") {
                   return (
                     <figure key={index} className="my-8">
-                      <Image
-                        src={getPublicPath(block.src || "")}
-                        alt={block.alt || ""}
-                        width={800}
-                        height={400}
-                        className="w-2/3 h-auto mx-auto"
-                        sizes="(max-width: 768px) 100vw, 800px"
-                        priority
-                      />
+                      {imagesLoaded ? (
+                        <Image
+                          src={getPublicPath(block.src || "")}
+                          alt={block.alt || ""}
+                          width={800}
+                          height={400}
+                          className="w-2/3 h-auto mx-auto"
+                          sizes="(max-width: 768px) 100vw, 800px"
+                          priority
+                        />
+                      ) : (
+                        <div className="w-2/3 h-64 mx-auto bg-primary-gray/10 animate-pulse flex items-center justify-center">
+                          <div className="text-primary-gray/50">Loading image...</div>
+                        </div>
+                      )}
                       <figcaption className="text-center text-sm mt-2 text-primary-gray">
                         {block.caption}
                       </figcaption>
