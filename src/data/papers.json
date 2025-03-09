@@ -5,13 +5,13 @@
       "shortTitle": "Paper One",
       "title": "Product Health Insights Using Telemetry",
       "author": "Chris",
-      "thumbnail": "paper-chris-thumbnail.png",
+      "thumbnail": "/paper-chris-thumbnail.png",
       "analysis": "This paper sought to assess whether a certain feature was significantly present on the same day that an uncorrected error occurred (think blue screen of death). There are many different types of uncorrected errors, so they looked at the top 30. They looked at two different features, daily max temperature and presence of a corrected error (an error that the OS manages to resolve). For each of these features, they made a univariate logistic regression model (two total times 30 uncorrected error types = 60 total models) to predict whether an uncorrected error occurred on a given day and with that coefficient they took a statistical test to assess whether or not that variable was statistically significant with an alpha = 0.05.",
       "privatization": "We looked at how corrected errors predict uncorrected errors and dropped daily max temperature. We trained on the top thirty uncorrected errors as well, and dropped one due to large compute times, for a total of 29 different logistic regression models. Privacy was applied in the form of differentially private gradient descent, which means that for each step of gradient descent, a small amount of noise is added. This does mean that compute scales linearly with epsilon, as higher epsilons means more noisy gradient descent steps, thus we stopped at epsilon 1.5 for each of the models. In order to ensure that our alpha would have the same statistical power as the non-private version, we did a permutation test for each of the logistic regression models to empirically find a p-value for the private logistic regression models. Because of the long compute times with epsilon, we took 200 permutations for each private logistic regression model to compare our result against.",
       "results": [
         {
           "type": "text",
-          "content": "Our main method of comparing against the baseline was by calculating the set intersection over union for the private models and the non-private models. Firstly, for a “strong DP” (epsilon = 1), the model severely under-shot the number of significant models. This means that it failed to find the correct relationship between corrected and uncorrected errors in a third (0.31) of the models."
+          "content": "Our main method of comparing against the baseline was by calculating the set intersection over union for the private models and the non-private models. Firstly, for a \"strong DP\" (epsilon = 1), the model severely under-shot the number of significant models. This means that it failed to find the correct relationship between corrected and uncorrected errors in a third (0.31) of the models."
         },
         {
           "type": "image",
@@ -30,7 +30,7 @@
       "shortTitle": "Paper Two",
       "title": "Exploration of CPU Error Dependencies and Prediction",
       "author": "Tyler",
-      "thumbnail": "paper-tyler-thumbnail.png",
+      "thumbnail": "/paper-tyler-thumbnail.png",
       "analysis": "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.  Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
       "privatization": "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.  Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
       "results": [
@@ -55,7 +55,7 @@
       "shortTitle": "Paper Three",
       "title": "Power Consumption Patterns in Intel's Telemetry Data",
       "author": "Trey",
-      "thumbnail": "paper-trey-thumbnail.png",
+      "thumbnail": "/paper-trey-thumbnail.png",
       "analysis": "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.",
       "privatization": "Similique sunt in culpa qui  squam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.  Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aofficia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.",
       "results": [
@@ -80,7 +80,7 @@
       "shortTitle": "Paper Four",
       "title": "PC Health Impact White Paper",
       "author": "Bradley",
-      "thumbnail": "paper-bradley-thumbnail.png",
+      "thumbnail": "/paper-bradley-thumbnail.png",
       "analysis": "Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae.",
       "privatization": "Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.",
       "results": [

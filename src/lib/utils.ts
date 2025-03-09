@@ -7,5 +7,7 @@ export function getPublicPath(path: string): string {
     ? '/' + window.location.pathname.split('/')[1]
     : '';
     
-  return `${basePath}${path}`;
+  // Ensure path starts with a forward slash and remove any double slashes
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  return `${basePath}${normalizedPath}`.replace(/\/+/g, '/');
 } 
