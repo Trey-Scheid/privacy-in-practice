@@ -5,10 +5,29 @@ import { getPublicPath } from "@/lib/utils";
 import papersData from "@/data/papers.json";
 import Image from "next/image";
 
+interface contentBlock {
+  type: "text" | "image";
+  content?: string;
+  src?: string;
+  alt?: string;
+  caption?: string;
+}
+
+interface Paper {
+  id: number;
+  shortTitle: string;
+  title: string;
+  author: string;
+  thumbnail: string;
+  analysis: contentBlock[];
+  privatization: contentBlock[];
+  results: contentBlock[];
+}
+
 export function PaperDisplay() {
   const [selectedPaper, setSelectedPaper] = useState(0);
   const [direction, setDirection] = useState(1); // 1 for right, -1 for left
-  const papers = papersData.papers;
+  const papers = papersData.papers as Paper[];
   const contentRef = useRef<HTMLDivElement>(null);
   const [imagesLoaded, setImagesLoaded] = useState(false);
 
@@ -316,9 +335,40 @@ export function PaperDisplay() {
             <h2 className="text-3xl font-bold mb-4 text-primary-gray">
               {papers[selectedPaper].id}.1 Paper&apos;s Analysis
             </h2>
-            <p className="text-xl text-primary-gray">
-              {papers[selectedPaper].analysis}
-            </p>
+            <div className="space-y-8">
+              {papers[selectedPaper].analysis.map((block, index) => {
+                if (block.type === "text") {
+                  return (
+                    <p key={index} className="text-xl text-primary-gray">
+                      {block.content}
+                    </p>
+                  );
+                } else if (block.type === "image") {
+                  return (
+                    <figure key={index} className="my-8">
+                      {imagesLoaded ? (
+                        <Image
+                          src={getPublicPath(block.src || "")}
+                          alt={block.alt || ""}
+                          width={800}
+                          height={400}
+                          className="w-2/3 h-auto mx-auto"
+                          sizes="(max-width: 768px) 100vw, 800px"
+                          priority
+                        />
+                      ) : (
+                        <div className="w-2/3 h-64 mx-auto bg-primary-gray/10 animate-pulse flex items-center justify-center">
+                          <div className="text-primary-gray/50">Loading image...</div>
+                        </div>
+                      )}
+                      <figcaption className="text-center text-sm mt-2 text-primary-gray">
+                        {block.caption}
+                      </figcaption>
+                    </figure>
+                  );
+                }
+              })}
+            </div>
           </section>
 
           {/* Privatization Approach */}
@@ -326,9 +376,40 @@ export function PaperDisplay() {
             <h2 className="text-3xl font-bold mb-4 text-primary-gray">
               {papers[selectedPaper].id}.2 How We Privatized
             </h2>
-            <p className="text-xl text-primary-gray">
-              {papers[selectedPaper].privatization}
-            </p>
+            <div className="space-y-8">
+              {papers[selectedPaper].privatization.map((block, index) => {
+                if (block.type === "text") {
+                  return (
+                    <p key={index} className="text-xl text-primary-gray">
+                      {block.content}
+                    </p>
+                  );
+                } else if (block.type === "image") {
+                  return (
+                    <figure key={index} className="my-8">
+                      {imagesLoaded ? (
+                        <Image
+                          src={getPublicPath(block.src || "")}
+                          alt={block.alt || ""}
+                          width={800}
+                          height={400}
+                          className="w-2/3 h-auto mx-auto"
+                          sizes="(max-width: 768px) 100vw, 800px"
+                          priority
+                        />
+                      ) : (
+                        <div className="w-2/3 h-64 mx-auto bg-primary-gray/10 animate-pulse flex items-center justify-center">
+                          <div className="text-primary-gray/50">Loading image...</div>
+                        </div>
+                      )}
+                      <figcaption className="text-center text-sm mt-2 text-primary-gray">
+                        {block.caption}
+                      </figcaption>
+                    </figure>
+                  );
+                }
+              })}
+            </div>
           </section>
 
           {/* Results */}

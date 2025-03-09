@@ -6,8 +6,18 @@
       "title": "Product Health Insights Using Telemetry",
       "author": "Chris",
       "thumbnail": "paper-chris-thumbnail.png",
-      "analysis": "This paper sought to assess whether a certain feature was significantly present on the same day that an uncorrected error occurred (think blue screen of death). There are many different types of uncorrected errors, so they looked at the top 30. They looked at two different features, daily max temperature and presence of a corrected error (an error that the OS manages to resolve). For each of these features, they made a univariate logistic regression model (two total times 30 uncorrected error types = 60 total models) to predict whether an uncorrected error occurred on a given day and with that coefficient they took a statistical test to assess whether or not that variable was statistically significant with an alpha = 0.05.",
-      "privatization": "We looked at how corrected errors predict uncorrected errors and dropped daily max temperature. We trained on the top thirty uncorrected errors as well, and dropped one due to large compute times, for a total of 29 different logistic regression models. Privacy was applied in the form of differentially private gradient descent, which means that for each step of gradient descent, a small amount of noise is added. This does mean that compute scales linearly with epsilon, as higher epsilons means more noisy gradient descent steps, thus we stopped at epsilon 1.5 for each of the models. In order to ensure that our alpha would have the same statistical power as the non-private version, we did a permutation test for each of the logistic regression models to empirically find a p-value for the private logistic regression models. Because of the long compute times with epsilon, we took 200 permutations for each private logistic regression model to compare our result against.",
+      "analysis": [
+        {
+          "type": "text",
+          "content": "This paper sought to assess whether a certain feature was significantly present on the same day that an uncorrected error occurred (think blue screen of death). There are many different types of uncorrected errors, so they looked at the top 30. They looked at two different features, daily max temperature and presence of a corrected error (an error that the OS manages to resolve). For each of these features, they made a univariate logistic regression model (two total times 30 uncorrected error types = 60 total models) to predict whether an uncorrected error occurred on a given day and with that coefficient they took a statistical test to assess whether or not that variable was statistically significant with an alpha = 0.05."
+        }
+      ],
+      "privatization": [
+        {
+          "type": "text",
+          "content": "We looked at how corrected errors predict uncorrected errors and dropped daily max temperature. We trained on the top thirty uncorrected errors as well, and dropped one due to large compute times, for a total of 29 different logistic regression models. Privacy was applied in the form of differentially private gradient descent, which means that for each step of gradient descent, a small amount of noise is added. This does mean that compute scales linearly with epsilon, as higher epsilons means more noisy gradient descent steps, thus we stopped at epsilon 1.5 for each of the models. In order to ensure that our alpha would have the same statistical power as the non-private version, we did a permutation test for each of the logistic regression models to empirically find a p-value for the private logistic regression models. Because of the long compute times with epsilon, we took 200 permutations for each private logistic regression model to compare our result against."
+        }
+      ],
       "results": [
         {
           "type": "text",
@@ -31,22 +41,32 @@
       "title": "Exploration of CPU Error Dependencies and Prediction",
       "author": "Tyler",
       "thumbnail": "paper-tyler-thumbnail.png",
-      "analysis": "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.  Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-      "privatization": "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.  Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+      "analysis": [
+        {
+          "type": "text",
+          "content": "This paper sought to assess whether a certain feature was significantly present on the same day that an uncorrected error occurred (think blue screen of death). There are many different types of uncorrected errors, so they looked at the top 30. They looked at two different features, daily max temperature and presence of a corrected error (an error that the OS manages to resolve). For each of these features, they made a univariate logistic regression model (two total times 30 uncorrected error types = 60 total models) to predict whether an uncorrected error occurred on a given day and with that coefficient they took a statistical test to assess whether or not that variable was statistically significant with an alpha = 0.05."
+        }
+      ],
+      "privatization": [
+        {
+          "type": "text",
+          "content": "We looked at how corrected errors predict uncorrected errors and dropped daily max temperature. We trained on the top thirty uncorrected errors as well, and dropped one due to large compute times, for a total of 29 different logistic regression models. Privacy was applied in the form of differentially private gradient descent, which means that for each step of gradient descent, a small amount of noise is added. This does mean that compute scales linearly with epsilon, as higher epsilons means more noisy gradient descent steps, thus we stopped at epsilon 1.5 for each of the models. In order to ensure that our alpha would have the same statistical power as the non-private version, we did a permutation test for each of the logistic regression models to empirically find a p-value for the private logistic regression models. Because of the long compute times with epsilon, we took 200 permutations for each private logistic regression model to compare our result against."
+        }
+      ],
       "results": [
         {
           "type": "text",
-          "content": "First paragraph of results..."
+          "content": "Our main method of comparing against the baseline was by calculating the set intersection over union for the private models and the non-private models. Firstly, for a \"strong DP\" (epsilon = 1), the model severely under-shot the number of significant models. This means that it failed to find the correct relationship between corrected and uncorrected errors in a third (0.31) of the models."
         },
         {
           "type": "image",
           "src": "lr_pval_1.png",
-          "alt": "Privacy-Utility Tradeoff",
-          "caption": "Figure 1: Our results show..."
+          "alt": "Confusion Matrix",
+          "caption": "Figure 1:  A diagram of the confusion matrix. Notice zero false positives and nine false negatives."
         },
         {
           "type": "text",
-          "content": "As we can see in Figure 1 above..."
+          "content": "Overall, as the epsilon increased from zero to 0.5, the intersection over union tended to increase. However, between 0.5 and 1.5, the intersection over union failed to approach the non-private model and failed to improve."
         }
       ]
     },
@@ -56,22 +76,32 @@
       "title": "Power Consumption Patterns in Intel's Telemetry Data",
       "author": "Trey",
       "thumbnail": "paper-trey-thumbnail.png",
-      "analysis": "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.",
-      "privatization": "Similique sunt in culpa qui  squam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.  Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aofficia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.",
+      "analysis": [
+        {
+          "type": "text",
+          "content": "This paper sought to assess whether a certain feature was significantly present on the same day that an uncorrected error occurred (think blue screen of death). There are many different types of uncorrected errors, so they looked at the top 30. They looked at two different features, daily max temperature and presence of a corrected error (an error that the OS manages to resolve). For each of these features, they made a univariate logistic regression model (two total times 30 uncorrected error types = 60 total models) to predict whether an uncorrected error occurred on a given day and with that coefficient they took a statistical test to assess whether or not that variable was statistically significant with an alpha = 0.05."
+        }
+      ],
+      "privatization": [
+        {
+          "type": "text",
+          "content": "We looked at how corrected errors predict uncorrected errors and dropped daily max temperature. We trained on the top thirty uncorrected errors as well, and dropped one due to large compute times, for a total of 29 different logistic regression models. Privacy was applied in the form of differentially private gradient descent, which means that for each step of gradient descent, a small amount of noise is added. This does mean that compute scales linearly with epsilon, as higher epsilons means more noisy gradient descent steps, thus we stopped at epsilon 1.5 for each of the models. In order to ensure that our alpha would have the same statistical power as the non-private version, we did a permutation test for each of the logistic regression models to empirically find a p-value for the private logistic regression models. Because of the long compute times with epsilon, we took 200 permutations for each private logistic regression model to compare our result against."
+        }
+      ],
       "results": [
         {
           "type": "text",
-          "content": "First paragraph of results..."
+          "content": "Our main method of comparing against the baseline was by calculating the set intersection over union for the private models and the non-private models. Firstly, for a \"strong DP\" (epsilon = 1), the model severely under-shot the number of significant models. This means that it failed to find the correct relationship between corrected and uncorrected errors in a third (0.31) of the models."
         },
         {
           "type": "image",
           "src": "lr_pval_1.png",
-          "alt": "Privacy-Utility Tradeoff",
-          "caption": "Figure 1: Our results show..."
+          "alt": "Confusion Matrix",
+          "caption": "Figure 1:  A diagram of the confusion matrix. Notice zero false positives and nine false negatives."
         },
         {
           "type": "text",
-          "content": "As we can see in Figure 1 above..."
+          "content": "Overall, as the epsilon increased from zero to 0.5, the intersection over union tended to increase. However, between 0.5 and 1.5, the intersection over union failed to approach the non-private model and failed to improve."
         }
       ]
     },
@@ -81,22 +111,36 @@
       "title": "PC Health Impact White Paper",
       "author": "Bradley",
       "thumbnail": "paper-bradley-thumbnail.png",
-      "analysis": "Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae.",
-      "privatization": "Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.",
+      "analysis": [
+        {
+          "type": "text",
+          "content": "This paper introduces two tools for detecting and analyzing changes in device usage patterns over time. Tool 1 identifies individual devices that exhibit significant behavioral changes in response to specific events by analyzing task switch data and applying statistical tests. Tool 2 groups devices based on their computer usage patterns over time using clustering techniques, allowing for the identification of different groups with similar behavioral changes. By leveraging large-scale telemetry data on user-task events, these methods help uncover shifts in human-device interactions for time-sensitive events."
+        }
+      ],
+      "privatization": [
+        {
+          "type": "text",
+          "content": "We trained on a subset of data from the large telemetry dataset the paper used due to computing limitations.  Each user is grouped by the number of respective task switches for each week. The week-to-week differences are computed to quantify the total change for each user. This number is then normalized and scaled to between -10 and 10. To prevent any single device from having too much influence, the data is first \"clipped\" to a fixed range (i.e. -9.9 to 9.9), meaning extreme values are capped before processing."
+        },
+        {
+          "type": "text",
+          "content": "The algorithm we privatized was Lloyd’s algorithm for k-means clustering. Noise, drawn from a Laplace distribution, is then added to the mean computation in each iteration, ensuring privacy while still allowing meaningful patterns to emerge. After at most 10 iterations, the privatized k-means model is trained and can then be tested on the test set. This process is repeated for epsilon between .01 and 100 which is shown in the next section."
+        }
+      ],
       "results": [
         {
           "type": "text",
-          "content": "First paragraph of results..."
+          "content": "The baseline method the the paper used was non-private k-means clustering. This had a loss of 1.69 in our testing.  The private k-means clustering algorithm converged only when epsilon was at least 1. This means that epsilon needs to be at least 1 to not significantly negatively affect performance."
         },
         {
           "type": "image",
-          "src": "lr_pval_1.png",
-          "alt": "Privacy-Utility Tradeoff",
-          "caption": "Figure 1: Our results show..."
+          "src": "kmeans_1.png",
+          "alt": "K-Means Clustering Loss vs Epsilon",
+          "caption": "Figure 1:  A plot showcasing inertia as epsilon increases. Notice where it converges."
         },
         {
           "type": "text",
-          "content": "As we can see in Figure 1 above..."
+          "content": "As epsilon increases, the inertia for the privatized model slowly converges to the non-private train and test loss. This is expected and given its convergence close to an epsilon of 1,  the model performs quite well in terms of both privacy and accuracy."
         }
       ]
     }
