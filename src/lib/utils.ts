@@ -1,16 +1,30 @@
 export function getPublicPath(path: string): string {
-  // Ensure path doesn't have leading slash for consistency
-  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  if (!path) {
+    console.error("Empty path provided to getPublicPath");
+    return "";
+  }
 
-  // Check if we're running on GitHub Pages
-  const isGitHubPages = typeof window !== 'undefined' && window.location.hostname.includes('github.io');
+  // Remove leading slash if present
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  
+  // Check if we're running in the browser
+  const isClient = typeof window !== 'undefined';
+  
+  // Detect GitHub Pages hosting
+  const isGitHubPages = isClient && window.location.hostname.includes('github.io');
+  
+  // Build the appropriate path
+  let finalPath;
   
   if (isGitHubPages) {
-    // Get repository name from URL
+    // GitHub Pages deployment
     const repoName = window.location.pathname.split('/')[1];
-    return `/${repoName}/${cleanPath}`;
+    finalPath = `/${repoName}/${cleanPath}`;
   } else {
-    // Local development
-    return `/${cleanPath}`;
+    // Local development or other hosting
+    finalPath = `/${cleanPath}`;
   }
+  
+  console.log(`getPublicPath: ${path} -> ${finalPath}`);
+  return finalPath;
 } 
