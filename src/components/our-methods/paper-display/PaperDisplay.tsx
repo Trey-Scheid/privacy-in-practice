@@ -261,7 +261,7 @@ export function PaperDisplay() {
                         alt={block.alt || ""}
                         width={800}
                         height={400}
-                        className="w-full h-auto"
+                        className="w-2/3 h-auto mx-auto"
                         sizes="(max-width: 768px) 100vw, 800px"
                         priority
                       />
