@@ -28,7 +28,7 @@ export function ScrollProgress() {
   useEffect(() => {
     const handleScroll = () => {
       // Get the main scrollable container
-      const container = document.querySelector('.h-screen.overflow-y-scroll');
+      const container = document.querySelector('.h-screen.overflow-y-auto');
       if (!container) return;
 
       // Get main content sections
@@ -72,7 +72,7 @@ export function ScrollProgress() {
     };
 
     // Get the main scrollable container
-    const container = document.querySelector('.h-screen.overflow-y-scroll');
+    const container = document.querySelector('.h-screen.overflow-y-auto');
     if (container) {
       container.addEventListener("scroll", handleScroll);
       handleScroll(); // Initial calculation
