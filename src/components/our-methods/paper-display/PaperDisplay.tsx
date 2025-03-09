@@ -5,6 +5,25 @@ import { getPublicPath } from "@/lib/utils";
 import papersData from "@/data/papers.json";
 import Image from "next/image";
 
+interface ResultBlock {
+  type: "text" | "image";
+  content?: string;
+  src?: string;
+  alt?: string;
+  caption?: string;
+}
+
+interface Paper {
+  id: number;
+  shortTitle: string;
+  title: string;
+  author: string;
+  thumbnail: string;
+  analysis: string;
+  privatization: string;
+  results: ResultBlock[];
+}
+
 export function PaperDisplay() {
   const [selectedPaper, setSelectedPaper] = useState(0);
   const [direction, setDirection] = useState(1); // 1 for right, -1 for left
@@ -39,27 +58,27 @@ export function PaperDisplay() {
     <div className="flex min-h-screen mb-16">
       {/* Left side - Static content */}
       <div className="w-1/2 bg-accent-light p-12 pl-24 sticky top-0 h-screen flex flex-col">
-        {/* Paper Stack with Tabs */}
-        <div className="flex-1 relative flex flex-col justify-center h-full">
-          {/* Tabs positioned above stack */}
-          <div className="flex w-full absolute top-24 z-30 bg-accent-light">
-            {papers.map((paper, index) => (
-              <button
-                key={paper.id}
-                onClick={() => selectPaper(index)}
-                className={`px-4 py-2 border-b-2 transition-colors ${
-                  selectedPaper === index
-                    ? "border-accent text-accent font-medium"
-                    : "border-transparent text-primary-gray hover:border-primary-gray/20"
-                }`}
-              >
-                {paper.shortTitle}
-              </button>
-            ))}
-          </div>
+        {/* Tabs at the top */}
+        <div className="flex justify-center w-full pt-8">
+          {papers.map((paper, index) => (
+            <button
+              key={paper.id}
+              onClick={() => selectPaper(index)}
+              className={`px-4 py-2 border-b-2 transition-colors ${
+                selectedPaper === index
+                  ? "border-accent text-accent font-medium"
+                  : "border-transparent text-primary-gray hover:border-primary-gray/20"
+              }`}
+            >
+              {paper.shortTitle}
+            </button>
+          ))}
+        </div>
 
-          {/* Paper Stack */}
-          <div className="relative w-full max-w-[350px] aspect-[8.5/11] mx-auto mt-32 flex-2">
+        {/* Paper Stack Container */}
+        <div className="flex-1 flex flex-col items-center justify-center">
+          {/* Paper Stack with max height constraint */}
+          <div className="relative w-full max-w-[350px] max-h-[80%] aspect-[8.5/11] mx-auto">
             {/* Static background papers */}
             {[3, 2, 1].map((offset) => (
               <div
@@ -170,8 +189,8 @@ export function PaperDisplay() {
             </AnimatePresence>
           </div>
 
-          {/* Navigation arrows */}
-          <div className="flex justify-center gap-4 mt-12">
+          {/* Navigation arrows at the bottom */}
+          <div className="flex justify-center gap-4 mt-8">
             <button
               onClick={previousPaper}
               className="p-2 rounded-full bg-primary-gray/10 hover:bg-primary-gray/20 transition-colors"
@@ -226,9 +245,34 @@ export function PaperDisplay() {
             <h2 className="text-3xl font-bold mb-4 text-primary-gray">
             {papers[selectedPaper].id}.3 Results Compared to Paper
             </h2>
-            <p className="text-xl text-primary-gray">
-              {papers[selectedPaper].results}
-            </p>
+            <div className="space-y-8">
+              {papers[selectedPaper].results.map((block, index) => {
+                if (block.type === "text") {
+                  return (
+                    <p key={index} className="text-xl text-primary-gray">
+                      {block.content}
+                    </p>
+                  );
+                } else if (block.type === "image") {
+                  return (
+                    <figure key={index} className="my-8">
+                      <Image
+                        src={getPublicPath(block.src || "")}
+                        alt={block.alt || ""}
+                        width={800}
+                        height={400}
+                        className="w-full h-auto"
+                        sizes="(max-width: 768px) 100vw, 800px"
+                        priority
+                      />
+                      <figcaption className="text-center text-sm mt-2 text-primary-gray">
+                        {block.caption}
+                      </figcaption>
+                    </figure>
+                  );
+                }
+              })}
+            </div>
           </section>
         </div>
       </div>
