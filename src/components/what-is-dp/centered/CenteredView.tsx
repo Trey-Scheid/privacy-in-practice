@@ -67,7 +67,7 @@ export function CenteredView() {
           <div className="w-full h-full flex justify-center items-center">
             <div className="relative w-[50%] md:w-[70%]">
               <Image
-                src={getPublicPath("netflix.svg")}
+                src="netflix.svg"
                 alt="Netflix Logo"
                 className="w-full h-auto"
                 width={500}
