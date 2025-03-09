@@ -238,7 +238,7 @@ export function SplitView({
                 and a way to quantify the privacy of an algorithm.
               </p>
               <div
-                className={`mt-8 transition-all duration-500 overflow-hidden ${
+                className={`mt-4 transition-all duration-500 overflow-hidden ${
                   showTechnicalDetails
                     ? "max-h-[500px] opacity-100"
                     : "max-h-0 opacity-0"
@@ -274,7 +274,7 @@ export function SplitView({
                     </span>
                     :
                   </p>
-                  <div className="bg-primary-gray/10 p-2 rounded-lg my-6 flex justify-center">
+                  <div className="bg-primary-gray/10 rounded-lg my-2 flex justify-center">
                     <BlockMath math="P(\mathcal{M}(\mathcal{D}) \in \mathcal{S}) \leq e^\varepsilon \cdot P(\mathcal{M}(\mathcal{D}') \in \mathcal{S}) + \delta" />
                   </div>
                   <p className="text-lg">Where:</p>
@@ -292,6 +292,17 @@ export function SplitView({
                       </span>{" "}
                       (delta) is the probability of the privacy guarantee
                       failing
+                    </li>
+                    <li>
+                      A dataset{" "}
+                      <span>
+                        <InlineMath math="\mathcal{D}" />
+                      </span>{" "}
+                      and{" "}
+                      <span>
+                        <InlineMath math="\mathcal{D}'" />
+                      </span>{" "}
+                      are neighbors if they differ by at most one record
                     </li>
                   </ul>
                   <div className="mt-4 space-y-4">

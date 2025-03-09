@@ -58,7 +58,9 @@ export function CenteredView() {
             >
               deanonymize the 99% of the users in the dataset
             </Link>
-            . This is why the rigor of DP is so important.
+            . This is why the rigor of DP is so important. Have you considered
+            what someone could do with your personal watch history, ratings,
+            browsing data, or worse?
           </p>
         </div>
         <div className="w-1/2 flex justify-center items-center">
@@ -106,15 +108,15 @@ export function CenteredView() {
                 ▼
               </span>
             </button>
-            {". "}
+            {". "}The question then becomes:
           </p>
-          <p className="text-xl">The question then becomes:</p>
           <p className="text-xl font-bold text-accent mt-4">
             When are differentially private methods practical and useful?
           </p>
           <p className="text-xl font-bold text-accent">
             How effective is differential privacy when applied in practice?
           </p>
+          {/* Dropdown */}
           <div
             className={`mt-8 transition-all duration-500 overflow-hidden ${
               showRevealDetails
