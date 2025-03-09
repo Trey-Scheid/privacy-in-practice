@@ -25,7 +25,7 @@ export default function Home() {
   };
 
   return (
-    <div className="h-screen overflow-y-scroll snap-y snap-mandatory bg-primary-white text-primary-black">
+    <div className="h-screen overflow-y-auto snap-y snap-mandatory bg-primary-white text-primary-black overscroll-none">
       {/* Navigation Bar */}
       <NavBar
         isTitleVisible={isTitleVisible}
@@ -36,28 +36,31 @@ export default function Home() {
         discussionRef={discussionRef}
       />
 
-      {/* Top Section */}
-      <div ref={topRef} className="h-0" />
+      {/* Content Container */}
+      <div className="min-h-[calc(100vh-64px)] mt-16">
+        {/* Top Section */}
+        <div ref={topRef} className="h-0" />
 
-      {/* What is DP Section */}
-      <div className="snap-start" data-section="what-is-dp">
-        <WhatIsDP
-          SplitViewRef={whatIsDPRef}
-          titleRef={titleRef}
-          scrollToSection={scrollToSection}
-          methodsRef={methodsRef}
-          discussionRef={discussionRef}
-        />
-      </div>
+        {/* What is DP Section */}
+        <div className="snap-start" data-section="what-is-dp">
+          <WhatIsDP
+            SplitViewRef={whatIsDPRef}
+            titleRef={titleRef}
+            scrollToSection={scrollToSection}
+            methodsRef={methodsRef}
+            discussionRef={discussionRef}
+          />
+        </div>
 
-      {/* Our Methods Section */}
-      <div className="snap-start" data-section="methods">
-        <OurMethods methodsRef={methodsRef} />
-      </div>
+        {/* Our Methods Section */}
+        <div className="snap-start" data-section="methods">
+          <OurMethods methodsRef={methodsRef} />
+        </div>
 
-      {/* Discussion Section */}
-      <div className="snap-start" data-section="discussion">
-        <Discussion discussionRef={discussionRef} />
+        {/* Discussion Section */}
+        <div className="snap-start" data-section="discussion">
+          <Discussion discussionRef={discussionRef} />
+        </div>
       </div>
     </div>
   );

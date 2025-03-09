@@ -14,6 +14,11 @@
   }
 }
 
+html, body {
+  overscroll-behavior: none;
+  overflow-x: hidden;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
