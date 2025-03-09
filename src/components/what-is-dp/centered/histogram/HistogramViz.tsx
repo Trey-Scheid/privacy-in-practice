@@ -45,20 +45,20 @@ export function HistogramViz() {
 
   return (
     <>
-      <div className="prose prose-lg max-w-3xl mx-auto mb-12 text-center">
-        <p className="text-xl">
+      <div className="prose prose-lg max-w-3xl mx-auto mb-8 md:mb-12 text-center">
+        <p className="text-base md:text-xl">
           Another simple way to privatize data is to add noise to each of the
           values you plan to release. Here, we&apos;re releasing the raw counts
           of each category by adding noise to each of the counts.
         </p>
       </div>
-      <div className="flex justify-between items-start gap-8">
-        {/* Left side - Table */}
-        <div className="w-1/2">
+      <div className="flex flex-col md:flex-row justify-between items-start gap-8">
+        {/* Table (full width on mobile, half width on desktop) */}
+        <div className="w-full md:w-1/2">
           <table className="w-full border-collapse">
             <thead>
               <tr>
-                <th className="p-4 text-left border-b border-primary-gray/10">
+                <th className="p-3 md:p-4 text-left border-b border-primary-gray/10">
                   <div className="flex items-center gap-2">
                     <div>Raw Data</div>
                     <div className="relative group">
@@ -84,11 +84,12 @@ export function HistogramViz() {
                       className="w-full h-2 bg-primary-gray rounded-lg appearance-none cursor-pointer accent-accent"
                     />
                     <div className="text-sm text-primary-gray mt-1">
-                      Scale = {scale < 1 ? `1/${Math.round(1 / scale)}` : `${scale}`}x
+                      Scale ={" "}
+                      {scale < 1 ? `1/${Math.round(1 / scale)}` : `${scale}`}x
                     </div>
                   </div>
                 </th>
-                <th className="p-4 text-left border-b border-primary-gray/10">
+                <th className="p-3 md:p-4 text-left border-b border-primary-gray/10">
                   <div className="flex items-center gap-2">
                     <div>Introduce Noise</div>
                     <div className="relative group">
@@ -121,7 +122,7 @@ export function HistogramViz() {
                     </div>
                   </div>
                 </th>
-                <th className="p-4 text-left border-b border-primary-gray/10">
+                <th className="p-3 md:p-4 text-left border-b border-primary-gray/10">
                   Privatized Data
                 </th>
               </tr>
@@ -129,13 +130,13 @@ export function HistogramViz() {
             <tbody>
               {data.map((row, i) => (
                 <tr key={i}>
-                  <td className="p-4 border-b border-primary-gray/10">
+                  <td className="p-3 md:p-4 border-b border-primary-gray/10">
                     {Math.round(row.raw * 100) / 100}
                   </td>
-                  <td className="p-4 border-b border-primary-gray/10">
+                  <td className="p-3 md:p-4 border-b border-primary-gray/10">
                     {row.noise.toFixed(2)}
                   </td>
-                  <td className="p-4 border-b border-primary-gray/10">
+                  <td className="p-3 md:p-4 border-b border-primary-gray/10">
                     {(row.raw + row.noise).toFixed(2)}
                   </td>
                 </tr>
@@ -143,9 +144,11 @@ export function HistogramViz() {
             </tbody>
           </table>
         </div>
-        {/* Right side - Chart */}
-        <Chart data={data} />
+        {/* Chart (full width on mobile, half width on desktop) */}
+        <div className="w-full md:w-1/2 mt-8 md:mt-0">
+          <Chart data={data} />
+        </div>
       </div>
     </>
   );
-} 
+}

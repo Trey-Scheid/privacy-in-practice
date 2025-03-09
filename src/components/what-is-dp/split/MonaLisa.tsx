@@ -29,6 +29,7 @@ export function MonaLisa({
 }: MonaLisaProps) {
   const [noisyAscii, setNoisyAscii] = useState(ascii);
 
+  // Update noise ONLY when props change
   useEffect(() => {
     if (shouldAddNoise && !showOriginal) {
       setNoisyAscii(addNoiseToAscii(ascii, noiseLevel));
@@ -42,4 +43,4 @@ export function MonaLisa({
       {noisyAscii}
     </pre>
   );
-} 
+}

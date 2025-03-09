@@ -3,8 +3,8 @@ import { ConfidenceChart } from "./ConfidenceChart";
 export function ConfidenceViz() {
   return (
     <>
-      <div className="prose prose-lg max-w-3xl mx-auto mb-12 text-center">
-        <p className="text-xl">
+      <div className="prose prose-lg max-w-3xl mx-auto mb-8 md:mb-12 text-center">
+        <p className="text-base md:text-xl">
           Here, we&apos;ve trained two logistic regression models, one privately
           and one non-privately, on the same task: predicting whether an image
           is a hotdog or not. We trained these models on the same training data
@@ -34,7 +34,9 @@ export function ConfidenceViz() {
             </span>
           </span>
         </p>
-        <ConfidenceChart />
+        <div className="mt-8">
+          <ConfidenceChart />
+        </div>
       </div>
     </>
   );

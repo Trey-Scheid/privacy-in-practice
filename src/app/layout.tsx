@@ -16,6 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Privacy in Practice",
   description: "The Feasibility of Differential Privacy for Telemetry Analysis",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
   openGraph: {
     title: "Privacy in Practice",
     description:

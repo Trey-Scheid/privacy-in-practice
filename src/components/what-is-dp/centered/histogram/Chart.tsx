@@ -34,8 +34,13 @@ export function Chart({ data }: ChartProps) {
 
     // Chart dimensions
     const width = chartRef.current.clientWidth;
-    const height = 400;
-    const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+    const height = window.innerWidth < 768 ? 300 : 400; // Smaller height on mobile
+    const margin = {
+      top: 20,
+      right: window.innerWidth < 768 ? 10 : 20,
+      bottom: 30,
+      left: window.innerWidth < 768 ? 30 : 40,
+    };
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
@@ -45,6 +50,8 @@ export function Chart({ data }: ChartProps) {
       .append("svg")
       .attr("width", width)
       .attr("height", height)
+      .attr("viewBox", `0 0 ${width} ${height}`) // Add viewBox for responsiveness
+      .attr("preserveAspectRatio", "xMidYMid meet") // Preserve aspect ratio
       .style("overflow", "visible");
 
     const g = svg
@@ -151,5 +158,5 @@ export function Chart({ data }: ChartProps) {
     return () => window.removeEventListener("resize", handleResize);
   }, [updateChart]);
 
-  return <div className="w-1/2" ref={chartRef} />;
-} 
+  return <div className="w-full" ref={chartRef} />;
+}

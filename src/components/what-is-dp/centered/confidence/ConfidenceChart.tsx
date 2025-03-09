@@ -43,8 +43,13 @@ export function ConfidenceChart() {
     if (!chartRef.current || chartRef.current.svg) return;
 
     const width = chartRef.current.clientWidth;
-    const height = 300;
-    const margin = { top: 20, right: 20, bottom: 30, left: 60 };
+    const height = window.innerWidth < 768 ? 250 : 300;
+    const margin = {
+      top: 20,
+      right: window.innerWidth < 768 ? 10 : 20,
+      bottom: 30,
+      left: window.innerWidth < 768 ? 35 : 60,
+    };
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
@@ -55,7 +60,7 @@ export function ConfidenceChart() {
       .attr("width", "100%")
       .attr("height", height)
       .attr("viewBox", `0 0 ${width} ${height}`)
-      .attr("preserveAspectRatio", "xMinYMin meet");
+      .attr("preserveAspectRatio", "xMidYMid meet");
 
     const g = svg
       .append("g")
@@ -71,7 +76,8 @@ export function ConfidenceChart() {
     const y = d3.scaleLinear().domain([0, 1]).range([innerHeight, 0]);
 
     // Add y-axis label
-    svg.append("text")
+    svg
+      .append("text")
       .attr("transform", "rotate(-90)")
       .attr("y", margin.left - 40)
       .attr("x", -(height / 2))
@@ -241,14 +247,18 @@ export function ConfidenceChart() {
       if (!chartRef.current?.svg) return;
 
       const width = chartRef.current.clientWidth;
-      const height = 300;
-      const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+      const height = window.innerWidth < 768 ? 250 : 300;
+      const margin = {
+        top: 20,
+        right: window.innerWidth < 768 ? 10 : 20,
+        bottom: 30,
+        left: window.innerWidth < 768 ? 35 : 60,
+      };
       const innerWidth = width - margin.left - margin.right;
       const innerHeight = height - margin.top - margin.bottom;
 
       // Update SVG viewBox
-      chartRef.current.svg
-        .attr("viewBox", `0 0 ${width} ${height}`);
+      chartRef.current.svg.attr("viewBox", `0 0 ${width} ${height}`);
 
       // Update scales
       chartRef.current.x.range([0, innerWidth]);
@@ -260,30 +270,41 @@ export function ConfidenceChart() {
       g.select(".reference-lines")
         .selectAll("line")
         .attr("x2", innerWidth)
-        .each(function(_, i) {
+        .each(function (_, i) {
           const line = d3.select(this);
-          if (i === 0) { // 0% line
+          if (i === 0) {
+            // 0% line
             line.attr("y1", innerHeight).attr("y2", innerHeight);
-          } else if (i === 1) { // 50% line
-            line.attr("y1", chartRef.current!.y(0.5)).attr("y2", chartRef.current!.y(0.5));
-          } else { // 100% line
-            line.attr("y1", chartRef.current!.y(1)).attr("y2", chartRef.current!.y(1));
+          } else if (i === 1) {
+            // 50% line
+            line
+              .attr("y1", chartRef.current!.y(0.5))
+              .attr("y2", chartRef.current!.y(0.5));
+          } else {
+            // 100% line
+            line
+              .attr("y1", chartRef.current!.y(1))
+              .attr("y2", chartRef.current!.y(1));
           }
         });
 
       // Update percentage labels
       g.select(".percentage-labels")
         .selectAll("text")
-        .each(function(_, i) {
+        .each(function (_, i) {
           const value = [0, 0.5, 1][i];
-          d3.select(this)
-            .attr("y", chartRef.current!.y(value));
+          d3.select(this).attr("y", chartRef.current!.y(value));
         });
 
       // Update x-axis labels
       g.select(".x-labels")
         .selectAll("text")
-        .attr("x", d => (chartRef.current!.x(d as string) || 0) + chartRef.current!.x.bandwidth() / 2)
+        .attr(
+          "x",
+          (d) =>
+            (chartRef.current!.x(d as string) || 0) +
+            chartRef.current!.x.bandwidth() / 2
+        )
         .attr("y", innerHeight + 20);
 
       // Update bars
@@ -291,24 +312,41 @@ export function ConfidenceChart() {
         .selectAll("rect")
         .attr("x", (d: any) => chartRef.current!.x(d.label) || 0)
         .attr("width", chartRef.current!.x.bandwidth())
-        .attr("y", (d: any) => chartRef.current!.y(isPrivate ? d.private : d.nonPrivate))
-        .attr("height", (d: any) => chartRef.current!.y(0) - chartRef.current!.y(isPrivate ? d.private : d.nonPrivate));
+        .attr("y", (d: any) =>
+          chartRef.current!.y(isPrivate ? d.private : d.nonPrivate)
+        )
+        .attr(
+          "height",
+          (d: any) =>
+            chartRef.current!.y(0) -
+            chartRef.current!.y(isPrivate ? d.private : d.nonPrivate)
+        );
 
       // Update value labels
       g.select(".value-labels")
         .selectAll("text")
-        .attr("x", (d: any) => (chartRef.current!.x(d.label) || 0) + chartRef.current!.x.bandwidth() / 2)
+        .attr(
+          "x",
+          (d: any) =>
+            (chartRef.current!.x(d.label) || 0) +
+            chartRef.current!.x.bandwidth() / 2
+        )
         .attr("y", (d: any) => {
           const value = isPrivate ? d.private : d.nonPrivate;
           if (value <= 0.05) {
             return chartRef.current!.y(value) - 10;
           } else {
-            return chartRef.current!.y(value) + (chartRef.current!.y(0) - chartRef.current!.y(value)) / 2 + 5;
+            return (
+              chartRef.current!.y(value) +
+              (chartRef.current!.y(0) - chartRef.current!.y(value)) / 2 +
+              5
+            );
           }
         });
 
       // Update y-axis label position
-      chartRef.current.svg.select("text")
+      chartRef.current.svg
+        .select("text")
         .attr("y", margin.left - 35)
         .attr("x", -(height / 2));
     };
@@ -318,15 +356,14 @@ export function ConfidenceChart() {
   }, [isPrivate]);
 
   return (
-    <div className="flex flex-col items-center gap-8 pt-8">
-
+    <div className="flex flex-col items-center gap-6 md:gap-8 pt-4 md:pt-8">
       {/* Datum Selection */}
-      <div className="flex gap-4 items-center">
+      <div className="flex gap-2 md:gap-4 items-center">
         {["Image 1", "Image 2", "Image 3"].map((datum) => (
           <button
             key={datum}
             onClick={() => setSelectedDatum(datum)}
-            className={`px-4 py-2 rounded-lg transition-colors ${
+            className={`px-3 md:px-4 py-2 rounded-lg transition-colors text-sm md:text-base ${
               selectedDatum === datum
                 ? "bg-primary-gray text-primary-white"
                 : "bg-primary-gray/10 text-primary-gray hover:bg-primary-gray/20"
@@ -336,14 +373,15 @@ export function ConfidenceChart() {
           </button>
         ))}
       </div>
+
       {/* Chart */}
       <div className="w-full" ref={chartRef} />
 
       {/* Privacy Toggle */}
-      <div className="flex gap-4 items-center">
+      <div className="flex gap-2 md:gap-4 items-center">
         <button
           onClick={() => setIsPrivate(true)}
-          className={`px-4 py-2 rounded-lg transition-colors ${
+          className={`px-3 md:px-4 py-2 rounded-lg transition-colors text-sm md:text-base ${
             isPrivate
               ? "bg-accent text-primary-white"
               : "bg-primary-gray/10 text-primary-gray hover:bg-primary-gray/20"
@@ -353,7 +391,7 @@ export function ConfidenceChart() {
         </button>
         <button
           onClick={() => setIsPrivate(false)}
-          className={`px-4 py-2 rounded-lg transition-colors ${
+          className={`px-3 md:px-4 py-2 rounded-lg transition-colors text-sm md:text-base ${
             !isPrivate
               ? "bg-primary-black text-primary-white"
               : "bg-primary-gray/10 text-primary-gray hover:bg-primary-gray/20"

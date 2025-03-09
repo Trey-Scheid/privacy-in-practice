@@ -35,7 +35,7 @@ export function PaperDisplay() {
   useEffect(() => {
     const preloadImages = async () => {
       console.log("Preloading images...");
-      
+
       // Preload all paper thumbnails
       const thumbnailPromises = papers.map((paper) => {
         return new Promise<string>((resolve, reject) => {
@@ -53,12 +53,12 @@ export function PaperDisplay() {
           };
         });
       });
-      
+
       // Preload all result images
-      const resultImagePromises = papers.flatMap((paper) => 
+      const resultImagePromises = papers.flatMap((paper) =>
         paper.results
-          .filter(result => result.type === "image" && result.src)
-          .map(result => {
+          .filter((result) => result.type === "image" && result.src)
+          .map((result) => {
             return new Promise<string>((resolve, reject) => {
               const img = new window.Image();
               const src = getPublicPath(result.src || "");
@@ -75,7 +75,7 @@ export function PaperDisplay() {
             });
           })
       );
-      
+
       try {
         await Promise.all([...thumbnailPromises, ...resultImagePromises]);
         console.log("All images preloaded successfully");
@@ -86,39 +86,44 @@ export function PaperDisplay() {
         setImagesLoaded(true);
       }
     };
-    
+
     preloadImages();
   }, [papers]);
 
   const scrollToTop = () => {
-    // Add a small delay to ensure state updates have completed
-    setTimeout(() => {
-      if (contentRef.current) {
-        console.log("Scrolling to top", contentRef.current);
-        
-        // Try scrollIntoView first
-        contentRef.current.scrollIntoView({ 
-          behavior: "smooth",
-          block: "start"
-        });
-        
-        // Fallback: also try to find the element by ID and scroll to it
-        const contentElement = document.getElementById('paper-content');
-        if (contentElement) {
-          // Scroll the parent container
-          const container = document.querySelector('.h-screen.overflow-y-auto');
-          if (container) {
-            const offsetTop = contentElement.offsetTop;
-            container.scrollTo({
-              top: offsetTop - 100, // Adjust for header/padding
-              behavior: 'smooth'
-            });
+    // Only scroll on desktop screens (lg breakpoint and above)
+    if (window.innerWidth >= 1024) {
+      // Add a small delay to ensure state updates have completed
+      setTimeout(() => {
+        if (contentRef.current) {
+          console.log("Scrolling to top", contentRef.current);
+
+          // Try scrollIntoView first
+          contentRef.current.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+
+          // Fallback: also try to find the element by ID and scroll to it
+          const contentElement = document.getElementById("paper-content");
+          if (contentElement) {
+            // Scroll the parent container
+            const container = document.querySelector(
+              ".h-screen.overflow-y-auto"
+            );
+            if (container) {
+              const offsetTop = contentElement.offsetTop;
+              container.scrollTo({
+                top: offsetTop - 100, // Adjust for header/padding
+                behavior: "smooth",
+              });
+            }
           }
+        } else {
+          console.error("contentRef is not attached to any element");
         }
-      } else {
-        console.error("contentRef is not attached to any element");
-      }
-    }, 50);
+      }, 50);
+    }
   };
 
   const nextPaper = () => {
@@ -149,9 +154,92 @@ export function PaperDisplay() {
   };
 
   return (
-    <div className="flex min-h-screen mb-16">
-      {/* Left side - Static content */}
-      <div className="w-1/2 bg-accent-light p-12 pl-24 sticky top-0 h-screen flex flex-col">
+    <div className="flex flex-col lg:flex-row min-h-screen mb-16">
+      {/* Mobile layout - Paper selection at the top */}
+      <div className="lg:hidden w-full bg-accent-light p-4">
+        {/* Tabs at the top */}
+        <div className="flex flex-wrap justify-center w-full py-4">
+          {papers.map((paper, index) => (
+            <button
+              key={paper.id}
+              onClick={() => selectPaper(index)}
+              className={`px-3 py-2 border-b-2 transition-colors text-sm ${
+                selectedPaper === index
+                  ? "border-accent text-accent font-medium"
+                  : "border-transparent text-primary-gray hover:border-primary-gray/20"
+              }`}
+            >
+              {paper.shortTitle}
+            </button>
+          ))}
+        </div>
+
+        {/* Current paper thumbnail */}
+        <div className="flex justify-center mt-2 mb-6">
+          <div className="relative w-40 aspect-[8.5/11]">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={selectedPaper}
+                initial={{
+                  opacity: 0,
+                  x: direction > 0 ? 20 : -20,
+                }}
+                animate={{
+                  opacity: 1,
+                  x: 0,
+                  transition: { duration: 0.3 },
+                }}
+                exit={{
+                  opacity: 0,
+                  x: direction > 0 ? -20 : 20,
+                  transition: { duration: 0.3 },
+                }}
+                className="absolute inset-0"
+              >
+                <div className="w-full h-full bg-primary-white rounded-lg shadow-md border border-primary-gray/10">
+                  <div className="w-full h-full flex items-center justify-center">
+                    {imagesLoaded ? (
+                      <Image
+                        src={getPublicPath(papers[selectedPaper].thumbnail)}
+                        alt={`${papers[selectedPaper].shortTitle} Thumbnail`}
+                        className="w-full h-full object-contain"
+                        width={200}
+                        height={260}
+                        priority
+                      />
+                    ) : (
+                      <div className="animate-pulse flex flex-col items-center justify-center">
+                        <div className="w-16 h-16 bg-primary-gray/20 rounded-full mb-2"></div>
+                        <div className="h-2 w-12 bg-primary-gray/20 rounded mb-1"></div>
+                        <div className="h-2 w-8 bg-primary-gray/20 rounded"></div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* Navigation arrows */}
+        <div className="flex justify-center gap-4 mb-2">
+          <button
+            onClick={previousPaper}
+            className="p-2 rounded-full bg-primary-gray/10 hover:bg-primary-gray/20 transition-colors"
+          >
+            <ChevronLeftIcon className="w-6 h-6 text-primary-gray" />
+          </button>
+          <button
+            onClick={nextPaper}
+            className="p-2 rounded-full bg-primary-gray/10 hover:bg-primary-gray/20 transition-colors"
+          >
+            <ChevronRightIcon className="w-6 h-6 text-primary-gray" />
+          </button>
+        </div>
+      </div>
+
+      {/* Desktop layout - Static sidebar */}
+      <div className="hidden lg:block lg:w-1/3 bg-accent-light p-12 pl-24 sticky top-0 h-screen flex flex-col">
         {/* Tabs at the top */}
         <div className="flex justify-center w-full pt-8">
           {papers.map((paper, index) => (
@@ -208,72 +296,40 @@ export function PaperDisplay() {
                         ].shortTitle
                       } Thumbnail`}
                       className="w-full h-full object-contain"
-                      width={510}
-                      height={660}
+                      width={300}
+                      height={400}
                       priority
                     />
                   ) : (
                     <div className="animate-pulse flex flex-col items-center justify-center">
-                      <div className="w-32 h-32 bg-primary-gray/20 rounded-full mb-4"></div>
-                      <div className="h-2 w-24 bg-primary-gray/20 rounded mb-2"></div>
-                      <div className="h-2 w-16 bg-primary-gray/20 rounded"></div>
+                      <div className="w-24 h-24 bg-primary-gray/20 rounded-full mb-4"></div>
+                      <div className="h-2 w-16 bg-primary-gray/20 rounded mb-2"></div>
+                      <div className="h-2 w-12 bg-primary-gray/20 rounded"></div>
                     </div>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Animated current paper */}
-            <AnimatePresence mode="popLayout">
+            {/* Main paper with animation */}
+            <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={selectedPaper}
                 initial={{
-                  x: 12,
-                  y: 12,
-                  rotate: 0,
-                  scale: 1,
-                  zIndex: 10,
+                  opacity: 0,
+                  x: direction > 0 ? 20 : -20,
                 }}
-                variants={{
-                  pull: {
-                    x: direction > 0 ? 24 : -24,
-                    y: direction > 0 ? -24 : 24,
-                    rotate: direction > 0 ? 5 : -5,
-                    scale: 1.02,
-                    zIndex: 20,
-                    transition: {
-                      duration: 0.2,
-                    },
-                  },
-                  settle: {
-                    x: 0,
-                    y: 0,
-                    rotate: 0,
-                    scale: 1,
-                    zIndex: 20,
-                    transition: {
-                      type: "spring",
-                      stiffness: 300,
-                      damping: 25,
-                    },
-                  },
+                animate={{
+                  opacity: 1,
+                  x: 0,
+                  transition: { duration: 0.3 },
                 }}
-                animate={["pull", "settle"]}
                 exit={{
-                  x: 12,
-                  y: 12,
-                  rotate: 0,
-                  scale: 0.98,
-                  zIndex: 0,
-                  transition: {
-                    duration: 0.2,
-                  },
+                  opacity: 0,
+                  x: direction > 0 ? -20 : 20,
+                  transition: { duration: 0.3 },
                 }}
                 className="absolute inset-0"
-                style={{
-                  perspective: "1000px",
-                  transformStyle: "preserve-3d",
-                }}
               >
                 <div className="w-full h-full bg-primary-white rounded-lg shadow-xl border border-primary-gray/10">
                   <div className="w-full h-full flex items-center justify-center text-primary-gray">
@@ -282,15 +338,15 @@ export function PaperDisplay() {
                         src={getPublicPath(papers[selectedPaper].thumbnail)}
                         alt={`${papers[selectedPaper].shortTitle} Thumbnail`}
                         className="w-full h-full object-contain"
-                        width={510}
-                        height={660}
+                        width={300}
+                        height={400}
                         priority
                       />
                     ) : (
                       <div className="animate-pulse flex flex-col items-center justify-center">
-                        <div className="w-32 h-32 bg-primary-gray/20 rounded-full mb-4"></div>
-                        <div className="h-2 w-24 bg-primary-gray/20 rounded mb-2"></div>
-                        <div className="h-2 w-16 bg-primary-gray/20 rounded"></div>
+                        <div className="w-24 h-24 bg-primary-gray/20 rounded-full mb-4"></div>
+                        <div className="h-2 w-16 bg-primary-gray/20 rounded mb-2"></div>
+                        <div className="h-2 w-12 bg-primary-gray/20 rounded"></div>
                       </div>
                     )}
                   </div>
@@ -317,138 +373,163 @@ export function PaperDisplay() {
         </div>
       </div>
 
-      {/* Right side - Scrollable content */}
-      <div className="w-3/4 p-12 pt-28 mt-16" ref={contentRef} id="paper-content">
-        <div className="max-w-3xl mx-auto space-y-16">
+      {/* Content area */}
+      <div
+        className="w-full lg:w-3/4 p-4 md:p-12 pt-6 lg:pt-28"
+        ref={contentRef}
+        id="paper-content"
+      >
+        <div className="max-w-3xl mx-auto space-y-8 md:space-y-16">
           {/* Paper Title */}
           <section>
-            <h1 className="text-4xl font-bold mb-4 text-primary-gray">
+            <h1 className="text-2xl md:text-4xl font-bold mb-2 md:mb-4 text-primary-gray">
               {papers[selectedPaper].id}. {papers[selectedPaper].title}
             </h1>
-            <p className="text-xl text-primary-gray">
+            <p className="text-lg md:text-xl text-primary-gray">
               Primary contributor: {papers[selectedPaper].author}
             </p>
           </section>
 
           {/* Paper Analysis */}
           <section>
-            <h2 className="text-3xl font-bold mb-4 text-primary-gray">
+            <h2 className="text-xl md:text-3xl font-bold mb-2 md:mb-4 text-primary-gray">
               {papers[selectedPaper].id}.1 Paper&apos;s Analysis
             </h2>
-            <div className="space-y-8">
+            <div className="space-y-4 md:space-y-8">
               {papers[selectedPaper].analysis.map((block, index) => {
                 if (block.type === "text") {
                   return (
-                    <p key={index} className="text-xl text-primary-gray">
+                    <p
+                      key={index}
+                      className="text-base md:text-xl text-primary-gray"
+                    >
                       {block.content}
                     </p>
                   );
                 } else if (block.type === "image") {
                   return (
-                    <figure key={index} className="my-8">
+                    <figure key={index} className="my-4 md:my-8">
                       {imagesLoaded ? (
-                        <Image
-                          src={getPublicPath(block.src || "")}
-                          alt={block.alt || ""}
-                          width={800}
-                          height={400}
-                          className="w-2/3 h-auto mx-auto"
-                          sizes="(max-width: 768px) 100vw, 800px"
-                          priority
-                        />
+                        <div className="flex flex-col items-center">
+                          <Image
+                            src={getPublicPath(block.src || "")}
+                            alt={block.alt || ""}
+                            width={800}
+                            height={600}
+                            className="rounded-lg max-w-full w-full md:w-2/3 h-auto"
+                            priority
+                          />
+                          <figcaption className="mt-2 text-sm md:text-base text-center text-primary-gray">
+                            {block.caption}
+                          </figcaption>
+                        </div>
                       ) : (
-                        <div className="w-2/3 h-64 mx-auto bg-primary-gray/10 animate-pulse flex items-center justify-center">
-                          <div className="text-primary-gray/50">Loading image...</div>
+                        <div className="w-full aspect-video bg-primary-gray/10 animate-pulse rounded-lg flex items-center justify-center">
+                          <div className="text-primary-gray/40">
+                            Loading image...
+                          </div>
                         </div>
                       )}
-                      <figcaption className="text-center text-sm mt-2 text-primary-gray">
-                        {block.caption}
-                      </figcaption>
                     </figure>
                   );
                 }
+                return null;
               })}
             </div>
           </section>
 
-          {/* Privatization Approach */}
+          {/* Paper Privatization */}
           <section>
-            <h2 className="text-3xl font-bold mb-4 text-primary-gray">
-              {papers[selectedPaper].id}.2 How We Privatized
+            <h2 className="text-xl md:text-3xl font-bold mb-2 md:mb-4 text-primary-gray">
+              {papers[selectedPaper].id}.2 Privatization
             </h2>
-            <div className="space-y-8">
+            <div className="space-y-4 md:space-y-8">
               {papers[selectedPaper].privatization.map((block, index) => {
                 if (block.type === "text") {
                   return (
-                    <p key={index} className="text-xl text-primary-gray">
+                    <p
+                      key={index}
+                      className="text-base md:text-xl text-primary-gray"
+                    >
                       {block.content}
                     </p>
                   );
                 } else if (block.type === "image") {
                   return (
-                    <figure key={index} className="my-8">
+                    <figure key={index} className="my-4 md:my-8">
                       {imagesLoaded ? (
-                        <Image
-                          src={getPublicPath(block.src || "")}
-                          alt={block.alt || ""}
-                          width={800}
-                          height={400}
-                          className="w-2/3 h-auto mx-auto"
-                          sizes="(max-width: 768px) 100vw, 800px"
-                          priority
-                        />
+                        <div className="flex flex-col items-center">
+                          <Image
+                            src={getPublicPath(block.src || "")}
+                            alt={block.alt || ""}
+                            width={800}
+                            height={600}
+                            className="rounded-lg max-w-full w-full md:w-2/3 h-auto"
+                            priority
+                          />
+                          <figcaption className="mt-2 text-sm md:text-base text-center text-primary-gray">
+                            {block.caption}
+                          </figcaption>
+                        </div>
                       ) : (
-                        <div className="w-2/3 h-64 mx-auto bg-primary-gray/10 animate-pulse flex items-center justify-center">
-                          <div className="text-primary-gray/50">Loading image...</div>
+                        <div className="w-full aspect-video bg-primary-gray/10 animate-pulse rounded-lg flex items-center justify-center">
+                          <div className="text-primary-gray/40">
+                            Loading image...
+                          </div>
                         </div>
                       )}
-                      <figcaption className="text-center text-sm mt-2 text-primary-gray">
-                        {block.caption}
-                      </figcaption>
                     </figure>
                   );
                 }
+                return null;
               })}
             </div>
           </section>
 
-          {/* Results */}
+          {/* Paper Results */}
           <section>
-            <h2 className="text-3xl font-bold mb-4 text-primary-gray">
-              {papers[selectedPaper].id}.3 Results Compared to Paper
+            <h2 className="text-xl md:text-3xl font-bold mb-2 md:mb-4 text-primary-gray">
+              {papers[selectedPaper].id}.3 Results
             </h2>
-            <div className="space-y-8">
+            <div className="space-y-4 md:space-y-8">
               {papers[selectedPaper].results.map((block, index) => {
                 if (block.type === "text") {
                   return (
-                    <p key={index} className="text-xl text-primary-gray">
+                    <p
+                      key={index}
+                      className="text-base md:text-xl text-primary-gray"
+                    >
                       {block.content}
                     </p>
                   );
                 } else if (block.type === "image") {
                   return (
-                    <figure key={index} className="my-8">
+                    <figure key={index} className="my-4 md:my-8">
                       {imagesLoaded ? (
-                        <Image
-                          src={getPublicPath(block.src || "")}
-                          alt={block.alt || ""}
-                          width={800}
-                          height={400}
-                          className="w-2/3 h-auto mx-auto"
-                          sizes="(max-width: 768px) 100vw, 800px"
-                          priority
-                        />
+                        <div className="flex flex-col items-center">
+                          <Image
+                            src={getPublicPath(block.src || "")}
+                            alt={block.alt || ""}
+                            width={800}
+                            height={600}
+                            className="rounded-lg max-w-full w-full md:w-2/3 h-auto"
+                            priority
+                          />
+                          <figcaption className="mt-2 text-sm md:text-base text-center text-primary-gray">
+                            {block.caption}
+                          </figcaption>
+                        </div>
                       ) : (
-                        <div className="w-2/3 h-64 mx-auto bg-primary-gray/10 animate-pulse flex items-center justify-center">
-                          <div className="text-primary-gray/50">Loading image...</div>
+                        <div className="w-full aspect-video bg-primary-gray/10 animate-pulse rounded-lg flex items-center justify-center">
+                          <div className="text-primary-gray/40">
+                            Loading image...
+                          </div>
                         </div>
                       )}
-                      <figcaption className="text-center text-sm mt-2 text-primary-gray">
-                        {block.caption}
-                      </figcaption>
                     </figure>
                   );
                 }
+                return null;
               })}
             </div>
           </section>
