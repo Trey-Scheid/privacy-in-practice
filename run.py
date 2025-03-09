@@ -13,6 +13,7 @@ from src.KMEANS import run as runKMeans
 from src.LR_PVAL import run as runLRPval
 
 
+
 def main(targets):
     with open(os.path.join("config", "run.json")) as fh:
         params = json.load(fh)
@@ -41,6 +42,7 @@ def main(targets):
         print(f"Error plotting {method}: {e}")
 
 
+
 def combine_plot(combined_df, fp):
     big_df = pd.concat(combined_df)
     plt.clf()
@@ -59,7 +61,7 @@ def combine_plot(combined_df, fp):
     plt.ylabel("Normalized Utility")
 
     plt.tight_layout()
-    plt.savefig(fp + "results.png")
+    plt.savefig(os.path.join(fp[0], "results.png"))
 
 
 if __name__ == "__main__":
