@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     url: "https://trey-scheid.github.io/privacy-in-practice/",
     images: [
       {
-        url: "og-image.png",
+        url: "https://trey-scheid.github.io/privacy-in-practice/og-image.png",
         width: 1200,
         height: 630,
         alt: "Privacy in Practice - Differential Privacy Research",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     title: "Privacy in Practice",
     description:
       "The Feasibility of Differential Privacy for Telemetry Analysis",
-    images: ["og-image.png"],
+    images: ["https://trey-scheid.github.io/privacy-in-practice/og-image.png"],
   },
   authors: [
     { name: "Tyler Kurpanek" },
@@ -53,9 +53,9 @@ export const metadata: Metadata = {
   ],
   icons: {
     icon: [
-      { url: "/favicon.ico" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+      { url: "favicon.ico" },
+      { url: "favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "apple-touch-icon.png", sizes: "180x180", type: "image/png" },
     ],
   },
 };
