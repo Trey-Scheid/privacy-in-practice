@@ -28,9 +28,9 @@ export function ConfidenceViz() {
             </span>
             <span className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-64 p-3 bg-primary-gray text-primary-white rounded-lg text-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
               Image 2 was in the training set! Notice in the non-private model
-              how image 2 is exceptionally 2 is exceptionally condfident. An
-              attacker could identify this datum as part of the training set (or
-              incorrectly assume so) and proceed to harm that individual.
+              how image 2 is exceptionally condfident. An attacker could
+              identify this datum as part of the training set (or incorrectly
+              assume so) and proceed to harm that individual.
             </span>
           </span>
         </p>

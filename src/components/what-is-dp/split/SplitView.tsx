@@ -157,7 +157,9 @@ export function SplitView({
             className="h-screen snap-start flex flex-col justify-center p-12"
           >
             <div className="prose prose-lg max-w-none">
-              <p className="text-xl">...all while maintaining the big picture!</p>
+              <p className="text-xl">
+                ...all while maintaining the big picture!
+              </p>
               <p className="text-xl mt-6">
                 But what just happened? We added noise to the image of Mona Lisa
                 by probabilistically flipping each pixel. This way, you can
@@ -200,8 +202,9 @@ export function SplitView({
             <div className="prose prose-lg max-w-none">
               <p className="text-xl">
                 What you see is a Differential Privacy technique called
-                Randomized Response. It&apos;s a simple method that satisfies
-                the{" "}
+                Randomized Response. Individual privacy is protected while
+                maintaining some statistical patterns of the whole dataset.
+                It&apos;s a simple method that satisfies the{" "}
                 <span className="font-bold text-accent">
                   Definition of Differential Privacy
                 </span>

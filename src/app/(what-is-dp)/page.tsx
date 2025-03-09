@@ -25,7 +25,7 @@ export default function Home() {
   };
 
   return (
-    <div className="h-screen overflow-y-scroll snap-y snap-mandatory bg-primary-white text-primary-black pt-16">
+    <div className="h-screen overflow-y-scroll snap-y snap-mandatory bg-primary-white text-primary-black">
       {/* Navigation Bar */}
       <NavBar
         isTitleVisible={isTitleVisible}

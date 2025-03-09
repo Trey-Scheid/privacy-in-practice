@@ -149,7 +149,19 @@ export function CenteredView() {
 
       <section className="h-screen snap-start flex flex-col justify-center items-center p-12">
         <div className="prose prose-lg max-w-3xl mx-auto text-center">
-          <p className="text-xl">Conclusion + transition here!!!</p>
+          <p className="text-xl">
+            Overall, differential privacy is a powerful tool for protecting
+            individual privacy while still allowing for useful data analysis.
+            There exist many different ways to implement differential privacy,
+            which requires asking questions like, "Where should we add noise?"
+            or "Are two neighboring datasets defined by a single entry, or a
+            single user&apos;s worth of entries?"
+          </p>
+          <p className="text-xl mt-4">
+            A lot of the research in DP has been finding the best ways to add
+            noise while maintaining utilty, and our following study focuses on
+            how applicable it actually is in practice.
+          </p>
         </div>
       </section>
     </div>
