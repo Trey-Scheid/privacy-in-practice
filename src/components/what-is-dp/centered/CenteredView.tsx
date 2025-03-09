@@ -92,10 +92,12 @@ export function CenteredView() {
             as training a machine learning model. A data scientist may do this
             because they don&apos;t want to{" "}
             <button
-              className="text-accent hover:text-primary-gray cursor-pointer transition-colors underline decoration-dotted inline-flex items-center gap-1 group"
+              className="text-accent hover:text-primary-gray cursor-pointer transition-colors inline-flex items-center gap-1 group"
               onClick={() => setShowRevealDetails(!showRevealDetails)}
             >
-              reveal if someone was in a training set
+              <span className="underline decoration-dotted">
+                reveal if someone was in a training set
+              </span>
               <span
                 className={`inline-block transition-transform duration-200 ${
                   showRevealDetails ? "rotate-180" : ""

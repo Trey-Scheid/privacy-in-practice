@@ -221,10 +221,12 @@ export function SplitView({
                 record, the probability of getting the same output from an
                 private algorithm should be similar. This paves the way for a{" "}
                 <button
-                  className="text-accent hover:text-primary-gray cursor-pointer transition-colors underline decoration-dotted inline-flex items-center gap-1 group"
+                  className="text-accent hover:text-primary-gray cursor-pointer transition-colors inline-flex items-center gap-1 group"
                   onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
                 >
-                  mathematical measure of privacy
+                  <span className="underline decoration-dotted">
+                    mathematical measure of privacy
+                  </span>
                   <span
                     className={`inline-block transition-transform duration-200 ${
                       showTechnicalDetails ? "rotate-180" : ""
