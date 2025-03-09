@@ -7,7 +7,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 
+from src.LASSO import run as runLasso
+from src.COND_PROB.src import private as runCondProb
 from src.KMEANS import run as runKMeans
+from src.LR_PVAL import run as runLRPval
 
 
 
@@ -15,8 +18,8 @@ def main(targets):
     with open(os.path.join("config", "run.json")) as fh:
         params = json.load(fh)
 
-    all_methods = ["kmeans"]
-    all_objects = [runKMeans]
+    all_methods = ["lasso", "cond_prob", "kmeans", "lr_pval"]
+    all_objects = [runLasso, runCondProb, runKMeans, runLRPval]
 
     # if no target is specified, run all methods
     target_methods = set(all_methods).intersection(set(targets))
