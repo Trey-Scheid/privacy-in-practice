@@ -49,8 +49,7 @@ export function Hero({
               className="hover:text-accent transition-colors cursor-pointer decoration-dotted underline"
             >
               Report
-            </Link>{" "}
-            |{" "}
+            </Link>{" | "}
             <Link
               href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
               target="_blank"
@@ -58,8 +57,7 @@ export function Hero({
               className="hover:text-accent transition-colors cursor-pointer decoration-dotted underline"
             >
               Poster
-            </Link>{" "}
-            |{" "}
+            </Link>{" | "}
             <Link
               href="https://github.com/Trey-Scheid/privacy-in-practice"
               target="_blank"
@@ -67,6 +65,14 @@ export function Hero({
               className="hover:text-accent transition-colors cursor-pointer decoration-dotted underline"
             >
               Github
+            </Link>{" | "}
+            <Link
+              href="https://endurable-gatsby-6d6.notion.site/Privacy-In-Practice-14556404e74780818747cbe76de2e04a"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-accent transition-colors cursor-pointer decoration-dotted underline"
+            >
+              Notion
             </Link>
           </p>
         </div>
