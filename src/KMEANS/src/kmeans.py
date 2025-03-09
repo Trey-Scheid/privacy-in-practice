@@ -7,47 +7,13 @@ class KMeans:
         self.centroids = None
     
     def initialize_centroids(self, data):
-        """Initialize centroids using sphere packing."""
+        """Initialize centroids randomly."""
         n, d = data.shape
-        a = 1  # Start with an initial guess for the radius a
-        centroids = []
-        max_attempts = 1000  # Maximum number of attempts to find valid centroids
         
-        # Function to check if a new centroid satisfies the conditions
-        def is_valid(new_centroid, centroids, a, data_min, data_max):
-            # Check if centroid is at least 'a' away from the borders
-            if np.any(new_centroid <= data_min + a) or np.any(new_centroid >= data_max - a):
-                return False
-            # Check if centroid is at least '2a' away from other centroids
-            for centroid in centroids:
-                if np.linalg.norm(new_centroid - centroid) < 2 * a:
-                    return False
-            return True
-        
-        # Binary search for the largest valid radius 'a'
-        data_min = np.min(data, axis=0)
-        data_max = np.max(data, axis=0)
-        while True:
-            centroids = []
-            attempts = 0
-            for _ in range(self.k):
-                while attempts < max_attempts:
-                    # Randomly generate a new candidate centroid
-                    new_centroid = np.random.uniform(data_min + a, data_max - a, size=d)
-                    if is_valid(new_centroid, centroids, a, data_min, data_max):
-                        centroids.append(new_centroid)
-                        break
-                    attempts += 1
-                if attempts >= max_attempts:
-                    break
+        # Randomly pick k unique points from the data to be the initial centroids
+        indices = np.random.choice(n, self.k, replace=False)
+        self.centroids = data[indices]
 
-            # If we successfully picked all k centroids, we stop and use this radius 'a'
-            if len(centroids) == self.k:
-                self.centroids = np.array(centroids)
-                break
-            else:
-                # If we failed, try a smaller radius and try again
-                a /= 2  # Halve the radius
     def fit(self, data):
         """Perform standard k-means clustering."""
         n, d = data.shape
