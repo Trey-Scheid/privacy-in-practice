@@ -225,14 +225,14 @@ export function SplitView({
                   onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
                 >
                   mathematical measure of privacy
+                  <span
+                    className={`inline-block transition-transform duration-200 ${
+                      showTechnicalDetails ? "rotate-180" : ""
+                    }`}
+                  >
+                    ▼
+                  </span>{" "}
                 </button>{" "}
-                <span
-                  className={`inline-block transition-transform duration-200 ${
-                    showTechnicalDetails ? "rotate-180" : ""
-                  }`}
-                >
-                  ▽
-                </span>{" "}
                 and a way to quantify the privacy of an algorithm.
               </p>
               <div

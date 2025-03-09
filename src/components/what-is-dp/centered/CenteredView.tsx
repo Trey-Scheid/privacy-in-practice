@@ -3,8 +3,11 @@ import Image from "next/image";
 import { HistogramViz } from "./histogram/HistogramViz";
 import { ConfidenceViz } from "./confidence/ConfidenceViz";
 import { getPublicPath } from "@/lib/utils";
+import { useState } from "react";
 
 export function CenteredView() {
+  const [showRevealDetails, setShowRevealDetails] = useState(false);
+
   return (
     <div className="bg-primary-white">
       {/* Sixth Paragraph - Full Width Centered */}
@@ -87,15 +90,52 @@ export function CenteredView() {
           <p className="text-xl">
             Differential Privacy can be used for more complex queries too, such
             as training a machine learning model. A data scientist may do this
-            because they don&apos;t want to reveal if someone was in a training
-            set. The question then becomes:
+            because they don&apos;t want to{" "}
+            <button
+              className="text-accent hover:text-primary-gray cursor-pointer transition-colors underline decoration-dotted inline-flex items-center gap-1 group"
+              onClick={() => setShowRevealDetails(!showRevealDetails)}
+            >
+              reveal if someone was in a training set
+              <span
+                className={`inline-block transition-transform duration-200 ${
+                  showRevealDetails ? "rotate-180" : ""
+                }`}
+              >
+                ▼
+              </span>
+            </button>
+            {". "}
           </p>
+          <p className="text-xl">The question then becomes:</p>
           <p className="text-xl font-bold text-accent mt-4">
             When are differentially private methods practical and useful?
           </p>
           <p className="text-xl font-bold text-accent">
             How effective is differential privacy when applied in practice?
           </p>
+          <div
+            className={`mt-8 transition-all duration-500 overflow-hidden ${
+              showRevealDetails
+                ? "max-h-[500px] opacity-100"
+                : "max-h-0 opacity-0"
+            }`}
+          >
+            <div className="bg-primary-gray/5 p-6 rounded-lg border border-primary-gray/10">
+              <h3 className="text-lg font-semibold mb-4">
+                Models can reveal what they were trained on!
+              </h3>
+              <p className="text-lg mb-4">
+                When ChatGPT 3.5 was released, trained on many datasets publicly
+                and privately available. Clever prompters called "Agents" were
+                able to gather SSN's for individuals which the model would
+                produce with perfect accuracy! A differentially private
+                algorithm guarantees that model outputs are not significantly
+                different wether your SSN was in the training data or not, which
+                means that the model would not reveal any information about the
+                training data.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
