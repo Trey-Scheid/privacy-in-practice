@@ -621,6 +621,8 @@ def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=1
         # MSE vs eps for each method
         plt.subplot(1, 2, 2)
         for i, method in enumerate(methods):
+            print(super_df.iloc[0])
+            print(method)
             method_data = super_df[super_df["method"] == method]
             best_l = best_models[method]["config"]["l"] if method in best_models else None
             best_iter = best_models[method]["config"]["iter"] if method in best_models else None
