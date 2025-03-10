@@ -23,6 +23,7 @@ interface Paper {
   analysis: contentBlock[];
   privatization: contentBlock[];
   results: contentBlock[];
+  interpretation: contentBlock[];
 }
 
 export function PaperDisplay() {
@@ -497,6 +498,53 @@ export function PaperDisplay() {
             </h2>
             <div className="space-y-4 md:space-y-8">
               {papers[selectedPaper].results.map((block, index) => {
+                if (block.type === "text") {
+                  return (
+                    <p
+                      key={index}
+                      className="text-base md:text-xl text-primary-gray"
+                    >
+                      {block.content}
+                    </p>
+                  );
+                } else if (block.type === "image") {
+                  return (
+                    <figure key={index} className="my-4 md:my-8">
+                      {imagesLoaded ? (
+                        <div className="flex flex-col items-center">
+                          <Image
+                            src={getPublicPath(block.src || "")}
+                            alt={block.alt || ""}
+                            width={800}
+                            height={600}
+                            className="rounded-lg max-w-full w-full md:w-2/3 h-auto"
+                            priority
+                          />
+                          <figcaption className="mt-2 text-sm md:text-base text-center text-primary-gray">
+                            {block.caption}
+                          </figcaption>
+                        </div>
+                      ) : (
+                        <div className="w-full aspect-video bg-primary-gray/10 animate-pulse rounded-lg flex items-center justify-center">
+                          <div className="text-primary-gray/40">
+                            Loading image...
+                          </div>
+                        </div>
+                      )}
+                    </figure>
+                  );
+                }
+                return null;
+              })}
+            </div>
+          </section>
+          {/* Paper Interpretation */}
+          <section>
+            <h2 className="text-xl md:text-3xl font-bold mb-2 md:mb-4 text-primary-gray">
+              {papers[selectedPaper].id}.4 Interpretation
+            </h2>
+            <div className="space-y-4 md:space-y-8">
+              {papers[selectedPaper].interpretation.map((block, index) => {
                 if (block.type === "text") {
                   return (
                     <p

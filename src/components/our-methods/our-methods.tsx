@@ -108,21 +108,16 @@ function OurMethods({ methodsRef }: OurMethodsProps) {
               </h2>
               <div className="space-y-4 md:space-y-8">
                 <p className="text-base md:text-xl text-primary-gray">
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
+                  For each of our tasks, the privacy-utility tradeoff is not
+                  identical. Each task has different sensitivities to added
+                  noise. Some tasks can tolerate higher amounts of noise without
+                  significantly affecting the utility of the results, while
+                  others rely on precision and can degrade very fast with even
+                  slight noise. Given by our combined plot, each task has
+                  signifcantly different curves as epsilon increases. One
+                  potential factor that also is not considered is that the added
+                  noise may reduce overfitting and could help the model
+                  generalize better.
                 </p>
 
                 {/* Image container with responsive width */}

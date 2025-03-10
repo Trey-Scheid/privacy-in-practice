@@ -38,6 +38,16 @@
           "type": "text",
           "content": "Overall, as the epsilon increased from zero to 0.5, the intersection over union tended to increase. However, between 0.5 and 1.5, the intersection over union failed to approach the non-private model and failed to improve."
         }
+      ],
+      "interpretation": [
+        {
+          "type": "text",
+          "content": "Due to high compute costs, we were only able to get up to epsilon 1.5 for each of the 29 models. As we expected, the utility would increase from very low epsilon but around ε = 0.5, it is unclear whether or not the utility would continue to increase. At ε = 1, the model does somewhat poorly as seen in Figure 1. The model has an intersect over union of around 0.60 and notably identifies a majority of the models as not significant, a result contrary to the nonprivate model. Overall, this analysis task did not seem to be replicable privately, at least under the strict privacy constraints."
+        },
+        {
+          "type": "text",
+          "content": "It is important to note that this analysis would not be nearly as computationally hungry if we weren't trying to compare the models to a non-private model. In the practical setting, we wouldn't need to do permutation testing to find our p-values empirically. Similarly to the non-private setting, our alpha would be a hyperparameter that we would be able to select ourselves. This means that we may be able to use much higher values of epsilon in practice"
+        }
       ]
     },
     {
@@ -73,6 +83,12 @@
         {
           "type": "text",
           "content": "Overall, as the epsilon increased from zero to 0.5, the intersection over union tended to increase. However, between 0.5 and 1.5, the intersection over union failed to approach the non-private model and failed to improve."
+        }
+      ],
+      "interpretation": [
+        {
+          "type": "text",
+          "content": "Insert interpretation here"
         }
       ]
     },
@@ -114,6 +130,20 @@
           "type": "text",
           "content": "As epsilon increases, the inertia for the privatized model slowly converges to the non-private train and test loss. This is expected and given its convergence close to an epsilon of 1,  the model performs quite well in terms of both privacy and accuracy."
         }
+      ],
+      "interpretation": [
+        {
+          "type": "text",
+          "content": "The clustering algorithm is unsupervised so the best way to quantify performance is using inertia. It is the squared differences between data points and their nearest centroid. The smaller this value is, the better performing the cluster locations are, and therefore the model. "
+        },
+        {
+          "type": "text",
+          "content": "The cluster locations are located where the most data points are. Given that the distribution of the data is right skewed, it makes sense that the centroids, or cluster locations, are also right skewed to follow the data."
+        },
+        {
+          "type": "text",
+          "content": "From Figure 1, we can see that as epsilon increases, the inertia for the privatized model slowly converges to the non-private train and test loss. This is expected, and given its convergence close to an epsilon of 1, the model performs quite well in terms of both privacy and accuracy."
+        }
       ]
     },
     {
@@ -149,6 +179,20 @@
         {
           "type": "text",
           "content": "Overall, as the epsilon increased from zero to 0.5, the intersection over union tended to increase. However, between 0.5 and 1.5, the intersection over union failed to approach the non-private model and failed to improve."
+        }
+      ],
+      "interpretation": [
+        {
+          "type": "text",
+          "content": "Similar to established differential privacy theory and literature, we observed a tradeoff between privacy and utility. However, our focus on conditional probability tasks allowed us to explore this tradeoff in a more specific context, providing insights into how differential privacy impacts analytical accuracy in this domain."
+        },
+        {
+          "type": "text",
+          "content": "Our results show a significant increase in utility as ε increases. For instance, at ε = 0.1, the utility was approximately 0.65, which rose to nearly 0.99 at ε = 1 and reached almost 1 at ε = 100. This demonstrates that less stringent privacy guarantees (higher ε values) lead to higher utility."
+        },
+        {
+          "type": "text",
+          "content": "For each epsilon, we found that as the number of corrected errors increased, the utility decreased due to more noise being added. "
         }
       ]
     }

@@ -48,68 +48,7 @@ function Discussion({ discussionRef }: DiscussionProps) {
       {/* Content sections */}
       <div className="py-6 md:py-12">
         <div className="max-w-3xl mx-auto space-y-8 md:space-y-16">
-          {/* First Section - Randomized Response */}
-          <section>
-            <div className="prose prose-lg max-w-none px-4 md:px-0">
-              <h2 className="text-xl md:text-3xl font-bold mb-2 md:mb-4">
-                Interpreting our Results
-              </h2>
-              
-              <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-4 mt-8 md:mt-12">
-                {papers[0].shortTitle}: {papers[0].algorithm}
-              </h3>
-              <div className="space-y-4 md:space-y-8">
-                <p className="text-base md:text-xl mb-4">
-                  Something about telemetry here. Lorem ipsum dolor sit amet,
-                  consectetur adipiscing elit. Sed do eiusmod tempor incididunt
-                  ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                  quis nostrud exercitation ullamco laboris nisi ut aliquip ex
-                  ea commodo consequat.
-                </p>
-              </div>
-
-              <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-4 mt-8 md:mt-12">
-                {papers[1].shortTitle}: {papers[1].algorithm}
-              </h3>
-              <div className="space-y-4 md:space-y-8">
-                <p className="text-base md:text-xl mb-4">
-                  Something about telemetry here. Lorem ipsum dolor sit amet,
-                  consectetur adipiscing elit. Sed do eiusmod tempor incididunt
-                  ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                  quis nostrud exercitation ullamco laboris nisi ut aliquip ex
-                  ea commodo consequat.
-                </p>
-              </div>
-
-              <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-4 mt-8 md:mt-12">
-                {papers[2].shortTitle}: {papers[2].algorithm}
-              </h3>
-              <div className="space-y-4 md:space-y-8">
-                <p className="text-base md:text-xl mb-4">
-                  Something about telemetry here. Lorem ipsum dolor sit amet,
-                  consectetur adipiscing elit. Sed do eiusmod tempor incididunt
-                  ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                  quis nostrud exercitation ullamco laboris nisi ut aliquip ex
-                  ea commodo consequat.
-                </p>
-              </div>
-
-              <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-4 mt-8 md:mt-12">
-                {papers[3].shortTitle}: {papers[3].algorithm}
-              </h3>
-              <div className="space-y-4 md:space-y-8">
-                <p className="text-base md:text-xl mb-4">
-                  Something about telemetry here. Lorem ipsum dolor sit amet,
-                  consectetur adipiscing elit. Sed do eiusmod tempor incididunt
-                  ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                  quis nostrud exercitation ullamco laboris nisi ut aliquip ex
-                  ea commodo consequat.
-                </p>
-              </div>
-            </div>
-          </section>
-
-          {/* Second Section */}
+          {/* Reflection Section */}
           <section>
             <div className="prose prose-lg max-w-none px-4 md:px-0">
               <h2 className="text-xl md:text-3xl font-bold mb-2 md:mb-4">
@@ -267,6 +206,117 @@ function Discussion({ discussionRef }: DiscussionProps) {
                   which "temperature" a paper was referring to. One of us had to
                   assess several papers before being able to find one that would
                   be able to be replicated.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Overall Summary Section */}
+          <section>
+            <div className="prose prose-lg max-w-none px-4 md:px-0">
+              <h2 className="text-xl md:text-3xl font-bold mb-2 md:mb-4">
+                In Summary
+              </h2>
+              <div className="space-y-4 md:space-y-8">
+                <p className="text-base md:text-xl mb-4">
+                  Overall, we found mixed results on how feasible applying
+                  differential privacy was. Some tasks were hardly affected and
+                  others would result in much different conclusions. There seems
+                  to be no universal solution for applying DP in tasks, it is
+                  task dependent. Different tasks have different success
+                  criteria, different methods have varying levels of ability to
+                  be privatized.
+                </p>
+              </div>
+              <div className="space-y-4 md:space-y-8">
+                <p className="text-base md:text-xl mb-4">
+                  The feasibility of applying differential privacy seems to rely
+                  heavily on the practitioner's knowledge of both DP methods and
+                  their own domain. There is a high barrier to entry with
+                  differential privacy. An analyst who is familiar with their
+                  domain but completely new to DP would struggle greatly
+                  switching their workflow from their non-private methods to
+                  their private counterparts. Further, if the guarantees of DP
+                  aren't adequately understood, there would be a lack of desire
+                  in putting in the effort to lose utility and gain privacy. A
+                  path forward to private analyses across the board would not be
+                  able to be done bottom up, smart people would need to hold the
+                  hand of the typical analyst.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Impact Section */}
+          <section>
+            <div className="prose prose-lg max-w-none px-4 md:px-0">
+              <h2 className="text-xl md:text-3xl font-bold mb-2 md:mb-4">
+                Impact of Our Work
+              </h2>
+              <div className="space-y-4 md:space-y-8">
+                <p className="text-base md:text-xl mb-4">
+                  We recreated baseline models and algorithms used in previous
+                  research papers with their associated private models in a
+                  practical setting, providing valuable insights into how these
+                  privacy-preserving techniques perform in real-world
+                  applications. As we are not PhD-level researchers, with more
+                  academic rigor it could lead to more promising findings and a
+                  deeper understanding of the privacy-utility balance in applied
+                  machine learning. Nevertheless, our work demonstrates that
+                  with just a few months of practice and an understanding of
+                  differential privacy, it is possible to implement
+                  privacy-preserving methods that showcase the best epsilon that
+                  balances privacy and utility. As DP becomes even more
+                  accessible, it will make implementation faster, improving both
+                  performance and computation.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Future Work Section */}
+          <section>
+            <div className="prose prose-lg max-w-none px-4 md:px-0">
+              <h2 className="text-xl md:text-3xl font-bold mb-2 md:mb-4">
+                Future Work
+              </h2>
+              <div className="space-y-4 md:space-y-8">
+                <p className="text-base md:text-xl mb-4">
+                  Future Work Stuff here
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Continue Our Work Section */}
+          <section>
+            <div className="prose prose-lg max-w-none px-4 md:px-0 mb-36">
+              <h2 className="text-xl md:text-3xl font-bold mb-2 md:mb-4">
+                Continue Our Work
+              </h2>
+              <div className="space-y-4 md:space-y-8">
+                <p className="text-base md:text-xl mb-4">
+                  Thank you for taking your time to read through our project! If
+                  you are interested in continuing our work, feel free to reach
+                  out to us or check out our project repository and notes.
+                </p>
+                <p className="text-base md:text-xl mb-4 text-accent underline decoration-dotted hover:text-white transition-colors cursor-pointer">
+                  <a
+                    href="https://github.com/Trey-Scheid/privacy-in-practice/tree/main"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Click here to view our project repository!
+                  </a>
+                </p>
+                <p className="text-base md:text-xl mb-4 text-accent underline decoration-dotted hover:text-white transition-colors cursor-pointer">
+                  <a
+                    href="https://endurable-gatsby-6d6.notion.site/Privacy-In-Practice-14556404e74780818747cbe76de2e04a"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Click here to catch up on our notes!
+                  </a>
                 </p>
               </div>
             </div>
