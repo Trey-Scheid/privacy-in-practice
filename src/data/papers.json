@@ -168,17 +168,23 @@
       "results": [
         {
           "type": "text",
-          "content": "Our main method of comparing against the baseline was by calculating the set intersection over union for the private models and the non-private models. Firstly, for a \"strong DP\" (epsilon = 1), the model severely under-shot the number of significant models. This means that it failed to find the correct relationship between corrected and uncorrected errors in a third (0.31) of the models."
+          "content": "We observed a tradeoff between privacy and utility. We observed a tradeoff between privacy and utility. Our results show a significant increase in utility as ε increases. For instance, at ε = 0.1, the utility was approximately 0.65, which rose to nearly 0.99 at ε = 1 and reached almost 1 at ε = 100. This demonstrates that less stringent privacy guarantees (higher ε values) lead to higher utility."
         },
         {
           "type": "image",
-          "src": "lr_pval_1.png",
-          "alt": "Confusion Matrix",
-          "caption": "Figure 1:  A diagram of the confusion matrix. Notice zero false positives and nine false negatives."
+          "src": "c_prob_1.png",
+          "alt": "MAE vs Epsilon",
+          "caption": "Figure 1:  A plot showcasing MAE as epsilon increases. As epsilon increases, the MAE decreases, indicating that the model is more accurate at predicting the number of GUIDs that will have an uncorrected error."
+        },
+        {
+          "type": "image",
+          "src": "c_prob_2.png",
+          "alt": "Noisy vs Original Histogram",
+          "caption": "Figure 2:  A plot showcasing the noisy vs original histogram. Most bins fit fairly well."
         },
         {
           "type": "text",
-          "content": "Overall, as the epsilon increased from zero to 0.5, the intersection over union tended to increase. However, between 0.5 and 1.5, the intersection over union failed to approach the non-private model and failed to improve."
+          "content": "For each epsilon, we found that as the number of corrected errors increased, the utility decreased. This is because the distribution of number of corrected errors is very heavily skewed left. The error amount with the largest amount of unique GUIDs is 0. This trend continues; as the number of corrected errors increases, the number of GUIDs with that exact amount of corrected errors decreases. This means the utility of the function is bounded by the maximum number of errors included in the histogram. We bounded our largest bin to be at 30 and found that an epsilon of 1 gave a sufficient utility. If we wanted to use a stricter epsilon, we would need to reduce the maximum corrected error to maintain the same utility."
         }
       ],
       "interpretation": [
