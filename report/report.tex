@@ -214,25 +214,26 @@ will add lots of detail about lasso, then talk about adapting franke-wolfe to be
 \subsection{KMEANS Private Clustering (DP-Lloyd's)}
 K-Means clustering (Lloyd's Algorithm) is applied to group devices based on similarities in their usage patterns. The method leverages Z-scores for standardizing the usage data and calculates L1 distances between weekly usage patterns to identify trends over time. Lloyd's Algorithm clusters devices by assigning them to centroids based on their usage patterns, recalculating the centroids as the mean of assigned points after each iteration. 
 
-Differentially Private Lloyd's Algorithm (DP-Lloyd's)\footnote{linkneeded} modifies the standard K-Means clustering by adding Laplacian noise during the iterative centroid update step to ensure privacy. It introduces noise to both the sum of coordinates and the count of points within clusters, with the amount of noise controlled by the number of iterations and the sensitivity of the data. 
+Differentially Private Lloyd's Algorithm (DP-Lloyd's)\footnote{\url{https://arxiv.org/pdf/1504.05998}} modifies the standard K-Means clustering by adding Laplacian noise during the iterative centroid update step to ensure privacy. It introduces noise to both the sum of coordinates and the count of points within clusters, with the amount of noise controlled by the number of iterations and the sensitivity of the data. This is applied after clipping the data, to for ensure that the impact of any single data point is limited. 
+\[
+\text{x'}_j = \text{clip}\left( \text{x}_j, -\tau, \tau \right)
+\]
 
-\subsubsection{Z-score (Additive Noise)}
-As Z-score is computed before performing K-means clustering, 
+After clipping the data, the sum of each cluster is computed with added Laplace noise. \\One point changes the sum, at most, the range of the dataset, which is $2 \times \tau$ (the sensitivty). The number of data points is at least 1 if the cluster exists, and so one data point changes the count by 1. The sensitivity is therefore 1. These sensitivities are then divided by the per-iteration  \epsilon.
+
 \[
-Z = \frac{X - \mu}{\sigma}
+\text{new\_centroid}_j=
+\frac{
+    \sum_{i=1}^{n_j} \text{x'}_{j,i} + \text{Lap}(\tau \times 2, \epsilon_{\text{iter}})
+}{
+    \max\left( 1, n_j + \text{Lap}(1, \epsilon_{\text{iter}}) \right)
+}
 \]
-One can privatize this clustering task by simply adding Laplacian noise to the Z-scores, though the privacy gurantee and performance between the two methods, DP-Lloyd's and Additive Noise are likely to be different.
-\[
-Z_{\text{private}} = \frac{X - \mu}{\sigma} + \text{Lap}\left(\frac{\Delta f}{\epsilon}\right)
-\]
-\begin{equation*}
-\begin{aligned}
-    \Delta f & \text{ is the global sensitivity of the Z-score computation,} \\
-    \epsilon & \text{ is the privacy parameter.}
-\end{aligned}
-\end{equation*}
 
 \subsubsection{Utility}
+To calculate the utility for the K-Means task, we defined the loss for each
+epsilon as the sum of squared distances between each data point and its closest centroid. We then divided it by the number of data point so it is agnostic to the dataset size. We then normalized the loss so that each loss value fell between 0 and 1 and defined the utility as
+1-loss to inverse it.
 
 
 
@@ -291,6 +292,18 @@ INSERT COMBINED PLOT
 
 \subsection{LR\_PVAL}
 \subsection{KMEANS}
+\begin{figure}[H] % 'h' specifies to place the figure here in the text
+    \centering
+    \includegraphics[width=0.6\textwidth]{figure/1d_clusters.png} % Path to the image
+    \caption{Centroid locations overlaid over data points $\epsilon=1$}
+    \label{fig:centroids}
+\end{figure}
+\begin{figure}[H] % 'h' specifies to place the figure here in the text
+    \centering
+    \includegraphics[width=0.6\textwidth]{figure/dpk_plot.png} % Path to the image
+    \caption{Epsilon vs. Inertia compared to baseline non-private model}
+    \label{fig:epsilon_inertia}
+\end{figure}
 \subsection{LASSO}
 
 
