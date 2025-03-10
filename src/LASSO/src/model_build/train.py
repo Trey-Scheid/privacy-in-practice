@@ -159,105 +159,7 @@ def train(feat, correct_feats=None, method='lasso', tol=1e-8, l=1, max_iter=1000
         plt.savefig(plot, dpi=300, facecolor='#EEEEEE', edgecolor='#EEEEEE')
     return mse, coef_dict, r2, similarity
 
-# def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=10000, epsilon=None, delta=None, plot=False, triv=False, nonpriv=None, normalize=False, clip_sd=None):
-#     """Generates all the plots in the report.pdf"""
-#     type_fw = False
-#     if method == 'lstsq':
-#         model_class = LinearRegression()
-#     elif method == 'lasso':
-#         model_class = Lasso(alpha=l, max_iter=max_iter, tol=tol, fit_intercept=True)
-#     # elif method in set(["fw-lasso", 'fw-lasso-exp', 'fw-lasso-lap', 'compare-fw-plot']):
-#     #     type_fw = True
-#     elif method == 'fw-lasso-lap':
-#         model_class = FWLasso.LaplaceNoise
-#     elif method == "fw-lasso":
-#         model_class = FWLasso.FW_NonPrivate
-#     elif method == 'fw-lasso-exp':
-#         model_class = FWLasso.ExponentialMechanism
-#     else:
-#         raise ValueError(f'bad method "{method}"')
-    
-#     X, y = feat.drop(y_name, axis=1), feat[y_name]
-#     ones_column = np.ones((X.shape[0], 1))
-#     X_train, X_test, y_train, y_test = train_test_split(np.hstack((ones_column, X)), y, test_size=0.7, random_state=1)
-
-#     if triv:
-#         # create trivial model
-#         avg = np.mean(y_train)
-#         coef = np.append(np.array([avg]), np.zeros(X.shape[1]))
-#         triv_train_mse = mean_squared_error(y_train, np.repeat(avg, y_train.shape[0]))
-#         triv_test_mse = mean_squared_error(y_test, np.repeat(avg, y_test.shape[0]))
-#         triv_coef_dict = dict(zip(np.append(["Intercept"], X.columns), coef))
-#         triv_r2 = r2_score(y_test, np.repeat(avg, y_test.shape[0]), force_finite=False)
-#         triv_similarity = jaccard_similarity(correct_feats, [k for k, v in triv_coef_dict.items() if v > 0]) if not correct_feats is None else None
-
-#     if (delta is None) and (not epsilon is None):
-#         delta = 1 / (X.shape[0]**3)
-
-#     for method in methods:
-#         # plots for each model
-#         results = {"mse":[], "R2":[], "similarity":[], "training_err":[], "trace_f":[], "sparse":[]}
-#         parameters = {"method":[], "l":[], "iter":[], "eps":[], "delta":[]}
-
-#         for li in l:
-#             for niter in max_iter:
-#                 if method == 'fw-lasso':
-#                     epsilons = [None, 1_000_000]
-#                 else:
-#                     epsilons = epsilon
-#                 for eps in epsilons:
-#                     if method == 'fw-lasso':
-#                         deltas = [0]
-#                     else:
-#                         deltas = delta
-#                     for d in deltas:
-#                         parameters["method"].append(method)
-#                         parameters["l"].append(li)
-#                         parameters["iter"].append(niter)
-#                         parameters["eps"].append(eps)
-#                         parameters["delta"].append(d)
-
-#                         model = model_class(X_train, y_train, l=li, tol=0, delta=d, epsilon=eps, K=niter, normalize=normalize, clip_sd=clip_sd, trace=True)
-
-#                         results["training_err"].append(mean_squared_error(y_train, X_train @ model.get("model")))
-#                         results["sparse"].append(100*sum(model.get("model")>0)/model.get("model").shape[0])
-#                         results["mse"].append(mean_squared_error(y_test, X_test @ model.get("model")))
-#                         coef_dict = dict(zip(np.append(["Intercept"],X.columns), model.get("model")))
-#                         results["R2"].append(r2_score(y_test, X_test @ model.get("model"), force_finite=False))
-#                         results["similarity"].append(jaccard_similarity(correct_feats, [k for k, v in coef_dict.items() if v > 0])) if not correct_feats is None else "No correct feature name vector passed to find similarity"
-#                         results["trace_f"].append(model.get("plot"))
-
-
-#         ### convergence plots ###
-#         # training error vs iter 4 each epsilon
-#         # training error vs iter 4 each l
-
-#         ### results plots ###
-
-#         ## per l ##
-#         # mse vs eps 4 each l @ eps=best
-#         # R2 vs eps 4 each l @ eps=best
-#         # similarity vs eps 4 each l @ eps=best
-#         # sparse vs eps 4 each l @ eps=best
-        
-#         ## per niter ##
-#         # mse vs eps 4 each niter @ l=best
-#         # R2 vs eps 4 each niter @ l=best
-#         # similarity vs eps 4 niter eps @ l=best
-#         # sparse vs eps 4 niter eps @ l=best
-
-        
-    
-#     ### convergence ###
-#     # training error vs iter 4 each method @ l=best eps=best
-
-#     ### results plots ###
-#     # mse vs eps 4 each method @ l=best eps=best
-
-
-#     return True
-
-def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=10000, epsilon=None, delta=None, plot=False, triv=False, nonpriv=None, normalize=False, clip_sd=None, log=False):
+def research_plots(feat, correct_feats=None, methods='lasso', baseline=None, l=None, max_iter=10000, epsilon=None, delta=None, plot=False, triv=False, nonpriv=None, normalize=False, clip_sd=None, log=False):
     """Generates all the plots in the report.pdf"""
     if isinstance(methods, str):
         methods = [methods]
@@ -268,7 +170,7 @@ def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=1
     if isinstance(epsilon, (int, float)) or epsilon is None:
         epsilon = [epsilon]
     
-    tol = 1e-4  # Adding this as it was referenced but not defined
+    tol = 1e-4
     
     all_results = []
     all_parameters = []
@@ -306,22 +208,315 @@ def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=1
         
         # Add trivial model to results
         triv_results = {
-            "method": "trivial",
-            "l": None,
-            "iter": None,
-            "eps": None,
-            "delta": None,
-            "mse": triv_test_mse,
-            "R2": triv_r2,
-            "similarity": triv_similarity,
-            "training_err": triv_train_mse,
-            "trace_f": None,
-            "sparse": 0
+            "method": ["trivial"],
+            "l": [None],
+            "iter": [None],
+            "eps": [None],
+            "delta": [None],
+            "mse": [triv_test_mse],
+            "R2": [triv_r2],
+            "similarity": [triv_similarity],
+            "training_err": [triv_train_mse],
+            "trace_f": [None],
+            "sparse": [0]
         }
-        all_results.append(triv_results)
+        all_results.append(pd.DataFrame(triv_results))
 
     if (delta is None) and (not epsilon is None):
         delta = 1 / (X.shape[0]**3)
+
+    if baseline:
+        if log:
+            print(f"Processing baseline: {baseline}...")
+        
+        # Initialize model class based on method
+        type_fw = False
+        if baseline == 'lstsq':
+            model_class = LinearRegression()
+        elif baseline == 'lasso':
+            model_class = lambda X, y, l, tol, delta, epsilon, K, normalize, clip_sd, trace: {
+                "model": Lasso(alpha=l, max_iter=K, tol=tol, fit_intercept=True).fit(X[:, 1:], y).coef_,
+                "plot": None
+            }
+        if baseline == 'fw-lasso-lap':
+            model_class = FWLasso.LaplaceNoise
+            type_fw = True
+        elif baseline == "fw-lasso":
+            model_class = FWLasso.FW_NonPrivate
+            type_fw = True
+        elif baseline == 'fw-lasso-exp':
+            model_class = FWLasso.ExponentialMechanism
+            type_fw = True
+        else:
+            raise ValueError(f'bad baseline "{baseline}"')
+        
+        # Run models with different parameters
+        results = {"mse":[], "R2":[], "similarity":[], "training_err":[], "trace_f":[], "sparse":[]}
+        parameters = {"method":[], "l":[], "iter":[], "eps":[], "delta":[]}
+
+        best_mse = float('inf')
+        best_config = None
+        best_model_data = None
+
+        if baseline == 'fw-lasso':
+            total_runs = len(l) * len(max_iter) * len([None, 1_000_000])
+        else:
+            total_runs = len(l) * len(max_iter) * len(epsilon)
+        current_run = 0
+        
+        for li in l:
+            for niter in max_iter:
+                if baseline == 'fw-lasso':
+                    epsilons = [None, 1_000_000]
+                else:
+                    epsilons = epsilon
+                for eps in epsilons:
+                    if baseline == 'fw-lasso':
+                        deltas = [0]
+                    else:
+                        deltas = [delta] if delta is not None else [None]
+                    for d in deltas:
+                        current_run += 1
+                        if log and current_run % max(1, total_runs // 10) == 0:
+                            print(f"  Progress: {current_run}/{total_runs} runs completed ({current_run/total_runs*100:.1f}%)")
+                        
+                        parameters["method"].append(baseline)
+                        parameters["l"].append(li)
+                        parameters["iter"].append(niter)
+                        parameters["eps"].append(eps)
+                        parameters["delta"].append(d)
+
+                        model = model_class(X_train, y_train, l=li, tol=0, delta=d, epsilon=eps, K=niter, normalize=normalize, clip_sd=clip_sd, trace=True)
+
+                        train_err = mean_squared_error(y_train, X_train @ model.get("model"))
+                        sparsity = 100*sum(model.get("model")>0)/model.get("model").shape[0]
+                        test_mse = mean_squared_error(y_test, X_test @ model.get("model"))
+                        coef_dict = dict(zip(np.append(["Intercept"],X.columns), model.get("model")))
+                        r2 = r2_score(y_test, X_test @ model.get("model"), force_finite=False)
+                        sim = jaccard_similarity(correct_feats, [k for k, v in coef_dict.items() if v > 0]) if correct_feats is not None else None
+                        
+                        results["training_err"].append(train_err)
+                        results["sparse"].append(sparsity)
+                        results["mse"].append(test_mse)
+                        results["R2"].append(r2)
+                        results["similarity"].append(sim)
+                        results["trace_f"].append(model.get("plot"))
+                        
+                        # Track best model for this baseline
+                        if test_mse < best_mse:
+                            best_mse = test_mse
+                            best_config = {"l": li, "iter": niter, "eps": eps, "delta": d}
+                            best_model_data = {
+                                "model": model,
+                                "train_err": train_err,
+                                "test_mse": test_mse,
+                                "r2": r2,
+                                "sim": sim,
+                                "sparsity": sparsity,
+                                "trace": model.get("plot")
+                            }
+        
+        best_models[baseline] = {"config": best_config, "data": best_model_data}
+        
+        # Create dataframe for this baseline
+        baseline_df = pd.DataFrame({
+            "method": parameters["method"],
+            "l": parameters["l"],
+            "iter": parameters["iter"],
+            "eps": parameters["eps"],
+            "delta": parameters["delta"],
+            "mse": results["mse"],
+            "R2": results["R2"],
+            "similarity": results["similarity"],
+            "training_err": results["training_err"],
+            "sparse": results["sparse"]
+        })
+        
+        all_results.append(baseline_df)
+        
+        if plot:
+            if log:
+                print(f"  Generating plots for baseline: {baseline}...")
+            
+            # Create a color map for this baseline l
+            unique_values = sorted(list(set([v for v in parameters["l"]])))
+            cmap = cm.Blues
+            colors = [cmap(i/max(1, len(unique_values)-1)) for i in range(len(unique_values))]
+            color_map_blue = {val: colors[i] for i, val in enumerate(unique_values)}
+
+            # Create a color map for this baseline eps
+            unique_values = (list(set([v for v in parameters["eps"]])))
+            cmap = cm.Greens
+            colors = [cmap(i/max(1, len(unique_values)-1)) for i in range(len(unique_values))]
+            color_map_green = {val: colors[i] for i, val in enumerate(unique_values)}
+
+            # Create a color map for this baseline eps
+            unique_values = sorted(list(set([v for v in parameters["iter"]])))
+            cmap = cm.Reds
+            colors = [cmap(i/max(1, len(unique_values)-1)) for i in range(len(unique_values))]
+            color_map_red = {val: colors[i] for i, val in enumerate(unique_values)}
+            
+            # Convergence plots
+            plt.figure(figsize=(12, 8))
+            plt.suptitle(f'Training Convergence for {baseline}', fontsize=16)
+
+            maxys = []
+            maxs = []
+            # Training error vs iter for each epsilon
+            plt.subplot(1, 2, 1)
+            for i, eps_val in enumerate(sorted([e for e in set(parameters["eps"]) if e is not None])):
+                eps_indices = [i for i, e in enumerate(parameters["eps"]) if e == eps_val and parameters["l"][i] == best_config["l"]]
+                if eps_indices:
+                    for idx in eps_indices:
+                        if results["trace_f"][idx] is not None:
+                            maxys.append(max(results["trace_f"][idx]))
+                            maxs.append(len(results["trace_f"][idx]))
+                            plt.plot(range(len(results["trace_f"][idx])), results["trace_f"][idx], color=color_map_green[eps_val], label=f'ε={eps_val}')
+            plt.xlabel('Iterations')
+            plt.ylabel('Training Error')
+            plt.legend()
+
+            plt.ylim(0, 50)#max(maxys))
+            if maxs:
+                plt.xlim(0, max(maxs))
+            
+
+            maxys = []
+            maxs = []
+            # Training error vs iter for each l
+            plt.subplot(1, 2, 2)
+            for i, l_val in enumerate(sorted(set(parameters["l"]))):
+                l_indices = [i for i, e in enumerate(parameters["l"]) if e == l_val and parameters["eps"][i] == best_config["eps"]]
+                if l_indices:
+                    for idx in l_indices:
+                        if results["trace_f"][idx] is not None:
+                            plt.plot(range(len(results["trace_f"][idx])), results["trace_f"][idx], color=color_map_blue[l_val], label=f'λ={l_val}')
+            plt.xlabel('Iterations')
+            plt.ylabel('Training Error')
+            plt.legend()
+
+            plt.ylim(0, 50)#max(maxys))
+            if maxs:
+                plt.xlim(0, max(maxs))
+            
+            plt.tight_layout()
+            # Save convergence plots
+            if isinstance(plot, str):
+                convergence_plot_path = os.path.join(plot, f'{baseline}_convergence_plots.png')
+                plt.savefig(convergence_plot_path, dpi=300, bbox_inches='tight')
+                plt.close()
+            
+            # Results plots
+            plt.figure(figsize=(15, 10))
+            plt.suptitle(f'Performance vs Privacy for {baseline}', fontsize=16, y=0.98)
+            
+            # Filter for best iteration
+            best_iter_df = baseline_df[baseline_df["iter"] == best_config["iter"]]
+            
+            # First row: plots per lambda
+            # MSE vs eps for each l
+            plt.subplot(2, 4, 1)
+            for i, l_val in enumerate(sorted(set(best_iter_df["l"]))):
+                l_data = best_iter_df[best_iter_df["l"] == l_val]
+                plt.plot(l_data["eps"], l_data["mse"], marker='o', color=color_map_blue[l_val], label=f'λ={l_val}')
+            if triv and "mse" in triv_metrics:
+                plt.axhline(y=triv_metrics["mse"], color='gray', linestyle='--', alpha=0.7, label='Trivial')
+            plt.xlabel('ε')
+            plt.ylabel('MSE')
+            if i == 0:  # Only add legend to the first plot in the row
+                plt.legend()
+            
+            # R2 vs eps for each l
+            plt.subplot(2, 4, 2)
+            for i, l_val in enumerate(sorted(set(best_iter_df["l"]))):
+                l_data = best_iter_df[best_iter_df["l"] == l_val]
+                plt.plot(l_data["eps"], l_data["R2"], marker='o', color=color_map_blue[l_val])
+            if triv and "R2" in triv_metrics:
+                plt.axhline(y=triv_metrics["R2"], color='gray', linestyle='--', alpha=0.7)
+            plt.xlabel('ε')
+            plt.ylabel('R²')
+            
+            # Similarity vs eps for each l
+            if correct_feats is not None:
+                plt.subplot(2, 4, 3)
+                for i, l_val in enumerate(sorted(set(best_iter_df["l"]))):
+                    l_data = best_iter_df[best_iter_df["l"] == l_val]
+                    plt.plot(l_data["eps"], l_data["similarity"], marker='o', color=color_map_blue[l_val])
+                if triv and "similarity" in triv_metrics and triv_metrics["similarity"] is not None:
+                    plt.axhline(y=triv_metrics["similarity"], color='gray', linestyle='--', alpha=0.7)
+                plt.xlabel('ε')
+                plt.ylabel('Jaccard Similarity')
+            
+            # Sparsity vs eps for each l
+            plt.subplot(2, 4, 4)
+            for i, l_val in enumerate(sorted(set(best_iter_df["l"]))):
+                l_data = best_iter_df[best_iter_df["l"] == l_val]
+                plt.plot(l_data["eps"], l_data["sparse"], marker='o', color=color_map_blue[l_val])
+            if triv:
+                plt.axhline(y=0, color='gray', linestyle='--', alpha=0.7)
+            plt.xlabel('ε')
+            plt.ylabel('Sparsity (%)')
+            
+            # Second row: plots per iteration
+            # Create a color map for iterations
+            unique_iters = sorted(list(set([v for v in parameters["iter"]])))
+            cmap = cm.Reds
+            iter_colors = [cmap(i/max(1, len(unique_iters)-1)) for i in range(len(unique_iters))]
+            iter_color_map_l = {val: iter_colors[i] for i, val in enumerate(unique_iters)}
+            
+            # Filter for best l
+            best_l_df = baseline_df[baseline_df["l"] == best_config["l"]]
+            
+            # MSE vs eps for each niter
+            plt.subplot(2, 4, 5)
+            for i, iter_val in enumerate(sorted(set(best_l_df["iter"]))):
+                iter_data = best_l_df[best_l_df["iter"] == iter_val]
+                plt.plot(iter_data["eps"], iter_data["mse"], marker='o', color=iter_color_map_l[iter_val], label=f'iter={iter_val}')
+            if triv and "mse" in triv_metrics:
+                plt.axhline(y=triv_metrics["mse"], color='gray', linestyle='--', alpha=0.7, label='Trivial')
+            plt.xlabel('ε')
+            plt.ylabel('MSE')
+            if i == 0:  # Only add legend to the first plot in the row
+                plt.legend()
+            
+            # R2 vs eps for each niter
+            plt.subplot(2, 4, 6)
+            for i, iter_val in enumerate(sorted(set(best_l_df["iter"]))):
+                iter_data = best_l_df[best_l_df["iter"] == iter_val]
+                plt.plot(iter_data["eps"], iter_data["R2"], marker='o', color=iter_color_map_l[iter_val])
+            if triv and "R2" in triv_metrics:
+                plt.axhline(y=triv_metrics["R2"], color='gray', linestyle='--', alpha=0.7)
+            plt.xlabel('ε')
+            plt.ylabel('R²')
+            
+            # Similarity vs eps for each niter
+            if correct_feats is not None:
+                plt.subplot(2, 4, 7)
+                for i, iter_val in enumerate(sorted(set(best_l_df["iter"]))):
+                    iter_data = best_l_df[best_l_df["iter"] == iter_val]
+                    plt.plot(iter_data["eps"], iter_data["similarity"], marker='o', color=iter_color_map_l[iter_val])
+                if triv and "similarity" in triv_metrics and triv_metrics["similarity"] is not None:
+                    plt.axhline(y=triv_metrics["similarity"], color='gray', linestyle='--', alpha=0.7)
+                plt.xlabel('ε')
+                plt.ylabel('Jaccard Similarity')
+            
+            # Sparsity vs eps for each niter
+            plt.subplot(2, 4, 8)
+            for i, iter_val in enumerate(sorted(set(best_l_df["iter"]))):
+                iter_data = best_l_df[best_l_df["iter"] == iter_val]
+                plt.plot(iter_data["eps"], iter_data["sparse"], marker='o', color=iter_color_map_l[iter_val])
+            if triv:
+                plt.axhline(y=0, color='gray', linestyle='--', alpha=0.7)
+            plt.xlabel('ε')
+            plt.ylabel('Sparsity (%)')
+            
+            plt.tight_layout(rect=[0, 0, 1, 0.95])  # Make room for the suptitle
+            
+            # Save results plots
+            if isinstance(plot, str):
+                results_plot_path = os.path.join(plot, f'{baseline}_results_plots.png')
+                plt.savefig(results_plot_path, dpi=300, bbox_inches='tight')
+                plt.close()
 
     for method_idx, method in enumerate(methods):
         if log:
@@ -336,7 +531,7 @@ def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=1
                 "model": Lasso(alpha=l, max_iter=K, tol=tol, fit_intercept=True).fit(X[:, 1:], y).coef_,
                 "plot": None
             }
-        elif method == 'fw-lasso-lap':
+        if method == 'fw-lasso-lap':
             model_class = FWLasso.LaplaceNoise
             type_fw = True
         elif method == "fw-lasso":
@@ -356,7 +551,10 @@ def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=1
         best_config = None
         best_model_data = None
 
-        total_runs = len(l) * len(max_iter) * len(epsilon)
+        if method == 'fw-lasso':
+            total_runs = len(l) * len(max_iter) * len([None, 1_000_000])
+        else:
+            total_runs = len(l) * len(max_iter) * len(epsilon)
         current_run = 0
         
         for li in l:
@@ -433,39 +631,66 @@ def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=1
             if log:
                 print(f"  Generating plots for method: {method}...")
             
-            # Create a color map for this method
+            # Create a color map for this method l
             unique_values = sorted(list(set([v for v in parameters["l"]])))
+            cmap = cm.Blues
+            colors = [cmap(i/max(1, len(unique_values)-1)) for i in range(len(unique_values))]
+            color_map_blue = {val: colors[i] for i, val in enumerate(unique_values)}
+
+            # Create a color map for this method eps
+            unique_values = sorted(list(set([v for v in parameters["eps"]])))
             cmap = cm.Greens
             colors = [cmap(i/max(1, len(unique_values)-1)) for i in range(len(unique_values))]
-            color_map = {val: colors[i] for i, val in enumerate(unique_values)}
+            color_map_green = {val: colors[i] for i, val in enumerate(unique_values)}
+
+            # Create a color map for this method eps
+            unique_values = sorted(list(set([v for v in parameters["iter"]])))
+            cmap = cm.Reds
+            colors = [cmap(i/max(1, len(unique_values)-1)) for i in range(len(unique_values))]
+            color_map_red = {val: colors[i] for i, val in enumerate(unique_values)}
             
             # Convergence plots
             plt.figure(figsize=(12, 8))
             plt.suptitle(f'Training Convergence for {method}', fontsize=16)
-            
+
+            maxys = []
+            maxs = []
             # Training error vs iter for each epsilon
             plt.subplot(1, 2, 1)
             for i, eps_val in enumerate(sorted([e for e in set(parameters["eps"]) if e is not None])):
-                eps_indices = [i for i, e in enumerate(parameters["eps"]) if e == eps_val and parameters["l"] == best_config["l"]]
+                eps_indices = [i for i, e in enumerate(parameters["eps"]) if e == eps_val and parameters["l"][i] == best_config["l"]]
                 if eps_indices:
                     for idx in eps_indices:
                         if results["trace_f"][idx] is not None:
-                            plt.plot(range(len(results["trace_f"][idx])), results["trace_f"][idx], label=f'ε={eps_val}')
+                            maxys.append(max(results["trace_f"][idx]))
+                            maxs.append(len(results["trace_f"][idx]))
+                            plt.plot(range(len(results["trace_f"][idx])), results["trace_f"][idx], color=color_map_green[eps_val], label=f'ε={eps_val}')
             plt.xlabel('Iterations')
             plt.ylabel('Training Error')
             plt.legend()
+
+            plt.ylim(0, 50)#max(maxys))
+            if maxs:
+                plt.xlim(0, max(maxs))
             
+
+            maxys = []
+            maxs = []
             # Training error vs iter for each l
             plt.subplot(1, 2, 2)
             for i, l_val in enumerate(sorted(set(parameters["l"]))):
-                l_indices = [i for i, e in enumerate(parameters["l"]) if e == l_val and parameters["eps"] == best_config["eps"]]
+                l_indices = [i for i, e in enumerate(parameters["l"]) if e == l_val and parameters["eps"][i] == best_config["eps"]]
                 if l_indices:
                     for idx in l_indices:
                         if results["trace_f"][idx] is not None:
-                            plt.plot(range(len(results["trace_f"][idx])), results["trace_f"][idx], color=color_map[l_val], label=f'λ={l_val}')
+                            plt.plot(range(len(results["trace_f"][idx])), results["trace_f"][idx], color=color_map_blue[l_val], label=f'λ={l_val}')
             plt.xlabel('Iterations')
             plt.ylabel('Training Error')
             plt.legend()
+
+            plt.ylim(0, 50)#max(maxys))
+            if maxs:
+                plt.xlim(0, max(maxs))
             
             plt.tight_layout()
             # Save convergence plots
@@ -486,9 +711,11 @@ def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=1
             plt.subplot(2, 4, 1)
             for i, l_val in enumerate(sorted(set(best_iter_df["l"]))):
                 l_data = best_iter_df[best_iter_df["l"] == l_val]
-                plt.plot(l_data["eps"], l_data["mse"], marker='o', color=color_map[l_val], label=f'λ={l_val}')
+                plt.plot(l_data["eps"], l_data["mse"], marker='o', color=color_map_blue[l_val], label=f'λ={l_val}')
             if triv and "mse" in triv_metrics:
                 plt.axhline(y=triv_metrics["mse"], color='gray', linestyle='--', alpha=0.7, label='Trivial')
+            if baseline and not best_models[baseline]['config'].get("test_err") is None:
+                plt.axhline(y=best_models[baseline]['config'].get("test_err"), color='black', linestyle='--', alpha=0.8, label=baseline)
             plt.xlabel('ε')
             plt.ylabel('MSE')
             if i == 0:  # Only add legend to the first plot in the row
@@ -498,9 +725,11 @@ def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=1
             plt.subplot(2, 4, 2)
             for i, l_val in enumerate(sorted(set(best_iter_df["l"]))):
                 l_data = best_iter_df[best_iter_df["l"] == l_val]
-                plt.plot(l_data["eps"], l_data["R2"], marker='o', color=color_map[l_val])
+                plt.plot(l_data["eps"], l_data["R2"], marker='o', color=color_map_blue[l_val])
             if triv and "R2" in triv_metrics:
                 plt.axhline(y=triv_metrics["R2"], color='gray', linestyle='--', alpha=0.7)
+            if baseline and not best_models[baseline]['config'].get("r2") is None:
+                plt.axhline(y=best_models[baseline]['config'].get("r2"), color='black', linestyle='--', alpha=0.8, label=baseline)
             plt.xlabel('ε')
             plt.ylabel('R²')
             
@@ -509,9 +738,11 @@ def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=1
                 plt.subplot(2, 4, 3)
                 for i, l_val in enumerate(sorted(set(best_iter_df["l"]))):
                     l_data = best_iter_df[best_iter_df["l"] == l_val]
-                    plt.plot(l_data["eps"], l_data["similarity"], marker='o', color=color_map[l_val])
+                    plt.plot(l_data["eps"], l_data["similarity"], marker='o', color=color_map_blue[l_val])
                 if triv and "similarity" in triv_metrics and triv_metrics["similarity"] is not None:
                     plt.axhline(y=triv_metrics["similarity"], color='gray', linestyle='--', alpha=0.7)
+                if baseline and not best_models[baseline]['config'].get("sim") is None:
+                    plt.axhline(y=best_models[baseline]['config'].get("sim"), color='black', linestyle='--', alpha=0.8, label=baseline)
                 plt.xlabel('ε')
                 plt.ylabel('Jaccard Similarity')
             
@@ -519,17 +750,20 @@ def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=1
             plt.subplot(2, 4, 4)
             for i, l_val in enumerate(sorted(set(best_iter_df["l"]))):
                 l_data = best_iter_df[best_iter_df["l"] == l_val]
-                plt.plot(l_data["eps"], l_data["sparse"], marker='o', color=color_map[l_val])
+                plt.plot(l_data["eps"], l_data["sparse"], marker='o', color=color_map_blue[l_val])
             if triv:
                 plt.axhline(y=0, color='gray', linestyle='--', alpha=0.7)
+            if baseline and not best_models[baseline]['config'].get("sparsity") is None:
+                plt.axhline(y=best_models[baseline]['config'].get("sparsity"), color='black', linestyle='--', alpha=0.8, label=baseline)
             plt.xlabel('ε')
             plt.ylabel('Sparsity (%)')
             
             # Second row: plots per iteration
             # Create a color map for iterations
             unique_iters = sorted(list(set([v for v in parameters["iter"]])))
+            cmap = cm.Reds
             iter_colors = [cmap(i/max(1, len(unique_iters)-1)) for i in range(len(unique_iters))]
-            iter_color_map = {val: iter_colors[i] for i, val in enumerate(unique_iters)}
+            iter_color_map_l = {val: iter_colors[i] for i, val in enumerate(unique_iters)}
             
             # Filter for best l
             best_l_df = method_df[method_df["l"] == best_config["l"]]
@@ -538,9 +772,11 @@ def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=1
             plt.subplot(2, 4, 5)
             for i, iter_val in enumerate(sorted(set(best_l_df["iter"]))):
                 iter_data = best_l_df[best_l_df["iter"] == iter_val]
-                plt.plot(iter_data["eps"], iter_data["mse"], marker='o', color=iter_color_map[iter_val], label=f'iter={iter_val}')
+                plt.plot(iter_data["eps"], iter_data["mse"], marker='o', color=iter_color_map_l[iter_val], label=f'iter={iter_val}')
             if triv and "mse" in triv_metrics:
                 plt.axhline(y=triv_metrics["mse"], color='gray', linestyle='--', alpha=0.7, label='Trivial')
+            if baseline and not best_models[baseline]['config'].get("test_err") is None:
+                plt.axhline(y=best_models[baseline]['config'].get("test_err"), color='black', linestyle='--', alpha=0.8, label=baseline)
             plt.xlabel('ε')
             plt.ylabel('MSE')
             if i == 0:  # Only add legend to the first plot in the row
@@ -550,9 +786,11 @@ def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=1
             plt.subplot(2, 4, 6)
             for i, iter_val in enumerate(sorted(set(best_l_df["iter"]))):
                 iter_data = best_l_df[best_l_df["iter"] == iter_val]
-                plt.plot(iter_data["eps"], iter_data["R2"], marker='o', color=iter_color_map[iter_val])
+                plt.plot(iter_data["eps"], iter_data["R2"], marker='o', color=iter_color_map_l[iter_val])
             if triv and "R2" in triv_metrics:
                 plt.axhline(y=triv_metrics["R2"], color='gray', linestyle='--', alpha=0.7)
+            if baseline and not best_models[baseline]['config'].get("r2") is None:
+                plt.axhline(y=best_models[baseline]['config'].get("r2"), color='black', linestyle='--', alpha=0.8, label=baseline)
             plt.xlabel('ε')
             plt.ylabel('R²')
             
@@ -561,9 +799,11 @@ def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=1
                 plt.subplot(2, 4, 7)
                 for i, iter_val in enumerate(sorted(set(best_l_df["iter"]))):
                     iter_data = best_l_df[best_l_df["iter"] == iter_val]
-                    plt.plot(iter_data["eps"], iter_data["similarity"], marker='o', color=iter_color_map[iter_val])
+                    plt.plot(iter_data["eps"], iter_data["similarity"], marker='o', color=iter_color_map_l[iter_val])
                 if triv and "similarity" in triv_metrics and triv_metrics["similarity"] is not None:
                     plt.axhline(y=triv_metrics["similarity"], color='gray', linestyle='--', alpha=0.7)
+                if baseline and not best_models[baseline]['config'].get("sim") is None:
+                    plt.axhline(y=best_models[baseline]['config'].get("sim"), color='black', linestyle='--', alpha=0.8, label=baseline)
                 plt.xlabel('ε')
                 plt.ylabel('Jaccard Similarity')
             
@@ -571,9 +811,11 @@ def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=1
             plt.subplot(2, 4, 8)
             for i, iter_val in enumerate(sorted(set(best_l_df["iter"]))):
                 iter_data = best_l_df[best_l_df["iter"] == iter_val]
-                plt.plot(iter_data["eps"], iter_data["sparse"], marker='o', color=iter_color_map[iter_val])
+                plt.plot(iter_data["eps"], iter_data["sparse"], marker='o', color=iter_color_map_l[iter_val])
             if triv:
                 plt.axhline(y=0, color='gray', linestyle='--', alpha=0.7)
+            if baseline and not best_models[baseline]['config'].get("sparsity") is None:
+                plt.axhline(y=best_models[baseline]['config'].get("sparsity"), color='black', linestyle='--', alpha=0.8, label=baseline)
             plt.xlabel('ε')
             plt.ylabel('Sparsity (%)')
             
@@ -602,7 +844,7 @@ def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=1
         # Create a color map for methods
         method_cmap = cm.tab10
         method_colors = [method_cmap(i % 10) for i in range(len(methods))]
-        method_color_map = {method: method_colors[i] for i in range(len(methods))}
+        method_color_map_l = {method: method_colors[i] for i in range(len(methods))}
         
         # Convergence plot comparing all methods
         plt.figure(figsize=(12, 6))
@@ -621,8 +863,6 @@ def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=1
         # MSE vs eps for each method
         plt.subplot(1, 2, 2)
         for i, method in enumerate(methods):
-            print(super_df.iloc[0])
-            print(method)
             method_data = super_df[super_df["method"] == method]
             best_l = best_models[method]["config"]["l"] if method in best_models else None
             best_iter = best_models[method]["config"]["iter"] if method in best_models else None
@@ -631,6 +871,8 @@ def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=1
                 plt.plot(filtered_data["eps"], filtered_data["mse"], marker='o', color=method_colors[i], label=method)
         if triv and "mse" in triv_metrics:
             plt.axhline(y=triv_metrics["mse"], color='gray', linestyle='--', alpha=0.7, label='Trivial')
+        if baseline and not best_models[baseline]['config'].get("test_err") is None:
+            plt.axhline(y=best_models[baseline]['config'].get("test_err"), color='black', linestyle='--', alpha=0.8, label=baseline)
         plt.xlabel('ε')
         plt.ylabel('MSE')
         plt.legend()
@@ -658,6 +900,8 @@ def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=1
                 plt.plot(filtered_data["eps"], filtered_data["R2"], marker='o', color=method_colors[i], label=method)
         if triv and "R2" in triv_metrics:
             plt.axhline(y=triv_metrics["R2"], color='gray', linestyle='--', alpha=0.7, label='Trivial')
+        if baseline and not best_models[baseline]['config'].get("r2") is None:
+            plt.axhline(y=best_models[baseline]['config'].get("r2"), color='black', linestyle='--', alpha=0.8, label=baseline)
         plt.xlabel('ε')
         plt.ylabel('R²')
         plt.legend()
@@ -674,6 +918,8 @@ def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=1
                     plt.plot(filtered_data["eps"], filtered_data["similarity"], marker='o', color=method_colors[i], label=method)
             if triv and "similarity" in triv_metrics and triv_metrics["similarity"] is not None:
                 plt.axhline(y=triv_metrics["similarity"], color='gray', linestyle='--', alpha=0.7, label='Trivial')
+            if baseline and not best_models[baseline]['config'].get("sim") is None:
+                plt.axhline(y=best_models[baseline]['config'].get("sim"), color='black', linestyle='--', alpha=0.8, label=baseline)
             plt.xlabel('ε')
             plt.ylabel('Jaccard Similarity')
             plt.legend()
@@ -689,6 +935,8 @@ def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=1
                 plt.plot(filtered_data["eps"], filtered_data["sparse"], marker='o', color=method_colors[i], label=method)
         if triv:
             plt.axhline(y=0, color='gray', linestyle='--', alpha=0.7, label='Trivial')
+        if baseline and not best_models[baseline]['config'].get("sparsity") is None:
+                plt.axhline(y=best_models[baseline]['config'].get("sparsity"), color='black', linestyle='--', alpha=0.8, label=baseline)
         plt.xlabel('ε')
         plt.ylabel('Sparsity (%)')
         plt.legend()
@@ -704,6 +952,8 @@ def research_plots(feat, correct_feats=None, methods='lasso', l=None, max_iter=1
                 plt.plot(filtered_data["eps"], filtered_data["training_err"], marker='o', color=method_colors[i], label=method)
         if triv and "training_err" in triv_metrics:
             plt.axhline(y=triv_metrics["training_err"], color='gray', linestyle='--', alpha=0.7, label='Trivial')
+        if baseline and not best_models[baseline]['config'].get("train_err") is None:
+                plt.axhline(y=best_models[baseline]['config'].get("train_err"), color='black', linestyle='--', alpha=0.8, label=baseline)
         plt.xlabel('ε')
         plt.ylabel('Training Error')
         plt.legend()
