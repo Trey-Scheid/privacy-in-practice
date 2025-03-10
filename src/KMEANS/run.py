@@ -95,7 +95,8 @@ def main(**params):
     tau = kmeans_params.get('tau') 
     parquet_path=kmeans_params.get('parquet_path')
     output_parquet_path=kmeans_params.get('output_parquet_path')
-    output_cluster_path=kmeans_params.get('output_cluster_path')
+    output_cluster_path = os.path.join(*params.get("output"), "KMEANS", kmeans_params.get("output_cluster_path"))
+
 
     cwd = os.getcwd()
     test_size = 0.2
