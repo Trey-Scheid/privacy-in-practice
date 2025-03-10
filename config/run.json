@@ -26,7 +26,7 @@
         "tau":9.9,
         "parquet_path":"dummy_data/raw/frgnd_v2_hist/synthetic.parquet",
         "output_parquet_path" : "synthetic_out.parquet",
-        "output_cluster_path":"viz/static_output/KMEANS/synthetic_1d_clusters.png"
+        "output_cluster_path":"synthetic_1d_clusters.png"
     },
     "lr-pval-params": {
         "item_dir": "dummy_data/raw/eventlog_item_hist",
