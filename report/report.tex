@@ -192,16 +192,6 @@ The tables once loaded to disc could be processed with SQL queries and filtered 
 
 \subsection{LR\_PVAL: Private Correlation (via Logistic Regression Coefficient)}
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-This paper\footnote{needs citation not a footnote} investigates how privacy affects different mini-batch stochastic gradient descent algorithms for logistic regression classification. It is shown that privacy affects the batch size for optimal performance.
-
-\subsection{Correlation (via Logistic Regression Coefficient)}
-
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 This paper\footnote{needs citation} seeks to identify whether a certain variable is disproportionately present for a certain outcome. 
 More specifically, it takes a close look at two variables, max temperature on a day and whether a corrected error was present on that day. 
 They would take one of those two variables and train a logistic regression model with maximum likelihood estimation to predict whether an uncorrected error was present.
@@ -209,6 +199,54 @@ From the model, they use the coefficient of the variable and make a hypothesis t
 
 For our implementation, we focused only on whether there were corrected errors on a day, and not the variable max temperature on a day.
 We add privacy to the model by using DP-SGD when training the logistic regression model, where the hypothesis test is then private by means of post-processing.
+We replicated the non-private model to get a baseline for utility and compared it to our private model using set intersection over union.
+Our data came from Intel's telemetry database, which contains information about the hardware and software on millions of devices
+and we took a subset of one year of the data from Februrary 2020 to 2021.
+
+\subsubsection{Nonprivate Logistic Regression}
+
+The paper used a univariate logistic regression model, one for each of the top 30 uncorrected error codes.
+The target variable is whether or not an uncorrected error was present on a day, 
+and the feature a boolean of whether there was a corrected error on that day, 
+making uncorrected error ~ corrected error.
+
+The logistic regression model is defined as 
+
+\begin{equation}
+    \label{eq:logistic_regression}
+    \log \frac{P(y=1|x)}{1-P(y=1|x)} = \beta_0 + \beta_1 x
+\end{equation}
+
+and they took $\beta_1$ as the coefficient of interest.
+They used a Wald test to test the null hypothesis that $\beta_1 = 0$ against the alternative that $\beta_1 \neq 0$.
+The Wald test statistic is defined as 
+
+\begin{equation}
+    \label{eq:wald_test}
+    W = \frac{\hat{\beta}_1}{SE(\hat{\beta}_1)}
+\end{equation}
+
+where $\hat{\beta}_1$ is the coefficient estimate and $SE(\hat{\beta}_1)$ is the standard error of the coefficient estimate.
+This statistic can be used to test whether or not the feature is significant in predicting the target variable (whether the presence of a corrected error is associated with the presence of an uncorrected error).
+For our implementation, we used the statsmodels library to fit the model and calculate the coefficient and standard error with an alpha of 0.05.
+
+\subsubsection{Private Logistic Regression}
+
+In order to add privacy to the model, we used DP-Gradient Descent to train the model.
+DP-GD is a method of training a model with differential privacy by adding noise to the gradient updates using Gaussian noise.
+Each iteration of gradient descent adds a little bit more noise, consuming a proportion of the privacy budget, 
+meaning that higher epsilons require more iterations.
+We considered using DP-Stochastic Gradient Descent, but the processed datasets were small enough to warrant using DP-GD.
+We implemented our own DP-GD algorithm using AutoDP\footnote{\url{https://pypi.org/project/autodp/}} to account for our privacy budget.
+After privately training the model, post-processing enabled us to calculate the wald test the same way as in the non-private model.
+In order to compare the alpha values, we completed permutation testing on each model in order to calculate the empirical p-value which was used to identify models that were statistically significant.
+One of the thirty models had exceptionally more values than the others, so to save compute we removed it from the analysis.
+
+\subsubsection{Utility}
+
+We defined our utility metric as the set intersection over union of the top 29 uncorrected error codes.
+This metric has a range of 0 to 1, where 0 is no intersection and 1 is full intersection,
+meaning that the higher the utility, the more similar the two results are.
 
 \subsection{LASSO Private Regression (via DP-Frank-Wolfe)}
 
