@@ -192,7 +192,7 @@ function Discussion({ discussionRef }: DiscussionProps) {
           </section>
 
           {/* The Field and Us section */}
-          <section>
+          {/* <section>
             <div className="prose prose-lg max-w-none px-4 md:px-0">
               <h2 className="text-xl md:text-3xl font-bold mb-2 md:mb-4">
                 The Field and Us
@@ -203,7 +203,7 @@ function Discussion({ discussionRef }: DiscussionProps) {
                 </p>
               </div>
             </div>
-          </section>
+          </section> */}
 
           {/* Overall Summary Section */}
           <section>
