@@ -54,7 +54,7 @@
 
 \section{Introduction}
 
-The implementation of differential privacy in production environments presents significant challenges in balancing privacy guarantees with analytical utility. This research addresses these challenges by developing practical privacy-preserving mechanisms for existing telemetry analysis tasks while maintaining the usefulness of their systems. We integrate various differential privacy mechanisms including: Gaussian Composition, the Exponential\/Laplace mechanism, and \_\_ to protect sensitive information in telemetry data. Our chosen data tasks encompasses multiple statistical tasks, from user-level rate analysis to logistic regression classification correlation. By evaluating the trade-offs between privacy guarantees and analytical accuracy in production settings, we provide evidence and direction for organizations looking to enhance their privacy practices.
+The implementation of differential privacy in production environments presents significant challenges in balancing privacy guarantees with analytical utility. This research addresses these challenges by developing practical privacy-preserving mechanisms for existing telemetry analysis tasks while maintaining the usefulness of their systems. We integrate various differential privacy mechanisms including: Gaussian Composition, the Exponential\/Laplace mechanism, and DP-GD to protect sensitive information in telemetry data. Our chosen data tasks encompasses multiple statistical tasks, from user-level rate analysis to logistic regression classification correlation. By evaluating the trade-offs between privacy guarantees and analytical accuracy in production settings, we provide evidence and direction for organizations looking to enhance their privacy practices.
 
 \subsection{Motivation}
 
@@ -98,21 +98,21 @@ Logistic Regression Significance Tests & LR\_PVAL & Product Health Insights Usin
 
 Differential privacy methods and guarantees are attractive for many domains. Telemetry is the remote data transfer of automated system measurements. As people use technology everyday their machines track usage diagnostics which are used by hardware and software manufacturers to reduce bugs and increase efficiency. System usage information is recorded at regular intervals and usually results in massive quantities of measurements. The identifiability of the specific machine or user of an event is a concern regardless of PIID tags. Dinur Nissim Reconstruction and linkage attacks can be used to recover or reconstruct the original information: the source \cite{DinurReconstruction}. This is a breach of privacy for a user which depending on the sensitivity of the information can be concerning. For example, personal laptops may send diagnostics to Intel given that the user opts in to the program [Intel telemetry]. 
 
-We use a secure research database shared be Intel Corporation with consent of its users to generate real results....
+We use a secure research database shared be Intel Corporation with consent of its users to generate real results.
 
 \subsubsection{Errors}
 
 In our paper, we will analyze two different types of errors. The Machine Check Architecture, or MCA, will detect an error and label it as either corrected or uncorrected. A corrected error means the system can observe and correct a detected error. Correction mechanisms include single error correction, double error correction, and more. An uncorrected error is one that was detected but not corrected or there was a computation delay long enough that the MCA treated it as an interrupted computation. \cite{Kwasnick2023}
 
-\subsubsection{Hardware Power [not done yet]}
+\subsubsection{Hardware Power}
 
 Another concept is power, this is the rate of energy consumption by the device. Our analysis is on CPU's produced by Intel and AMD. \cite{Kwasnick2023}
 
-\subsection{Applications [not done yet]}
+\subsection{Applications}
 
-Telemetry is one narrow domain which privacy is a concern, many other types of data require sensitive handling and sharing practices. For example the US Census \footnote{need citation}. 
+Telemetry is one narrow domain which privacy is a concern, many other types of data require sensitive handling and sharing practices. For example the US Census \footnote{https://www.census.gov/about/policies/privacy/privacy-policy.html}. 
 
-We will get into the specifics of each task, however note that each one can be applied to datasets about any interest. probabilities of political party affiliation, Lasso/kmeans for gene identification, or correlation for \_\_. 
+We will get into the specifics of each task, however note that each one can be applied to datasets in any domain. Probabilities of political party affiliation, Lasso/kmeans for gene identification, or correlation for stock prices. 
 
 \subsection{Related Work}
 
@@ -137,7 +137,7 @@ The tables once loaded to disc could be processed with SQL queries and filtered 
 
 \subsection{LR\_PVAL: Private Correlation (via Logistic Regression Coefficient)}
 
-This paper\footnote{needs citation} seeks to identify whether a certain variable is disproportionately present for a certain outcome. 
+This paper\cite{prodhealLR} seeks to identify whether a certain variable is disproportionately present for a certain outcome. 
 More specifically, it takes a close look at two variables, max temperature on a day and whether a corrected error was present on that day. 
 They would take one of those two variables and train a logistic regression model with maximum likelihood estimation to predict whether an uncorrected error was present.
 From the model, they use the coefficient of the variable and make a hypothesis test whether that variable is equal to zero.
@@ -195,7 +195,6 @@ meaning that the higher the utility, the more similar the two results are.
 
 \subsection{LASSO Private Regression (via DP-Frank-Wolfe)}
 
-will add lots of detail about lasso, then talk about adapting franke-wolfe to be differentially private. 
 
 % Since the model is predicting power\_mean [SUM(pw.nrs * pw.mean) / SUM(pw.nrs)] which is a weighted average of some power rate metric in Watts I did some research. I found that 50W is a normal CPU and they typically range 10-150W with GPU up to 500-1000W which aligns with some EDA.
 
@@ -214,25 +213,26 @@ will add lots of detail about lasso, then talk about adapting franke-wolfe to be
 \subsection{KMEANS Private Clustering (DP-Lloyd's)}
 K-Means clustering (Lloyd's Algorithm) is applied to group devices based on similarities in their usage patterns. The method leverages Z-scores for standardizing the usage data and calculates L1 distances between weekly usage patterns to identify trends over time. Lloyd's Algorithm clusters devices by assigning them to centroids based on their usage patterns, recalculating the centroids as the mean of assigned points after each iteration. 
 
-Differentially Private Lloyd's Algorithm (DP-Lloyd's)\footnote{linkneeded} modifies the standard K-Means clustering by adding Laplacian noise during the iterative centroid update step to ensure privacy. It introduces noise to both the sum of coordinates and the count of points within clusters, with the amount of noise controlled by the number of iterations and the sensitivity of the data. 
+Differentially Private Lloyd's Algorithm (DP-Lloyd's)\footnote{\url{https://arxiv.org/pdf/1504.05998}} modifies the standard K-Means clustering by adding Laplacian noise during the iterative centroid update step to ensure privacy. It introduces noise to both the sum of coordinates and the count of points within clusters, with the amount of noise controlled by the number of iterations and the sensitivity of the data. This is applied after clipping the data, to for ensure that the impact of any single data point is limited. 
+\[
+\text{x'}_j = \text{clip}\left( \text{x}_j, -\tau, \tau \right)
+\]
 
-\subsubsection{Z-score (Additive Noise)}
-As Z-score is computed before performing K-means clustering, 
+After clipping the data, the sum of each cluster is computed with added Laplace noise. \\One point changes the sum, at most, the range of the dataset, which is $2 \times \tau$ (the sensitivty). The number of data points is at least 1 if the cluster exists, and so one data point changes the count by 1. The sensitivity is therefore 1. These sensitivities are then divided by the per-iteration  \epsilon.
+
 \[
-Z = \frac{X - \mu}{\sigma}
+\text{new\_centroid}_j=
+\frac{
+    \sum_{i=1}^{n_j} \text{x'}_{j,i} + \text{Lap}(\tau \times 2, \epsilon_{\text{iter}})
+}{
+    \max\left( 1, n_j + \text{Lap}(1, \epsilon_{\text{iter}}) \right)
+}
 \]
-One can privatize this clustering task by simply adding Laplacian noise to the Z-scores, though the privacy gurantee and performance between the two methods, DP-Lloyd's and Additive Noise are likely to be different.
-\[
-Z_{\text{private}} = \frac{X - \mu}{\sigma} + \text{Lap}\left(\frac{\Delta f}{\epsilon}\right)
-\]
-\begin{equation*}
-\begin{aligned}
-    \Delta f & \text{ is the global sensitivity of the Z-score computation,} \\
-    \epsilon & \text{ is the privacy parameter.}
-\end{aligned}
-\end{equation*}
 
 \subsubsection{Utility}
+To calculate the utility for the K-Means task, we defined the loss for each
+epsilon as the sum of squared distances between each data point and its closest centroid. We then divided it by the number of data point so it is agnostic to the dataset size. We then normalized the loss so that each loss value fell between 0 and 1 and defined the utility as
+1-loss to inverse it.
 
 
 
@@ -276,7 +276,12 @@ To calculate the utility for the Conditional Probability task, we defined the lo
 
 \subsection{All Tasks: Privacy vs Utility}
 
-INSERT COMBINED PLOT
+\begin{figure}[H] % 'h' specifies to place the figure here in the text
+  \centering
+  \includegraphics[width=0.6\textwidth]{figure/meta.png} % Path to the image
+  \caption{Privacy vs Normalized Utility for all tasks. Non-private models have a utility of 1.}
+  \label{fig:meta}
+\end{figure}
 
 \subsection{COND\_PROB}
 
@@ -287,12 +292,30 @@ INSERT COMBINED PLOT
     \label{fig:yourplot}
 \end{figure}
 
-
-
 \subsection{LR\_PVAL}
-\subsection{KMEANS}
-\subsection{LASSO}
+Our main method of comparing against the baseline was by calculating the set intersection over union for the private models and the non-private models. For epsilon = 1, the model severely under-shot the number of significant models. This means that it failed to find the correct relationship between corrected and uncorrected errors in a third (0.31) of the models.
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=.85\linewidth]{figure/conf_matrix.png}
+\caption{Confusion matrix for epsilon = 1 for Wald Test. Right side has the private model classifications and the left has the non-private baselines. There were no false positives}
+\label{fig:conf_matrix}
+\end{figure}
+
+\subsection{KMEANS}
+\begin{figure}[H] % 'h' specifies to place the figure here in the text
+    \centering
+    \includegraphics[width=0.6\textwidth]{figure/1d_clusters.png} % Path to the image
+    \caption{Centroid locations overlaid over data points $\epsilon=1$}
+    \label{fig:centroids}
+\end{figure}
+\begin{figure}[H] % 'h' specifies to place the figure here in the text
+    \centering
+    \includegraphics[width=0.6\textwidth]{figure/dpk_plot.png} % Path to the image
+    \caption{Epsilon vs. Inertia compared to baseline non-private model}
+    \label{fig:epsilon_inertia}
+\end{figure}
+\subsection{LASSO}
 
 %%%%%%%%%%%%%%%%%%%
 %%%% DISCUSSION  %%%%%%%
@@ -304,10 +327,71 @@ INSERT COMBINED PLOT
 \subsection{Interpretation}
 Our work provides a road map for integrating differential privacy into production environments, ensuring that sensitive telemetry data can be analyzed without compromising user privacy. This is particularly relevant for industries handling large volumes of user data. 
 
+\subsubsection{COND PROB}
+Similar to established differential privacy theory and literature /cite{Dworkroth, we observed a tradeoff between privacy and utility. However, our focus on conditional probability tasks allowed us to explore this tradeoff in a more specific context, providing insights into how differential privacy impacts analytical accuracy in this domain.
 
-\subsection{Limitations}
+Our results show a significant increase in utility as ε increases. For instance, at ε = 0.1, the utility was approximately 0.65, which rose to nearly 0.99 at ε = 1 and reached almost 1 at ε = 100. This demonstrates that less stringent privacy guarantees (higher ε values) lead to higher utility.
+
+For each epsilon, we found that as the number of corrected errors increased, the utility decreased. This is because the distribution of number of corrected errors is very heavily skewed left. The error amount with the largest amount of unique GUIDs is 0. This trend continues; as the number of corrected errors increases, the number of GUIDs with that exact amount of corrected errors decreases. This means the utility of the function is bounded by the maximum number of errors included in the histogram. We bounded our largest bin to be at 30 and found that an epsilon of 1 gave a sufficient utility. If we wanted to use a stricter epsilon, we would need to reduce the maximum corrected error to maintain the same utility. 
 
 
+\subsubsection{LR_PVAL}
+Due to high compute costs, we were only able to get up to epsilon 1.5 for each of the 29 models. As we expected, the utility would increase from very low epsilon but around ε = 0.5, it is unclear whether or not the utility would continue to increase. At ε = 1, the model does somewhat poorly as seen in \ref{fig:conf_matrix}. The model has an intersect over union of around 0.60 and notably identifies a majority of the models as not significant, a result contrary to the nonprivate model. Overall, this analysis task did not seem to be replicable privately, at least under the strict privacy constraints.
+
+It is important to note that this analysis would not be nearly as computationally hungry if we weren't trying to compare the models to a non-private model. In the practical setting, we wouldn't need to do permutation testing to find our p-values empirically. Similarly to the non-private setting, our alpha would be a hyperparameter that we would be able to select ourselves. This means that we may be able to use much higher values of epsilon in practice
+
+\subsubsection{KMEANS}
+The clustering algorithm is unsupervised so the best way to quantify performance is using inertia. It is the squared differences between data points and their nearest centroid. The smaller this value is, the better performing the cluster locations are, and therefore the model. 
+
+As you can see from figure \ref{fig:centroids}, the cluster locations are located where the most data points are. Given that the distribution of the data is right skewed, it makes sense that the centroids, or cluster locations, are also right skewed to follow the data. 
+
+From the figure \ref{fig:epsilon_inertia}, we can see that as epsilon increases, the inertia for the privatized model slowly converges to the non-private train and test loss. This is expected, and given its convergence close to an epsilon of 1, the model performs quite well in terms of both privacy and accuracy.
+
+\subsubsection{LASSO}
+
+\subsubsection{Meta}
+% BRADLEY %
+For each of our tasks, the privacy-utility tradeoff is not identical. Each task has different sensitivities to added noise. Some tasks can tolerate higher amounts of noise without significantly affecting the utility of the results, while others rely on precision and can degrade very fast with even slight noise. Given by our combined plot, each task has signifcantly different curves as epsilon increases. 
+One potential factor that also is not considered is that the added noise may reduce overfitting and could help the model generalize better. 
+
+        
+
+
+\subsection{Reflecting On The Process}
+% CHRIS %
+A part of assessing the feasibility of applying differential privacy is necessarily going to be a discussion surrounding the process of applying DP itself. We have gotten together to discuss what went well, what went poorly, and what limitations we had to concede.
+
+\subsubsection{What was helpful}
+% CHRIS %
+In the process of applying differential privacy, we found three main things the most helpful: mathematical foundations of DP result in a consistent comparison across methods, differential privacy algorithms are intuitive at a high level, and that many papers exist on different DP algorithms ready to be implemented.
+
+Comparing across methods was made easy because of the groundedness of DP in its definition and its reliance on epsilon. We could easily compare across tasks and observe that some tasks work well with an epsilon of 1 and some tasks didn't. The structure enabled us to have a strong idea that each of our privacy guarantees were identical.
+
+These mathematical foundations do mean that a lot of research is theory and math oriented, but we found that at a high level, DP algorithms are intuitive and straight forward. DP algorithms rely on three main things: add noise/randomness, bound sensitivity, and privacy accounting. The specific math of how much noise to add or what to clip might be tough, but boiling down an algorithm is often as simple as knowing where the data gets clipped and where the noise gets added.
+
+Many traditional analysis tasks have been privatized and written about. Applying differential privacy oneself often relies on finding a paper detailing the mechanism and molding it for your specific use case. The authors of the papers have been especially nice as well, being available to email and talk to about their methods. One small thing to note, several times have we found minor errors in papers which did make applying the methods occasionally difficult, but overall, the methods already existed and we just needed to implement it.  
+
+\subsubsection{What was difficult}
+% CHRIS %
+In the process, we also found two main difficulties that hindered our ability to complete our analysis tasks: epsilon is difficult to interpret and it is hard to quantify utility loss.
+
+Epsilon, as a value in the differential privacy equation, is straightforward with how it compares two probabilities. The issue is what this really looks like in real life. It is hard to get an intuition for what an arbitrarily bad event is and at what probability that would occur. We may know that our epsilons are the same, but what protections does that practically assure us? We know that an epsilon of 10 is bad, but how bad is it really? Sure, $e^{10}$ is a massive value, but what is the probability that something terrible actually happens?
+
+On the other hand, we sought to measure utility loss as compared to a baseline. This had a set of difficulties in its own right. For some analysis tasks, the non-private version may not be the ground truth. For example, a lot of deep learning models generalize better when noise is added during training. Establishing what is exactly maximum utility was a long conversation. Secondly, for a given amount of utility, it's hard to quantify how bad is bad. For example in our paper, the logistic regression models had an IOU of around 0.60. This is an example of a task that does have a more solid baseline, but how solid terrible is it to have 0.60 IOU? At a more abstract level, what if being 1\% off is the difference betewen 100 million and 99 million lives saved? It's difficult to have a good intuition of what exactly we're losing.
+
+\subsubsection{Limitations}
+% CHRIS %
+There were a couple of limitations surrounding our ability to forge our analyses: a general lack of knowledge and replication vs. novel analysis.
+
+Six months ago, differential privacy was a new concept to each of us. None of our backgrounds delved greatly into the rigor of mathematical proofs. Telemetry data was new to us and we suffered from lack of domain knowledge. Researchers or analysts who wish to accomplish similar comparisons may benefit greatly from more knowledge in either differential privacy and/or the domain in question itself. 
+
+The applicability of our study as a commentary of the feasibility of DP methods must be framed knowing that we replicated papers and did not seek to do novel analyses from scratch. Having the guidance of the original paper meant that there were some steps that we did not attempt or do privately ourselves. We did not try to tune hyperparameters privately, a task that would rely on high amounts of domain knowledge or using some of the privacy budget in order to find valuable hyperparameters. Further, we already knew what features we wanted, private EDA might take up plenty of privacy budget itself. One could argue that the analyst implementing a DP algorithm is already private and need not consider privacy in their analysis, but then the question arises, whom are we protecting against?
+
+Additionally on replicating papers, some papers were difficult to replicate due to obscurity in their writing or lack of general information. A common pitfall was not knowing exactly which "temperature" a paper was referring to. One of us had to assess several papers before being able to find one that would be able to be replicated.
+
+
+\subsection{State of DP and how it relates to us}
+The field of differential privacy is rapidly growing as more organizations and governments recognize the importance of protecting individuals' data in an increasingly data-driven world. It is crucial to be knowledgable about this field as it equips us with the understanding of how to protect sensitive data while enabling meaningful analysis.
 
 %%%%%%%%%%%%%%%%%%%
 %%%% CONCLUSION %%%%%%%
@@ -317,13 +401,26 @@ Our work provides a road map for integrating differential privacy into productio
 
 
 \subsection{Summary}
-Unlike previous studies that focused solely on theoretical aspects, our research demonstrates the practical feasibility of differential privacy in applied settings. Our approach offers a more accessible framework for practitioners
+% CHRIS %
+Overall, we found mixed results on how feasible applying differential privacy was. Some tasks were hardly affected and others would result in much different conclusions. There seems to be no universal solution for applying DP in tasks, it is task dependent. Different tasks have different success criteria, different methods have varying levels of ability to be privatized.
+
+The feasibility of applying differential privacy seems to rely heavily on the practitioner's knowledge of both DP methods and their own domain. There is a high barrier to entry with differential privacy. An analyst who is familiar with their domain but completely new to DP would struggle greatly switching their workflow from their non-private methods to their private counterparts. Further, if the guarantees of DP aren't adequately understood, there would be a lack of desire in putting in the effort to lose utility and gain privacy. A path forward to private analyses across the board would not be able to be done bottom up, smart people would need to hold the hand of the typical analyst.
 
 \subsection{Impact}
-
+% BRADLEY %
+We recreated baseline models and algorithms used in previous research papers with their associated private models in a practical setting, providing valuable insights into how these privacy-preserving techniques perform in real-world applications. As we are not PhD-level researchers, with more academic rigor it could lead to more promising findings and a deeper understanding of the privacy-utility balance in applied machine learning. Nevertheless, our work demonstrates that with just a few months of practice and an understanding of differential privacy, it is possible to implement privacy-preserving methods that showcase the best epsilon that balances privacy and utility. As DP becomes even more accessible, it will make implementation faster, improving both performance and computation.
 
 \subsection{Future Direction}
+% TYLER %
+Future research could explore alternative differential privacy methods for our tasks, such as applying Lasso regression using the Functional Mechanism to improve utility while maintaining privacy. Additionally, investigating different privacy accounting regimes, such as Rényi differential privacy or zero-Concentrated DP, could provide a more flexible trade-off between privacy and accuracy, optimizing the overall performance of the model. 
 
+Future work could focus on privatizing additional data tasks to enhance privacy while maintaining analytical utility. One potential task for future privatization is identifying the owning group for addressing a telemetry-detected issue, which could benefit from group-level differential privacy. This approach would help protect sensitive organizational information while still enabling efficient issue resolution. 
+
+We could explore several directions to improve and expand differential privacy applications. One avenue is scaling up computations and applying privatization methods to different domains, enabling broader adoption in diverse fields such as gaming analytics, hardware performance, and behavioral studies. Additionally, investigating tasks with varying sensitivity levels could lead to more nuanced privacy strategies, where higher-sensitivity tasks receive stronger protections while lower-sensitivity tasks maintain higher utility.
+
+Another promising direction is leveraging off-the-shelf differential privacy packages, such as Google's DP library or PySyft, to streamline implementation and improve accessibility. This could facilitate the more widespread adoption and standardization of privacy-preserving methods.
+
+Beyond technical advancements, think-aloud studies and longitudinal research could provide valuable insights into how users interact with differentially private systems in real-world settings. By observing users over time, we can refine privacy mechanisms to better align with practical workflows. Finally, validating utility results through alternative testing methods would help ensure that privacy-preserving models maintain effectiveness across different evaluation metrics, strengthening confidence in their real-world applicability
 
 
 %%%%%%%%%%%%%%%%%%%%%%
@@ -333,7 +430,7 @@ Unlike previous studies that focused solely on theoretical aspects, our research
 \section{Contributions}
 
 \subsection{Author Contributions}:
-T.S. focused on task22 LASSO Regression to highlight the exploratory capabilities of private data while implementing a previously theoretical framework (Franke-Wolfe). C.L. implemented the algorithms in ... B.N. analyzed the experimental results ... T.K. analyzed the experimental results ... Y.W. supervised the research and provided guidance on the mathematical foundations. All authors contributed to writing and reviewing the manuscript.
+T.S. focused on task22 LASSO Regression to highlight the exploratory capabilities of private data while implementing a previously theoretical framework (Franke-Wolfe). C.L. focused on private linear regression to be able to do Wald tests to asses the relationship between input and target variables B.N. analyzed and implemented non-private and private K-Means clustering.  T.K. analyzed the experimental results of applying privacy mechanisms to a conditional probability histogram. Y.W. supervised the research and provided guidance on the mathematical foundations. All authors contributed to writing and reviewing the manuscript.
 
 \subsection{Task Details}
 
@@ -346,10 +443,22 @@ Trey Scheid
 \end{itemize}
 
 Tyler Kurpanek
+\begin{itemize}
+    \item Replication of Exploration of CPU Error Dependencies and Prediction
+    \item Implementation of Laplace Mechanism 
+\end{itemize}
 
 Bradley Nathanson
+\begin{itemize}
+    \item Replication of k-means clustering with Lloyd's algorithm
+    \item Implementation of privatized k-means clustering
+\end{itemize}
 
 Christopher Lum
+\begin{itemize}
+  \item Preprocess and replicate logistic regression paper privately and non-privately
+  \item Develop website
+\end{itemize}
 
 Yu-Xiang Wang
 \begin{itemize}
@@ -362,11 +471,9 @@ Yu-Xiang Wang
 
 \subsection{Acknowledgements}
 
-We would like to recognize the support of our instructor, Yu-Xiang Wang, for his guidance and feedback throughout the project. We would also like to thank the teaching staff Umesh Bellur and Shriniwas Kulkarni for their support and feedback. The tasks database was a foundational part of our work and was created by another student researcher: Qiyu Li. 
+We would like to recognize the support of our instructor, Yu-Xiang Wang, for his guidance and feedback throughout the project. We would also like to thank the teaching staff Umesh Bellur and Shriniwas Kulkarni for their support and feedback. The tasks database was a foundational part of our work and was created by another student researcher: Qiyu Li. We also attended a workshop called "Workshop on Defining Holistic Private Data Science for Practice" hosted by ENCORE at UC San Diego, which helped greatly with our broad understanding of the state of the field of differential privacy in practice.
 
-We also would like to thank the authors of the papers we referenced in our literature review. Their work was instrumental in our understanding of the topic and the development of our project. Our understandings of differential privacy has been built on the work of many researchers in the field such as: \_\_, \_\_, \_\_, and \_\_. Especially those which engaged in discussion with us about the field (Smith, Ulman, Guatam et al.). We are grateful for their contributions.
-
-
+We also would like to thank the authors of the papers we referenced in our literature review. Their work was instrumental in our understanding of the topic and the development of our project. Our understandings of differential privacy has been built on the work of many researchers in the field. Especially those which engaged in discussion with us about the field (Smith, Ulman, Guatam et al.). We are grateful for their contributions.
 
 % COMMENT THIS BEFORE RENDERING
 %\input{example_tex_section_6.tex}
@@ -434,13 +541,6 @@ The other requirements for this project rely on data access and task availabilit
 
 Lastly, although we have not reviewed the dataset and tasks yet (no access), the intel program is sharing genuine telemetry information from devices with given consent as part of their program. Additionally, this HDSI-Intel partnership has been cooperating since 2020 and HDSI has used hundreds of terabytes of information.
 
-\subsection{Additional Results}
-example
-
-\subsection{Training Details}
-example
-
-\subsection{Additional Figures}
 
 
 
