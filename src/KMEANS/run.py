@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import src.KMEANS.src.DPKMeans
 import numpy as np
 from sklearn.model_selection import train_test_split
-import src.KMEANS.src.KMeans
+import src.KMEANS.src.kmeans
 import json
 def plot_1d_clusters(data, cluster_centers, output_path="1d_clusters.png"):
     """Plot data points along a 1D line and mark cluster centers with upside-down triangles."""
@@ -60,7 +60,7 @@ def preprocess_data(cwd,parquet_path,output_parquet_path):
 def compute_kmeans_loss(data, k, test_size, random_seed):
     """Compute train and test loss using standard KMeans."""
     train_data, test_data = train_test_split(data, test_size=test_size, random_state=random_seed)
-    kmeans = src.KMEANS.src.KMeans.KMeans(k)
+    kmeans = src.KMEANS.src.kmeans.KMeans(k)
     kmeans.fit(train_data)
     train_loss = kmeans.compute_inertia(train_data) / train_data.shape[0]
     test_loss = kmeans.compute_inertia(test_data) / test_data.shape[0]
