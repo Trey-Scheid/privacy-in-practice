@@ -191,6 +191,20 @@ function Discussion({ discussionRef }: DiscussionProps) {
             </div>
           </section>
 
+          {/* The Field and Us section */}
+          <section>
+            <div className="prose prose-lg max-w-none px-4 md:px-0">
+              <h2 className="text-xl md:text-3xl font-bold mb-2 md:mb-4">
+                The Field and Us
+              </h2>
+              <div className="space-y-4 md:space-y-8">
+                <p className="text-base md:text-xl mb-4">
+                  Filler text
+                </p>
+              </div>
+            </div>
+          </section>
+
           {/* Overall Summary Section */}
           <section>
             <div className="prose prose-lg max-w-none px-4 md:px-0">
