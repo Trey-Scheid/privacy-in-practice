@@ -14,7 +14,7 @@ The database our analsis was completed on is confidential, so only the resulting
 
 ## Running the project
 
-* To install the dependencies, run the following command from the root directory of the project: `pip install -r requirements.txt`
+* To install the dependencies, run the following command from the root directory of the project: `conda env create -f environment.yml`
   
 ### Building the project stages using `run.py`
 
@@ -64,7 +64,7 @@ the methods inputted into the target arguments.
 │
 ├─ poster.pdf            <- Conference Poster
 │
-├─ requirements.txt      <- Built with conda for executing run.py
+├─ environment.yml      <- Built with conda for executing run.py
 │
 ├─ config/               <- parameters for run.py and each other .py
 │
