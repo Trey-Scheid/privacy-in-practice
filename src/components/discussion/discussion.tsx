@@ -1,29 +1,8 @@
-import papersData from "@/data/papers.json";
-
 interface DiscussionProps {
   discussionRef: React.RefObject<HTMLElement>;
 }
 
-interface contentBlock {
-  type: "text" | "image";
-  content?: string;
-  src?: string;
-  alt?: string;
-}
-interface Paper {
-  id: number;
-  shortTitle: string;
-  title: string;
-  author: string;
-  algorithm: string;
-  analysis: contentBlock[];
-  privatization: contentBlock[];
-  results: contentBlock[];
-}
-
 function Discussion({ discussionRef }: DiscussionProps) {
-  const papers = papersData.papers as Paper[];
-
   return (
     <div className="bg-primary-gray text-primary-white relative z-20">
       {/* Title Section */}
@@ -85,8 +64,8 @@ function Discussion({ discussionRef }: DiscussionProps) {
                   groundedness of DP in its definition and its reliance on
                   epsilon. We could easily compare across tasks and observe that
                   some tasks work well with an epsilon of 1 and some tasks
-                  didn't. The structure enabled us to have a strong idea that
-                  each of our privacy guarantees were identical.
+                  didn&apos;t. The structure enabled us to have a strong idea
+                  that each of our privacy guarantees were identical.
                 </p>
               </div>
               <div className="space-y-4 md:space-y-8">
@@ -149,13 +128,14 @@ function Discussion({ discussionRef }: DiscussionProps) {
                   learning models generalize better when noise is added during
                   training. Establishing what is exactly maximum utility was a
                   long conversation. Secondly, for a given amount of utility,
-                  it's hard to quantify how bad is bad. For example in our
+                  it&apos;s hard to quantify how bad is bad. For example in our
                   paper, the logistic regression models had an IOU of around
                   0.60. This is an example of a task that does have a more solid
                   baseline, but how solid terrible is it to have 0.60 IOU? At a
-                  more abstract level, what if being 1\% off is the difference
-                  betewen 100 million and 99 million lives saved? It's difficult
-                  to have a good intution of what exactly we're losing.
+                  more abstract level, what if being 1% off is the difference
+                  betewen 100 million and 99 million lives saved? It&apos;s
+                  difficult to have a good intution of what exactly we&apos;re
+                  losing.
                 </p>
               </div>
 
@@ -203,9 +183,9 @@ function Discussion({ discussionRef }: DiscussionProps) {
                   Additionally on replicating papers, some papers were difficult
                   to replicate due to obscurity in their writing or lack of
                   general information. A common pitfall was not knowing exactly
-                  which "temperature" a paper was referring to. One of us had to
-                  assess several papers before being able to find one that would
-                  be able to be replicated.
+                  which &quot;temperature&quot; a paper was referring to. One of
+                  us had to assess several papers before being able to find one
+                  that would be able to be replicated.
                 </p>
               </div>
             </div>
@@ -231,17 +211,17 @@ function Discussion({ discussionRef }: DiscussionProps) {
               <div className="space-y-4 md:space-y-8">
                 <p className="text-base md:text-xl mb-4">
                   The feasibility of applying differential privacy seems to rely
-                  heavily on the practitioner's knowledge of both DP methods and
-                  their own domain. There is a high barrier to entry with
-                  differential privacy. An analyst who is familiar with their
-                  domain but completely new to DP would struggle greatly
+                  heavily on the practitioner&apos;s knowledge of both DP
+                  methods and their own domain. There is a high barrier to entry
+                  with differential privacy. An analyst who is familiar with
+                  their domain but completely new to DP would struggle greatly
                   switching their workflow from their non-private methods to
                   their private counterparts. Further, if the guarantees of DP
-                  aren't adequately understood, there would be a lack of desire
-                  in putting in the effort to lose utility and gain privacy. A
-                  path forward to private analyses across the board would not be
-                  able to be done bottom up, smart people would need to hold the
-                  hand of the typical analyst.
+                  aren&apos;t adequately understood, there would be a lack of
+                  desire in putting in the effort to lose utility and gain
+                  privacy. A path forward to private analyses across the board
+                  would not be able to be done bottom up, smart people would
+                  need to hold the hand of the typical analyst.
                 </p>
               </div>
             </div>
@@ -282,7 +262,62 @@ function Discussion({ discussionRef }: DiscussionProps) {
               </h2>
               <div className="space-y-4 md:space-y-8">
                 <p className="text-base md:text-xl mb-4">
-                  Future Work Stuff here
+                  Future research could explore alternative differential privacy
+                  methods for our tasks, such as applying Lasso regression using
+                  the Functional Mechanism to improve utility while maintaining
+                  privacy. Additionally, investigating different privacy
+                  accounting regimes, such as Rényi differential privacy or
+                  zero-Concentrated DP, could provide a more flexible trade-off
+                  between privacy and accuracy, optimizing the overall
+                  performance of the model.
+                </p>
+              </div>
+              <div className="space-y-4 md:space-y-8">
+                <p className="text-base md:text-xl mb-4">
+                  Future work could focus on privatizing additional data tasks
+                  to enhance privacy while maintaining analytical utility. One
+                  potential task for future privatization is identifying the
+                  owning group for addressing a telemetry-detected issue, which
+                  could benefit from group-level differential privacy. This
+                  approach would help protect sensitive organizational
+                  information while still enabling efficient issue resolution.
+                </p>
+              </div>
+              <div className="space-y-4 md:space-y-8">
+                <p className="text-base md:text-xl mb-4">
+                  We could explore several directions to improve and expand
+                  differential privacy applications. One avenue is scaling up
+                  computations and applying privatization methods to different
+                  domains, enabling broader adoption in diverse fields such as
+                  gaming analytics, hardware performance, and behavioral
+                  studies. Additionally, investigating tasks with varying
+                  sensitivity levels could lead to more nuanced privacy
+                  strategies, where higher-sensitivity tasks receive stronger
+                  protections while lower-sensitivity tasks maintain higher
+                  utility.
+                </p>
+              </div>
+              <div className="space-y-4 md:space-y-8">
+                <p className="text-base md:text-xl mb-4">
+                  Another promising direction is leveraging off-the-shelf
+                  differential privacy packages, such as Google&apos;s DP
+                  library or PySyft, to streamline implementation and improve
+                  accessibility. This could facilitate the more widespread
+                  adoption and standardization of privacy-preserving methods.
+                </p>
+              </div>
+              <div className="space-y-4 md:space-y-8">
+                <p className="text-base md:text-xl mb-4">
+                  Beyond technical advancements, think-aloud studies and
+                  longitudinal research could provide valuable insights into how
+                  users interact with differentially private systems in
+                  real-world settings. By observing users over time, we can
+                  refine privacy mechanisms to better align with practical
+                  workflows. Finally, validating utility results through
+                  alternative testing methods would help ensure that
+                  privacy-preserving models maintain effectiveness across
+                  different evaluation metrics, strengthening confidence in
+                  their real-world applicability
                 </p>
               </div>
             </div>
@@ -292,13 +327,21 @@ function Discussion({ discussionRef }: DiscussionProps) {
           <section>
             <div className="prose prose-lg max-w-none px-4 md:px-0 mb-36">
               <h2 className="text-xl md:text-3xl font-bold mb-2 md:mb-4">
-                Continue Our Work
+                Continue Our Work!
               </h2>
               <div className="space-y-4 md:space-y-8">
                 <p className="text-base md:text-xl mb-4">
                   Thank you for taking your time to read through our project! If
                   you are interested in continuing our work, feel free to reach
                   out to us or check out our project repository and notes.
+                </p>
+                <p className="text-base md:text-xl mb-4">
+                  Special thanks to our advisor, Dr. Yu-Xiang Wang, for his help
+                  and confidence in our work. We also want to thank ENCORE for
+                  hosting the workshop &quot;Workshop on Defining Holistic
+                  Private Data Science for Practice&quot; which helped greatly
+                  with our broad understanding of the state of the field of
+                  differential privacy in practice.
                 </p>
                 <p className="text-base md:text-xl mb-4 text-accent underline decoration-dotted hover:text-white transition-colors cursor-pointer">
                   <a
@@ -317,6 +360,9 @@ function Discussion({ discussionRef }: DiscussionProps) {
                   >
                     Click here to catch up on our notes!
                   </a>
+                </p>
+                <p className="text-base md:text-xl mb-4 text-accent underline decoration-dotted hover:text-white transition-colors cursor-pointer">
+                  TL;DR: It&apos;s nuanced.
                 </p>
               </div>
             </div>
