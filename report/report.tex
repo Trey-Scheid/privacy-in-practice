@@ -54,7 +54,7 @@
 
 \section{Introduction}
 
-The implementation of differential privacy in production environments presents significant challenges in balancing privacy guarantees with analytical utility. This research addresses these challenges by developing practical privacy-preserving mechanisms for existing telemetry analysis tasks while maintaining the usefulness of their systems. We integrate various differential privacy mechanisms including: Gaussian Composition, the Exponential\/Laplace mechanism, and \_\_ to protect sensitive information in telemetry data. Our chosen data tasks encompasses multiple statistical tasks, from user-level rate analysis to logistic regression classification correlation. By evaluating the trade-offs between privacy guarantees and analytical accuracy in production settings, we provide evidence and direction for organizations looking to enhance their privacy practices.
+The implementation of differential privacy in production environments presents significant challenges in balancing privacy guarantees with analytical utility. This research addresses these challenges by developing practical privacy-preserving mechanisms for existing telemetry analysis tasks while maintaining the usefulness of their systems. We integrate various differential privacy mechanisms including: Gaussian Composition, the Exponential\/Laplace mechanism, and DP-GD to protect sensitive information in telemetry data. Our chosen data tasks encompasses multiple statistical tasks, from user-level rate analysis to logistic regression classification correlation. By evaluating the trade-offs between privacy guarantees and analytical accuracy in production settings, we provide evidence and direction for organizations looking to enhance their privacy practices.
 
 \subsection{Motivation}
 
@@ -104,15 +104,15 @@ We use a secure research database shared be Intel Corporation with consent of it
 
 In our paper, we will analyze two different types of errors. The Machine Check Architecture, or MCA, will detect an error and label it as either corrected or uncorrected. A corrected error means the system can observe and correct a detected error. Correction mechanisms include single error correction, double error correction, and more. An uncorrected error is one that was detected but not corrected or there was a computation delay long enough that the MCA treated it as an interrupted computation. \cite{Kwasnick2023}
 
-\subsubsection{Hardware Power [not done yet]}
+\subsubsection{Hardware Power}
 
 Another concept is power, this is the rate of energy consumption by the device. Our analysis is on CPU's produced by Intel and AMD. \cite{Kwasnick2023}
 
-\subsection{Applications [not done yet]}
+\subsection{Applications}
 
-Telemetry is one narrow domain which privacy is a concern, many other types of data require sensitive handling and sharing practices. For example the US Census \footnote{need citation}. 
+Telemetry is one narrow domain which privacy is a concern, many other types of data require sensitive handling and sharing practices. For example the US Census \footnote{https://www.census.gov/about/policies/privacy/privacy-policy.html}. 
 
-We will get into the specifics of each task, however note that each one can be applied to datasets about any interest. probabilities of political party affiliation, Lasso/kmeans for gene identification, or correlation for \_\_. 
+We will get into the specifics of each task, however note that each one can be applied to datasets in any domain. Probabilities of political party affiliation, Lasso/kmeans for gene identification, or correlation for stock prices. 
 
 \subsection{Related Work}
 
@@ -137,7 +137,7 @@ The tables once loaded to disc could be processed with SQL queries and filtered 
 
 \subsection{LR\_PVAL: Private Correlation (via Logistic Regression Coefficient)}
 
-This paper\footnote{needs citation} seeks to identify whether a certain variable is disproportionately present for a certain outcome. 
+This paper\cite{prodhealLR} seeks to identify whether a certain variable is disproportionately present for a certain outcome. 
 More specifically, it takes a close look at two variables, max temperature on a day and whether a corrected error was present on that day. 
 They would take one of those two variables and train a logistic regression model with maximum likelihood estimation to predict whether an uncorrected error was present.
 From the model, they use the coefficient of the variable and make a hypothesis test whether that variable is equal to zero.
@@ -277,7 +277,12 @@ To calculate the utility for the Conditional Probability task, we defined the lo
 
 \subsection{All Tasks: Privacy vs Utility}
 
-INSERT COMBINED PLOT
+\begin{figure}[H] % 'h' specifies to place the figure here in the text
+  \centering
+  \includegraphics[width=0.6\textwidth]{figure/meta.png} % Path to the image
+  \caption{Privacy vs Normalized Utility for all tasks. Non-private models have a utility of 1.}
+  \label{fig:meta}
+\end{figure}
 
 \subsection{COND\_PROB}
 
@@ -288,9 +293,16 @@ INSERT COMBINED PLOT
     \label{fig:yourplot}
 \end{figure}
 
-
-
 \subsection{LR\_PVAL}
+Our main method of comparing against the baseline was by calculating the set intersection over union for the private models and the non-private models. For epsilon = 1, the model severely under-shot the number of significant models. This means that it failed to find the correct relationship between corrected and uncorrected errors in a third (0.31) of the models.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=.85\linewidth]{figure/conf_matrix.png}
+\caption{Confusion matrix for epsilon = 1 for Wald Test. Right side has the private model classifications and the left has the non-private baselines. There were no false positives}
+\label{fig:conf_matrix}
+\end{figure}
+
 \subsection{KMEANS}
 \begin{figure}[H] % 'h' specifies to place the figure here in the text
     \centering
