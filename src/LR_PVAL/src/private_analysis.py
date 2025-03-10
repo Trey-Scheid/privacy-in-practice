@@ -7,7 +7,7 @@ from autodp.autodp_core import Mechanism
 from autodp.mechanism_zoo import GaussianMechanism
 from autodp.transformer_zoo import ComposeGaussian
 from autodp.calibrator_zoo import eps_delta_calibrator
-from utils import get_data_fps
+from src.LR_PVAL.src.utils import get_data_fps
 import argparse
 import concurrent.futures
 from functools import partial
@@ -191,28 +191,16 @@ def run_single_permutation(raw_X, raw_y, epsilon, delta, verbose, log_gap, mid_r
     ).fit(log_gap=log_gap, mid_results=mid_results)[2]
 
 
-def save_progress(results, data_dir, bugcheck_id, is_final=False):
+def save_progress(results, data_dir, bugcheck_id):
     """Save results to either in-progress or final directory"""
     results_df = pd.DataFrame(results)
 
-    if is_final:
-        # Save to final location
-        os.makedirs(os.path.join(data_dir, "permutation_results"), exist_ok=True)
-        final_path = os.path.join(data_dir, "permutation_results", f"{bugcheck_id}.csv")
-        results_df.to_csv(final_path, index=False)
-
-        # Remove in-progress file if it exists
-        in_progress_path = os.path.join(data_dir, "in_progress", f"{bugcheck_id}.csv")
-        if os.path.exists(in_progress_path):
-            os.remove(in_progress_path)
-    else:
-        # Save to in-progress location
-        os.makedirs(os.path.join(data_dir, "in_progress"), exist_ok=True)
-        in_progress_path = os.path.join(data_dir, "in_progress", f"{bugcheck_id}.csv")
-        results_df.to_csv(in_progress_path, index=False)
+    os.makedirs(os.path.join(data_dir, "permutation_results"), exist_ok=True)
+    final_path = os.path.join(data_dir, "permutation_results", f"{bugcheck_id}.csv")
+    results_df.to_csv(final_path, index=False)
 
 
-def get_permutaiton_results(
+def get_permutation_results(
     epsilon=1.5,
     delta=1e-6,
     verbose=False,
@@ -278,10 +266,10 @@ def get_permutaiton_results(
 
                     # Save progress every 10 permutations
                     if completed % 10 == 0:
-                        save_progress(results, data_dir, bugcheck_id, is_final=False)
+                        save_progress(results, data_dir, bugcheck_id)
                         print(f"Saved progress: {completed} / {n_permutations}")
                     elif completed == n_permutations:
-                        save_progress(results, data_dir, bugcheck_id, is_final=True)
+                        save_progress(results, data_dir, bugcheck_id)
                         print(
                             f"Finished all {n_permutations} permutations for bugcheck {bugcheck_id}"
                         )
@@ -295,13 +283,13 @@ def get_permutaiton_results(
 
 
 def get_all_private_lr_results(
+    data_dir,
     epsilon=1.5,
     delta=1e-6,
     verbose=False,
     log_gap=10,
     mid_results=True,
 ):
-    data_dir = "private_data/"
     data_dir = os.path.abspath(data_dir)
     data_fps = get_data_fps(data_dir)
 
@@ -360,7 +348,7 @@ if __name__ == "__main__":
             verbose=args.verbose, log_gap=args.log_gap, mid_results=args.mid_results
         )
     else:  # perm mode
-        get_permutaiton_results(
+        get_permutation_results(
             verbose=args.verbose,
             log_gap=args.log_gap,
             mid_results=args.mid_results,

@@ -7,7 +7,7 @@
 %%%% Title and Authors
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title{Novel Techniques in Private Telemetry Analysis}
+\title{Privacy in Practice: The Feasibility of Differential Privacy for Telemetry Analysis}
 
 \author{Trey Scheid \\
   {\tt tscheid@ucsd.edu} \\\And
@@ -32,17 +32,18 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{abstract}    
-  \textcolor{LightGrey}{Is the abstract supposed to be in light gray as well? Seems difficult to read. \
-  This research investigates the practical implementation of differential privacy mechanisms for telemetry data analysis, with a focus on real-world applications. We propose a comprehensive framework that employs various privacy-preserving techniques, including randomized response and the Laplace mechanism, to protect sensitive information while maintaining analytical utility. Our methodology encompasses multiple statistical tasks, from user-level rate analysis to logistic regression classification. The study utilizes AutoDP for precise privacy loss measurement and documents the inherent tradeoffs between privacy guarantees and analytical accuracy in production environments. By demonstrating the feasibility of differential privacy in telemetry analysis, we provide a roadmap for organizations seeking to enhance their privacy practices.
-  }
+  This research investigates the implementation implications of differential privacy mechanisms for telemetry data analysis, with a focus on real-world applications. We show, through examples, how knowledge of fundamental privacy-preserving techniques, including randomized response and the Laplace mechanism, is enough to protect sensitive information while maintaining analytical utility. We privatize data tasks from 4 applied research works using Intel telemetry data which   encompasses multiple statistical tasks, from user-level rate analysis to logistic regression classification. The study utilizes various $(\epsilon, \delta)$ budgets (using AutoDP) for precise privacy loss measurement and to quantify the inherent tradeoff between privacy and utility. By demonstrating the feasibility of differential privacy in production environments, we provide a roadmap for organizations seeking to enhance their privacy practices.
   \begin{center}
-    Website: \url{https://endurable-gatsby-6d6.notion.site/DP-Telemetry-14556404e74780818747cbe76de2e04a?pvs=4}[Notion until actual site is created] \\
-    Code: \url{https://github.com/Trey-Scheid/Novel-Techniques-in-Private-Data-Analysis}
+    Website: \url{https://trey-scheid.github.io/privacy-in-practice/} \\
+    Code: \url{https://github.com/Trey-Scheid/privacy-in-practice}
   \end{center}
 \end{abstract}
 
+\clearpage
 
 % TABLE OF CONTENTS
+{\Large\bf\raggedright Table of Contents}
+
 \maketoc
 
 \clearpage
@@ -53,35 +54,129 @@
 
 \section{Introduction}
 
-The implementation of differential privacy in production environments presents significant challenges in balancing privacy guarantees with analytical utility. This research addresses these challenges by developing practical privacy-preserving mechanisms for existing telemetry analysis tasks while maintaining the usefulness of their systems. We identify comprehensive frameworks that integrate various differential privacy mechanisms, including Guassian Composition and the Laplace mechanism, to protect sensitive information in telemetry data. Our methodology encompasses multiple statistical tasks, from user-level rate analysis to logistic regression classification, and utilizes AutoDP for precise privacy loss measurement. By evaluating the tradeoffs between privacy guarantees and analytical accuracy in production settings, we provide a roadmap for organizations looking to enhance their privacy practices.
+The implementation of differential privacy in production environments presents significant challenges in balancing privacy guarantees with analytical utility. This research addresses these challenges by developing practical privacy-preserving mechanisms for existing telemetry analysis tasks while maintaining the usefulness of their systems. We integrate various differential privacy mechanisms including: Gaussian Composition, the Exponential\/Laplace mechanism, and \_\_ to protect sensitive information in telemetry data. Our chosen data tasks encompasses multiple statistical tasks, from user-level rate analysis to logistic regression classification correlation. By evaluating the trade-offs between privacy guarantees and analytical accuracy in production settings, we provide evidence and direction for organizations looking to enhance their privacy practices.
 
 \subsection{Motivation}
 
-Despite the growing importance of privacy-preserving data analysis, many practitioners perceive differential privacy implementation as complex and challenging \cite{needed1}. This perception stems from several factors: the mathematical complexity of privacy definitions, the need to carefully calibrate privacy parameters, and concerns about reduced utility \cite{needed2}. A survey by Smith et al. found that only 23\% of data scientists felt confident implementing differential privacy mechanisms in their workflows \cite{needed3}.
-However, recent developments have significantly lowered these barriers to entry. Tools like Google's Privacy on Beam \footnote{linkneeded}, Microsoft's SmartNoise \footnote{linkneeded}, and various open-source libraries like AutoDP\footnote{linkneeded} provide accessible frameworks for implementing differential privacy. These tools abstract away much of the underlying complexity while maintaining rigorous privacy guarantees. Additionally, educational resources and practical tutorials have emerged to guide practitioners through implementation challenges \cite{that one website Trey found its in discord}.
-% citations needed to be found
-% 1. A recent survey on DP adoption challenges
-% 2. A paper discussing barriers to DP implementation
-% 3. citation for Smith's survey of data scientists (or similar)
-This research builds upon these recent developments by providing a practical demonstration of differential privacy mechanisms in telemetry data analysis. By implementing privacy-preserving techniques for existing tasks, we aim to show that differential privacy can be seamlessly integrated into production systems without significant utility loss. Our work focuses on two key objectives: privatizing existing telemetry analysis tasks and evaluating the privacy-utility tradeoffs in production settings.
+Despite the growing importance of privacy-preserving data analysis \cite{PewPrivacy2019}, many practitioners perceive differential privacy implementation as complex and challenging, others note how results only come with dissatisfactory $\epsilon$-level guarantees \cite{FLandPrivacy}. Besides the sub-optimality of some DP methods, this perception stems from human difficulties: the mathematical complexity of privacy definitions, the need to carefully calibrate privacy parameters, and concerns about reduced utility (managing the trade-off) \cite{DP-fyML}. A survey by Smith et al. found that only 23\% of data scientists felt confident implementing differential privacy mechanisms in their workflows \cite{needed3}. Researchers are working to democratize, demystify, and improve usability around Differential Privacy \cite{DP-fyML}. Recent developments have significantly lowered these barriers to entry. Tools like Google's Privacy on Beam \footnote{\url{https://codelabs.developers.google.com/codelabs/privacy-on-beam}}, Microsoft's SmartNoise \footnote{\url{https://smartnoise.org}}, and various open-source libraries like AutoDP\footnote{\url{https://pypi.org/project/autodp/}} provide accessible frameworks for implementing differential privacy. These tools abstract away much of the underlying complexity while maintaining rigorous privacy guarantees. In addition, educational resources and practical tutorials have emerged to guide practitioners through implementation challenges \footnote{\url{https://desfontain.es/blog/friendly-intro-to-differential-privacy.html}}.
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
-\subsection{Background and Literature Review}
+
+%"has been observed that limiting sensitivity even with small amounts of noise (or no noise at all) can significantly reduce memorization.18 This gap is to be expected, as DP assumes a “worst-case adversary’’ with infinite computation and access to arbitrary side information. These assumptions are often unrealistic in practice. Thus, there are substantial advantages to training using a DP algorithm that limits each user’s influence, even if the explicit random noise introduced into the training process is not enough to ensure a small ε formally. Nevertheless, designing practical FL and FA algorithms that achieve small ε guarantees is an important area of ongoing research."
+
+
+
+This research builds upon these recent developments by providing a practical demonstration of differential privacy mechanisms in telemetry data analysis. By implementing privacy-preserving techniques for existing tasks, we aim to show that differential privacy can be seamlessly integrated into production systems without significant utility loss. Our work focuses on two key objectives: privatizing existing telemetry analysis tasks and evaluating the privacy-utility tradeoffs in production settings.
+=======
+>>>>>>> Stashed changes
+
+=======
+
+>>>>>>> Stashed changes
+%"has been observed that limiting sensitivity even with small amounts of noise (or no noise at all) can significantly reduce memorization.18 This gap is to be expected, as DP assumes a “worst-case adversary’’ with infinite computation and access to arbitrary side information. These assumptions are often unrealistic in practice. Thus, there are substantial advantages to training using a DP algorithm that limits each user’s influence, even if the explicit random noise introduced into the training process is not enough to ensure a small ε formally. Nevertheless, designing practical FL and FA algorithms that achieve small ε guarantees is an important area of ongoing research."
+
+This research builds upon these recent developments by providing a practical demonstration of differential privacy mechanisms in telemetry data analysis. By implementing privacy-preserving techniques for existing tasks, we aim to show that differential privacy can be seamlessly integrated into production systems without significant utility loss. Our work focuses on two key objectives: privatizing existing telemetry analysis tasks and evaluating the privacy-utility tradeoffs in production settings.
 
 \subsection{Differential Privacy}
 
-Differential privacy is a framework for data privacy that gives a mathematical guarantee that the sensitivity of each individual in the dataset is preserved. The core idea is to introduce random noise to the output of algorithms so that any single individual’s data does not significantly affect the overall result. Mathematically, a mechanism is considered (,) differentially private if for all datasets D and D’ which differ by at most 1 element when $\P [ M(D)\in S ] \leq e^\epsilon \P [ M(D') \in S)] + \delta$ where $\epsilon$ and $\delta$ are privacy loss parameters. Smaller  and  imply stronger privacy guarantees. 
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+Differential privacy by \cite{DworkRoth} is a framework for data privacy that gives a mathematical guarantee that the information for each individual (record or user) in the dataset is protected\footnote{\cite{DP-def} has an in depth explanation of interpretations and attacks.}. The core idea is to introduce random noise into algorithms so that the data of any individual does not significantly affect the overall result and therefore is not recoverable or identifiable. Mathematically, a mechanism is considered $(\epsilon, \delta)$ differentially private if for all datasets $D$ and $D’$ which differ by at most 1 element when $\P [ M(D)\in S ] \leq e^\epsilon \P [ M(D') \in S)] + \delta$ where $\epsilon$ and $\delta$ are privacy loss parameters. Smaller $\epsilon$ and $\delta$ imply stronger privacy guarantees. Differential privacy is a property of algorithms, not datasets; it is a method that ensures private results (whether that is a trained model or a noisy dataset). This definition applies to data anonymization, but does not cover methods for transparency, use, access or security.
 
-Differential privacy is applied to algorithms, not datasets. One common and foundational algorithm is logistic regression. Many privatized implementations of logistic regression exist, leaving data scientists with a host of convoluted choices and complex language about parameters they may not fully understand. We hope to show some examples that will help practitioners implement this model on their own datasets.
+\subsection{Telemetry Data}
 
-\subsection{Intel Telemetry Data}
+The Intel Data Collection and Analysis (DCA) team derives insights from over 39 million systems! This includes any of their hardware installed in personal, corporate and IoT devices (collected only with consent). Through their partnership with the University of California San Diego's Halicioğlu Data Science Institute, at the foundation of Intel Lab's Telemetry Center of Excellence, they permit study of possibly sensitive device information to develop solutions that benefit the whole ecosystem \footnote{\url{https://community.intel.com/t5/Blogs/Tech-Innovation/Data-Center/Intel-Labs-Investment-in-Telemetry-Center-of-Excellence-Produces/post/1460669}}. Faculty and Intel researchers have published many white papers using the database since the CoE inception in 2020. We selected 4 of interest and found their core data science methods:
 
-Differential privacy methods and guarantees are attractive for many domains. Telemetry is the remote data transfer of automated system measurements. As people use technology everyday their machines track usage diagnostics which are used by hardware and software manufacturers to reduce bugs and increase efficiency. System usage information is recorded at regular intervals and usually results in massive quantities of measurements. The identifiability of the specific machine or user of an event is a concern regardless of PIID tags. Dinur Nissim \cite{dinur} and linkage attacks can be used to recover or reconstruct the original information: the source. This is a breach of privacy for a user which depending on the sensitivity of the information can be concerning. For example, personal laptops may send diagnostics to intel given that the user opts in to the program [Intel telemetry]. 
+\begin{table}[h]
+=======
+Differential privacy by \cite{DworkRoth} is a framework for data privacy that gives a mathematical guarantee that the information for each individual (record or user) in the dataset is protected\footnote{\cite{DP-def} has an in depth explanation of interpretations and attacks.}. The core idea is to introduce random noise into algorithms so that the data of any individual does not significantly affect the overall result and therefore is not recoverable or identifiable. 
+
+Mathematically, a mechanism $M$ is considered $(\epsilon, \delta)$ differentially private if for all datasets $D$ and $D'$ which differ by at most 1 element when $\P [ M(D)\in S ] \leq e^\epsilon \P [ M(D') \in S)] + \delta$ where $\epsilon$ and $\delta$ are privacy parameters and $S$ is a query solution set. Smaller $\epsilon$ and $\delta$ imply stronger privacy guarantees. Differential privacy is a \textit{property} of algorithms, not datasets; it is a method that ensures private results to a high degree of probability (whether that is a trained model or a noisy dataset). 
+
+This definition applies to data anonymization, but does not cover methods for transparency, use, access or security. By pursuing this property for common data tasks we aim to create a solution which once implemented achieves similar results but removes the need for data access and security. Some settings the predictions themselves are important, but sensitive, meaning a mechanism without anonymity is unusable!
+
+=======
+Differential privacy by \cite{DworkRoth} is a framework for data privacy that gives a mathematical guarantee that the information for each individual (record or user) in the dataset is protected\footnote{\cite{DP-def} has an in depth explanation of interpretations and attacks.}. The core idea is to introduce random noise into algorithms so that the data of any individual does not significantly affect the overall result and therefore is not recoverable or identifiable. 
+
+Mathematically, a mechanism $M$ is considered $(\epsilon, \delta)$ differentially private if for all datasets $D$ and $D'$ which differ by at most 1 element when $\P [ M(D)\in S ] \leq e^\epsilon \P [ M(D') \in S)] + \delta$ where $\epsilon$ and $\delta$ are privacy parameters and $S$ is a query solution set. Smaller $\epsilon$ and $\delta$ imply stronger privacy guarantees. Differential privacy is a \textit{property} of algorithms, not datasets; it is a method that ensures private results to a high degree of probability (whether that is a trained model or a noisy dataset). 
+
+This definition applies to data anonymization, but does not cover methods for transparency, use, access or security. By pursuing this property for common data tasks we aim to create a solution which once implemented achieves similar results but removes the need for data access and security. Some settings the predictions themselves are important, but sensitive, meaning a mechanism without anonymity is unusable!
+
+>>>>>>> Stashed changes
+\subsection{Telemetry Data}
+
+The Intel Data Collection and Analysis (DCA) team derives insights from over 39 million systems! This includes any of their hardware installed in personal, corporate and IoT devices (collected only with consent). Through their partnership with the University of California San Diego's Halicioğlu Data Science Institute, at the foundation of Intel Lab's Telemetry Center of Excellence, they permit study of possibly sensitive device information to develop solutions that benefit the whole ecosystem \footnote{\url{https://community.intel.com/t5/Blogs/Tech-Innovation/Data-Center/Intel-Labs-Investment-in-Telemetry-Center-of-Excellence-Produces/post/1460669}}. Faculty and Intel researchers have published many white papers using the database since the CoE inception in 2020. We selected 4 of interest and found their core data science methods Table \ref{tab:DataTasks}.
+
+\begin{table}[h]%!
+\begin{center}
+\caption{Data Tasks}
+\label{tab:DataTasks}
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
+\begin{tabular}{|p{4.5cm}|p{2.5cm}|p{5cm}|p{2.7cm}|}
+\hline
+Data Task & Code & Paper & Citation \\
+\hline
+Conditional Probabilities & COND\_PROB & Exploration of CPU Error Dependencies and Prediction & \cite{Kwasnick2023} \\
+\hline
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+KMeans Clustering & KMeans & PC Health Impact White Paper & \cite{kmeans} \\
+=======
+KMeans Clustering & KMEANS & PC Health Impact White Paper & \cite{kmeans} \\
+>>>>>>> Stashed changes
+=======
+KMeans Clustering & KMEANS & PC Health Impact White Paper & \cite{kmeans} \\
+>>>>>>> Stashed changes
+\hline
+Lasso Regression & LASSO & Power Consumption Patterns in Intel’s Telemetry Data: China Burns 2x Energy that of the US & \cite{lassocarbon} \\
+\hline
+Logistic Regression Significance Tests & LR\_PVAL & Product Health Insights Using Telemetry & \cite{prodhealLR} \\
+\hline
+\end{tabular}
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+\end{center}
+>>>>>>> Stashed changes
+=======
+\end{center}
+>>>>>>> Stashed changes
+\end{table}
+
+Differential privacy methods and guarantees are attractive for many domains. Telemetry is the remote data transfer of automated system measurements. As people use technology everyday their machines track usage diagnostics which are used by hardware and software manufacturers to reduce bugs and increase efficiency. System usage information is recorded at regular intervals and usually results in massive quantities of measurements. The identifiability of the specific machine or user of an event is a concern regardless of PIID tags. Dinur Nissim Reconstruction and linkage attacks can be used to recover or reconstruct the original information: the source \cite{DinurReconstruction}. This is a breach of privacy for a user which depending on the sensitivity of the information can be concerning. For example, personal laptops may send diagnostics to Intel given that the user opts in to the program [Intel telemetry]. 
 
 We use a secure research database shared be Intel Corporation with consent of its users to generate real results....
 
 \subsubsection{Errors}
 
-In our paper, we will analyze two different types of errors. The Machine Check Architecture, or MCA, will detect an error and label it as either corrected or uncorrected. A corrected error means the system can observe and correct a detected error. Correction mechanisms include single error correction, double error correction, and more. An uncorrected error is one that was detected but not corrected or there was a computation delay long enough that the MCA treated it as an interrupted computation. \cite{add a citation}
+In our paper, we will analyze two different types of errors. The Machine Check Architecture, or MCA, will detect an error and label it as either corrected or uncorrected. A corrected error means the system can observe and correct a detected error. Correction mechanisms include single error correction, double error correction, and more. An uncorrected error is one that was detected but not corrected or there was a computation delay long enough that the MCA treated it as an interrupted computation. \cite{Kwasnick2023}
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+=======
+>>>>>>> Stashed changes
+
+\subsubsection{Hardware Power [not done yet]}
+
+Another concept is power, this is the rate of energy consumption by the device. Our analysis is on CPU's produced by Intel and AMD. \cite{Kwasnick2023}
+
+\subsection{Applications [not done yet]}
+
+Telemetry is one narrow domain which privacy is a concern, many other types of data require sensitive handling and sharing practices. For example the US Census \footnote{need citation}. 
+
+We will get into the specifics of each task, however note that each one can be applied to datasets about any interest. probabilities of political party affiliation, Lasso/kmeans for gene identification, or correlation for \_\_. 
+
+\subsection{Related Work}
+
+We are building on a previous analysis on differentially private mechanisms for Logistic Regression  \cite{qtr1proj}. The paper investigates how privacy affects different mini-batch stochastic gradient descent algorithms for logistic regression classification. It is shown that privacy affects the batch size for optimal performance.
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
 
 %%%%%%%%%%%%%%%%%%%
 %%%%  METHODS  %%%%%%%%
@@ -89,19 +184,25 @@ In our paper, we will analyze two different types of errors. The Machine Check A
 
 \section{Methods}
 
-\subsection{Data Preprocessing}
+\subsection{Data Structure}
 
-Add some language here about steps that were universal between all tasks if any
+The first sub-task was data ingestion and processing. One key feature of telemetry data is the volume; the research database was already a processed version of raw signals from devices, aggregated and merged for usefulness and practicality. This left us with a schema containing 10's of tables and cryptic metrics, highlighting the importance of documentation by our fellow researchers to help us replicate their work.
 
-For each of the follow sections we will describe the task, the algorithm used, and the implementation details.
+The tables once loaded to disc could be processed with SQL queries and filtered and processed with more basic operations such as aggregating by group and finding statistics. These would make up our featurized datasets ready for Python analysis.
 
-\subsubsection{Logistic Regression (DP-SGD)}
+\subsection{LR\_PVAL: Private Correlation (via Logistic Regression Coefficient)}
 
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 This paper\footnote{needs citation not a footnote} investigates how privacy affects different mini-batch stochastic gradient descent algorithms for logistic regression classification. It is shown that privacy affects the batch size for optimal performance.
 
 \subsection{Correlation (via Logistic Regression Coefficient)}
 
-This paper \footnote{needs citation} seeks to identify whether a certain variable is disproportionately present for a certain outcome. 
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
+This paper\footnote{needs citation} seeks to identify whether a certain variable is disproportionately present for a certain outcome. 
 More specifically, it takes a close look at two variables, max temperature on a day and whether a corrected error was present on that day. 
 They would take one of those two variables and train a logistic regression model with maximum likelihood estimation to predict whether an uncorrected error was present.
 From the model, they use the coefficient of the variable and make a hypothesis test whether that variable is equal to zero.
@@ -109,11 +210,23 @@ From the model, they use the coefficient of the variable and make a hypothesis t
 For our implementation, we focused only on whether there were corrected errors on a day, and not the variable max temperature on a day.
 We add privacy to the model by using DP-SGD when training the logistic regression model, where the hypothesis test is then private by means of post-processing.
 
-\subsubsection{LASSO Regression (DP-FW)}
+\subsection{LASSO Private Regression (via DP-Frank-Wolfe)}
 
 will add lots of detail about lasso, then talk about adapting franke-wolfe to be differentially private. 
 
-\subsubsection{K-Means (DP-Lloyd's)}
+% Since the model is predicting power\_mean [SUM(pw.nrs * pw.mean) / SUM(pw.nrs)] which is a weighted average of some power rate metric in Watts I did some research. I found that 50W is a normal CPU and they typically range 10-150W with GPU up to 500-1000W which aligns with some EDA.
+
+% Therefore, the features and coefficients found by LASSO represent the main culprits for energy consumption across all Intel devices which gets straight at the goal of the paper to reduce emissions! 
+
+% 2. How can I interpret whether 5 or 50 or 500 mse watts is a reliable model? I found a model that predicts the average for each column gets around 40 mse watts. 
+
+% 3. Also if power\_mean is in watts, would mse be watts^2 and root mse be watts, so we should report root mse?
+
+% The interpretation of RMSE depends on the context. This requires us to think about how big of a difference is 3/30/300 watts for CPU power consumption?
+
+% i.e., if MSE ≈ 15, we have RMSE ≈ 3.87. I would say a difference of 4 watts is not that bad.
+
+\subsection{KMEANS Private Clustering (DP-Lloyd's)}
 K-Means clustering (Lloyd's Algorithm) is applied to group devices based on similarities in their usage patterns. The method leverages Z-scores for standardizing the usage data and calculates L1 distances between weekly usage patterns to identify trends over time. Lloyd's Algorithm clusters devices by assigning them to centroids based on their usage patterns, recalculating the centroids as the mean of assigned points after each iteration. 
 
 Differentially Private Lloyd's Algorithm (DP-Lloyd's)\footnote{linkneeded} modifies the standard K-Means clustering by adding Laplacian noise during the iterative centroid update step to ensure privacy. It introduces noise to both the sum of coordinates and the count of points within clusters, with the amount of noise controlled by the number of iterations and the sensitivity of the data. 
@@ -136,22 +249,86 @@ Z_{\text{private}} = \frac{X - \mu}{\sigma} + \text{Lap}\left(\frac{\Delta f}{\e
 
 
 
-\subsubsection{Probabilty (Additive Noise)}
-The probability of one or more uncorrected errors occurring on a system given the number of corrected errors it experienced during a specific time period is given as 
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+\subsubsection{Conditional Probability}
+=======
+\subsection{COND\_PROB: Private Conditional Probability Release (Laplace Mechanism)}
+>>>>>>> Stashed changes
+In order to replicate the paper, were are going to apply differential privacy methods to the processes outlined in the paper. In the paper, the authors first separate each GUID (user) into the number of corrected errors observed during a set time period. They then created a histogram where the x-axis was the number of corrected errors observed and the y-axis was the percentage of GUID's that observed an uncorrected error. This is the process that we are aiming to privatize. 
+=======
+\subsection{COND\_PROB: Private Conditional Probability Release (Laplace Mechanism)}
+In order to replicate the paper, were are going to apply differential privacy methods to the processes outlined in the paper. In the paper, the authors first separate each GUID (user) into the number of corrected errors observed during a set time period. They then created a histogram where the x-axis was the number of corrected errors observed and the y-axis was the percentage of GUID's that observed an uncorrected error.\cite{Kwasnick2023} This is the process that we are aiming to privatize. 
+>>>>>>> Stashed changes
+
+We are releasing a percentage for each bin in the histogram, and in order to guarantee privacy, we must add noise to to both the numerator and denominator where the numerator is the number of GUID's that contained an uncorrected error (number of 1's) and the denominator is the number of GUID's total. However we can not release the number of GUID's in each corrected error count as that would violate differential privacy so instead we are just going to add noise to number of GUID's that contained an uncorrected error as well as the number of GUID's that did not contain an uncorrected an error (number of 1's + number of 0's) so that we have a private denominator. 
+
 \[
-P(Uncorrected|Corrected) = \frac{P(Corrected \cap Uncorrected)}{P(Corrected)}
+P(Uncorrected) = \frac{\text{GUID's containing an Uncorrected Error}}{\text{Total GUID's}}
 \]
 
-To privatize this mechanism, one can apply two methods, adding noise to the numerator and denominator, as well as clipping. The noise is sampled from a Laplace distribution with scale parameter $
-\frac{\nabla f}{\epsilon}$, where $\nabla f$ is the sensitivity and $\nabla f$ is the privacy paramater. The sensitivity in this case for both the numerator and denominator will be equal to 1 because the max change in probability is equal to 1. 
+<<<<<<< Updated upstream
+We are going to apply the Laplace mechanism to to release this percentage privately. The Laplace mechanism adds noise drawn from the Laplace distribution to the output of a function. B is the scale parameter and $\nabla f$ is the sensitivity of the function f. 
+<<<<<<< Updated upstream
+=======
+We are going to apply the Laplace mechanism to to release this percentage privately. The Laplace mechanism adds noise drawn from the Laplace distribution to the output of a function. B is the scale parameter and $\nabla f$ is the sensitivity of the function f. \cite{DworkRoth}
+>>>>>>> Stashed changes
 
-In addition to the noise that is added we will regularize the data by adding a constant, $\lambda$. This constant will also be added to both the numerator and denominator so that the denominator does not get too close to 0. 
-Clipping the dataset involves capping the values of data points to a predefined range, preventing extreme values from disproportionately influencing analysis or model training. We will make sure that each GUID is limited in the amount of datapoints that it can contribute. 
 
-\subsection{Tyler task}
+$$noise \sim Lap(b) $$
+$$Lap(x|b) = \frac{1}{2b}e^{-\frac{|x|}{b}}$$
+$$b = \frac{\Delta f}{\epsilon}$$
+<<<<<<< Updated upstream
 
-\subsection{Bradley task}
+The sensitivity of the function is defined as the maximum possible absolute change in the output of the function due to the change in a single user's data. Since we are dealing with a percentage (and we are considering the worst case), this change can be at most 1 user, which corresponds to a sensitivity of 1 (in terms of the scale of the count, not the percentage itself). This is because, in the worst case, the change is a single user being added or removed, and the total number of GUIDs is assumed to be large enough that the effect of one user's change on the output is not too significant.and $\nabla f$ is the privacy parameter. 
+\begin{center}
+$$\Delta f = \max_{D, D'} ||f(x) - f(x')|| = 1$$ \\
+\text{D and D' are neighboring datasets}
+\end{center}
+=======
 
+The sensitivity of the function is defined as the maximum possible absolute change in the output of the function due to the change in a single user's data. Since we are dealing with a percentage (and we are considering the worst case), this change can be at most 1 user, which corresponds to a sensitivity of 1 (in terms of the scale of the count, not the percentage itself). This is because, in the worst case, the change is a single user being added or removed, and the total number of GUIDs is assumed to be large enough that the effect of one user's change on the output is not too significant.and $\nabla f$ is the privacy parameter. 
+\begin{center}
+$$\Delta f = \max_{D, D'} ||f(x) - f(x')|| = 1$$ \\
+\text{D and D' are neighboring datasets}
+\end{center}
+
+\subsection{Utility}
+
+Each method has different measures of success. However, they can all be roughly translated to a proportion representing utility compared to the best model (whether that is the non-private baseline or better). 
+
+\subsubsection{COND\_PROB}
+
+To calculate the utility for the Conditional Probability task, we defined the loss for each epsilon as the Mean Absolute error between the Noisy and Original Histograms. We then normalized the loss so that each loss value fell between 0 and 1 and defined the utility as 1/loss. 
+
+\subsubsection{LR\_PVAL}
+\subsubsection{KMEANS}
+\subsubsection{LASSO}
+
+
+>>>>>>> Stashed changes
+
+
+
+=======
+
+
+$$noise \sim Lap(b) $$
+$$Lap(x|b) = \frac{1}{2b}e^{-\frac{|x|}{b}}$$
+$$b = \frac{\Delta f}{\epsilon}$$
+>>>>>>> Stashed changes
+
+The sensitivity of the function is defined as the maximum possible absolute change in the output of the function due to the change in a single user's data. Since we are dealing with a percentage (and we are considering the worst case), this change can be at most 1 user, which corresponds to a sensitivity of 1 (in terms of the scale of the count, not the percentage itself). This is because, in the worst case, the change is a single user being added or removed, and the total number of GUIDs is assumed to be large enough that the effect of one user's change on the output is not too significant.and $\nabla f$ is the privacy parameter. 
+\begin{center}
+$$\Delta f = \max_{D, D'} ||f(x) - f(x')|| = 1$$ \\
+\text{D and D' are neighboring datasets}
+\end{center}
+
+\subsection{Utility}
+
+Each method has different measures of success. However, they can all be roughly translated to a proportion representing utility compared to the best model (whether that is the non-private baseline or better). 
+
+SHOULD WE ADD THIS TO EACH METHOD INDIVIDUALLY?
 
 %%%%%%%%%%%%%%%%%%%
 %%%% RESULTS  %%%%%%%%%
@@ -159,13 +336,30 @@ Clipping the dataset involves capping the values of data points to a predefined 
 
 \section{Results}
 
-Should we do a results section for each task separately again?
-Should we do a results section for each task separately again?
+\subsection{All Tasks: Privacy vs Utility}
 
+INSERT COMBINED PLOT
 
-\subsection{Combined Results}
+\subsection{COND\_PROB}
+<<<<<<< Updated upstream
+=======
 
-We have discussed with Yu-Xiang a plot we can create which combines all the tasks into 1. 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{report/figure/histoeps1.png}
+    \caption{Your plot caption here.}
+    \label{fig:yourplot}
+\end{figure}
+
+Similar to , we observed a tradeoff between privacy and utility. However, our focus on conditional probability tasks allowed us to explore this tradeoff in a more specific context, providing insights into how differential privacy impacts analytical accuracy in this domain.
+Our results show a significant increase in utility as ε increases. For instance, at ε = 0.1, the utility was approximately 0.65, which rose to nearly 0.99 at ε = 1 and reached almost 1 at ε = 100. This demonstrates that less stringent privacy guarantees (higher ε values) lead to higher utility.
+
+We also found that for each epsilon, as the number of corrected errors increased, the utility decreased due to more noise being added. 
+
+>>>>>>> Stashed changes
+\subsection{LR\_PVAL}
+\subsection{KMEANS}
+\subsection{LASSO}
 
 
 %%%%%%%%%%%%%%%%%%%
@@ -176,6 +370,7 @@ We have discussed with Yu-Xiang a plot we can create which combines all the task
 
 
 \subsection{Interpretation}
+Our work provides a road map for integrating differential privacy into production environments, ensuring that sensitive telemetry data can be analyzed without compromising user privacy. This is particularly relevant for industries handling large volumes of user data. 
 
 
 \subsection{Limitations}
@@ -190,12 +385,13 @@ We have discussed with Yu-Xiang a plot we can create which combines all the task
 
 
 \subsection{Summary}
-
+Unlike previous studies that focused solely on theoretical aspects, our research demonstrates the practical feasibility of differential privacy in applied settings. Our approach offers a more accessible framework for practitioners
 
 \subsection{Impact}
 
 
 \subsection{Future Direction}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%
@@ -266,32 +462,55 @@ We also would like to thank the authors of the papers we referenced in our liter
 \subsection{Project Proposal}
 
 
-Need to add project\_proposal.tex to folder then uncomment here. 
-
+% style bad
 % \input{project_proposal.tex}
 
+\subsubsection{Problem Statement}
 
-\subsection{Appendix A: Additional Results}
+Telemetry data is important to privatize as it encodes personally identifiable information which could be used to discover sensitive information. This data is collected from various IT devices, from satellites to personal computers. For our project, the telemetry data includes hardware and software performance metrics, monitoring, and errors. 
+
+We will privatize 22 analysis tasks for the Intel telemetry dataset, ensuring a reasonable privacy budget (). We will implement mechanisms that balance data utility and privacy, ensuring sensitive information is protected, and allocate a reasonable privacy budget (), a parameter that governs the trade-off between accuracy and privacy.
+
+One example of a task is to predict CPU failure. This would require a privatized logistic regression model that predicts the probability of a failure from 0-1. The model would analyze data such as CPU temperature, usage patterns, error logs, or other performance indicators. If non-privatized, this model could expose this data, as a malicious individual could do a reconstruction attack, a method to reconstruct the training data by repeatedly querying the model with various synthetic inputs. The attacker could query this model with different sets of CPU-related inputs, and, over time, the attacker could gain information such as the CPU temperature threshold for an error to occur, or whether certain system configurations have a distinct failure pattern.
+
+\subsubsection{Methods}
+
+Our methodology for privatizing the 22 telemetry analysis tasks will employ multiple privacy mechanisms, such as the exponential mechanism and the Laplace mechanism, with AutoDP serving as our core privacy accounting tool. For each analysis task, we will first evaluate the sensitivity of the computation and determine the optimal privacy mechanism to maintain utility while satisfying privacy requirements. The implementation process requires careful privacy budget allocation across multiple components of each analysis to ensure the total privacy loss remains within acceptable bounds.
+
+The evaluation of each privatized implementation will involve a comprehensive comparison with non-private baselines to document the privacy-utility tradeoff. This includes analyzing performance metrics before and after applying privacy mechanisms, measuring accuracy degradation at various privacy budget levels, and considering computational efficiency challenges specific to telemetry data analysis. AutoDP will help quantify the privacy guarantees and guide the noise calibration process throughout implementation. 
+
+Each privatized task will be thoroughly documented with implementation details, privacy guarantees, and performance metrics. This documentation will include privacy budget allocation strategies, noise mechanism selection rationale, and practical guidelines for future implementations. The goal is to create a comprehensive resource demonstrating how different privacy mechanisms can be effectively applied to various telemetry analysis scenarios while maintaining practical utility and ensuring strong privacy protections.
+
+
+\subsubsection{Deliverable}
+
+The privatized analysis tasks will be stored and shared in a public repository, (without release of source data from Intel). This is our primary contribution, to offer tools in a privatized manner. In collaboration with the accessible programs, we will publish a website that will serve to educate our peers on differential privacy. The variety of analysis tasks done in the telemetry domain can be generalized and applied to many types of data; therefore, descriptions of privacy algorithms, their motivations, and limitations can teach practitioners new methods for their own tasks. 
+
+The Intel data as mentioned is not public (due to the customer privacy and proprietary nature). Therefore our data processing, tasks, and report will include only some metrics of performance and data quality (size, distribution, features, etc). For the information we can share, we will compare the performance of the task with that of the non-private baseline. This gives analysts a sense of the utility-privacy tradeoff in each application. 
+
+\subsubsection{Impact}
+
+By implementing differential privacy across telemetry we will create a significant impact by maintaining data confidentiality. This project will establish novel approaches to common tasks enabling hardware manufacturers to analyze system performance data while preserving strong privacy guarantees. This advances the field by demonstrating how to maintain data utility while protecting sensitive information in real-world applications. 
+
+The research contribution includes documenting privacy-utility trade-offs and establishing guidelines for privacy budget allocation across multiple analysis tasks. Our work will demonstrate practical privacy considerations in telemetry analysis while protecting users’ participation in datasets. The methodologies developed can be adapted by other researchers working with sensitive telemetry data. 
+
+\subsubsection{Success Criteria}
+
+The success of this project is dependent on a few factors. The first two are team collaboration and schedule adherence. There are many tasks that can be privatized and there may be unique challenges for each (hence the value in sharing these!). With one-quarter complete with group work on our privatized logistic regression paper, our group is confident in our communication, task management, and problem-solving abilities. Paired with our mentor Yu-Xiang Wang, an expert in the field of differential privacy, and a seasoned professor, we are equipped to find innovative and theoretically founded methods for privatizing data tasks.
+
+The other requirements for this project rely on data access and task availability. The Intel data is proprietary, and we have signed agreements to use the data for research, however strict access and usage terms have not been given to us yet. Previous students have worked with the contact/program at Intel successfully and we are reassured by them that we will have a usable telemetry dataset by the start of the quarter.  Similarly, there is a set of non-privatized tasks completed on this dataset by previous data scientists, their work is the foundation which we will build off of to show utility is possible even with privacy. These projects were successful implementations on the specific dataset we will have access to, this pairing therefore will continue to bear fruit as we privatize the tasks and compare baselines. 
+
+Lastly, although we have not reviewed the dataset and tasks yet (no access), the intel program is sharing genuine telemetry information from devices with given consent as part of their program. Additionally, this HDSI-Intel partnership has been cooperating since 2020 and HDSI has used hundreds of terabytes of information.
+
+\subsection{Additional Results}
 example
 
-\subsection{Appendix B: Training Details}
-example
-\subsection{Project Proposal}
-
-
-% Comment out when fixed
-\input{project_proposal.tex}
-% Comment out when fixed
-
-
-\subsection{Appendix A: Additional Results}
+\subsection{Training Details}
 example
 
-\subsection{Appendix B: Training Details}
-example
+\subsection{Additional Figures}
 
-\subsection{Appendix C: Additional Figures}
-example
+
 
 
 \end{document}
