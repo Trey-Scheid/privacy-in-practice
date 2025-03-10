@@ -1,6 +1,6 @@
 {
     "data": "dummy_data",
-    "output": ["viz", "static_output"],
+    "output": ["viz", "dynamic_output"],
     "task":["cond_prob", "kmeans", "lasso", "lr_pval"],
     "epsilons": [0.01, 0.1, 1.0, 10, 100],
     "single_epsilon": 1,
