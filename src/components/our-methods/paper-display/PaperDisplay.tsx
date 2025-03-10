@@ -18,6 +18,7 @@ interface Paper {
   shortTitle: string;
   title: string;
   author: string;
+  algorithm: string;
   thumbnail: string;
   analysis: contentBlock[];
   privatization: contentBlock[];
@@ -387,6 +388,9 @@ export function PaperDisplay() {
             </h1>
             <p className="text-lg md:text-xl text-primary-gray">
               Primary contributor: {papers[selectedPaper].author}
+            </p>
+            <p className="text-lg md:text-xl text-primary-gray">
+              Algorithm used: {papers[selectedPaper].algorithm}
             </p>
           </section>
 

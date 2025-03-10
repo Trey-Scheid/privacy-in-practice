@@ -1,5 +1,6 @@
 import { PaperDisplay } from "./paper-display/PaperDisplay";
 import { InlineMath } from "react-katex";
+import Image from "next/image";
 
 interface OurMethodsProps {
   methodsRef: React.RefObject<HTMLElement>;
@@ -123,34 +124,20 @@ function OurMethods({ methodsRef }: OurMethodsProps) {
                   Additional content can go here and will scroll normally.
                   Additional content can go here and will scroll normally.
                 </p>
-              </div>
-            </div>
-          </section>
 
-          <section>
-            <div className="prose prose-lg max-w-none">
-              <h2 className="text-xl md:text-3xl font-bold mb-2 md:mb-4 text-primary-gray">
-                Conclusion
-              </h2>
-              <div className="space-y-4 md:space-y-8">
-                <p className="text-base md:text-xl text-primary-gray">
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                  Additional content can go here and will scroll normally.
-                </p>
+                {/* Image container with responsive width */}
+                <div className="flex justify-center w-full my-6 md:my-8">
+                  <div className="w-2/3 relative">
+                    <Image
+                      src={"meta.png"}
+                      alt="Meta-analysis visualization"
+                      width={800}
+                      height={500}
+                      className="w-full h-auto rounded-lg shadow-md"
+                      priority
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </section>

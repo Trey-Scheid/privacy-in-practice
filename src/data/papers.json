@@ -5,6 +5,7 @@
       "shortTitle": "Paper One",
       "title": "Product Health Insights Using Telemetry",
       "author": "Chris",
+      "algorithm": "Logistic Regression and Significance Testing",
       "thumbnail": "paper-chris-thumbnail.png",
       "analysis": [
         {
@@ -42,9 +43,10 @@
     {
       "id": 2,
       "shortTitle": "Paper Two",
-      "title": "Exploration of CPU Error Dependencies and Prediction",
-      "author": "Tyler",
-      "thumbnail": "paper-tyler-thumbnail.png",
+      "title": "Power Consumption Patterns in Intel's Telemetry Data",
+      "author": "Trey",
+      "algorithm": "LASSO Regression",
+      "thumbnail": "paper-trey-thumbnail.png",
       "analysis": [
         {
           "type": "text",
@@ -77,43 +79,9 @@
     {
       "id": 3,
       "shortTitle": "Paper Three",
-      "title": "Power Consumption Patterns in Intel's Telemetry Data",
-      "author": "Trey",
-      "thumbnail": "paper-trey-thumbnail.png",
-      "analysis": [
-        {
-          "type": "text",
-          "content": "This paper sought to assess whether a certain feature was significantly present on the same day that an uncorrected error occurred (think blue screen of death). There are many different types of uncorrected errors, so they looked at the top 30. They looked at two different features, daily max temperature and presence of a corrected error (an error that the OS manages to resolve). For each of these features, they made a univariate logistic regression model (two total times 30 uncorrected error types = 60 total models) to predict whether an uncorrected error occurred on a given day and with that coefficient they took a statistical test to assess whether or not that variable was statistically significant with an alpha = 0.05."
-        }
-      ],
-      "privatization": [
-        {
-          "type": "text",
-          "content": "We looked at how corrected errors predict uncorrected errors and dropped daily max temperature. We trained on the top thirty uncorrected errors as well, and dropped one due to large compute times, for a total of 29 different logistic regression models. Privacy was applied in the form of differentially private gradient descent, which means that for each step of gradient descent, a small amount of noise is added. This does mean that compute scales linearly with epsilon, as higher epsilons means more noisy gradient descent steps, thus we stopped at epsilon 1.5 for each of the models. In order to ensure that our alpha would have the same statistical power as the non-private version, we did a permutation test for each of the logistic regression models to empirically find a p-value for the private logistic regression models. Because of the long compute times with epsilon, we took 200 permutations for each private logistic regression model to compare our result against."
-        }
-      ],
-      "results": [
-        {
-          "type": "text",
-          "content": "Our main method of comparing against the baseline was by calculating the set intersection over union for the private models and the non-private models. Firstly, for a \"strong DP\" (epsilon = 1), the model severely under-shot the number of significant models. This means that it failed to find the correct relationship between corrected and uncorrected errors in a third (0.31) of the models."
-        },
-        {
-          "type": "image",
-          "src": "lr_pval_1.png",
-          "alt": "Confusion Matrix",
-          "caption": "Figure 1:  A diagram of the confusion matrix. Notice zero false positives and nine false negatives."
-        },
-        {
-          "type": "text",
-          "content": "Overall, as the epsilon increased from zero to 0.5, the intersection over union tended to increase. However, between 0.5 and 1.5, the intersection over union failed to approach the non-private model and failed to improve."
-        }
-      ]
-    },
-    {
-      "id": 4,
-      "shortTitle": "Paper Four",
       "title": "PC Health Impact White Paper",
       "author": "Bradley",
+      "algorithm": "K-Means Clustering and Lloyd's Algorithm",
       "thumbnail": "paper-bradley-thumbnail.png",
       "analysis": [
         {
@@ -145,6 +113,42 @@
         {
           "type": "text",
           "content": "As epsilon increases, the inertia for the privatized model slowly converges to the non-private train and test loss. This is expected and given its convergence close to an epsilon of 1,  the model performs quite well in terms of both privacy and accuracy."
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "shortTitle": "Paper Four",
+      "title": "Exploration of CPU Error Dependencies and Prediction",
+      "author": "Tyler",
+      "algorithm": "Conditional Probabilities",
+      "thumbnail": "paper-tyler-thumbnail.png",
+      "analysis": [
+        {
+          "type": "text",
+          "content": "This paper sought to assess whether a certain feature was significantly present on the same day that an uncorrected error occurred (think blue screen of death). There are many different types of uncorrected errors, so they looked at the top 30. They looked at two different features, daily max temperature and presence of a corrected error (an error that the OS manages to resolve). For each of these features, they made a univariate logistic regression model (two total times 30 uncorrected error types = 60 total models) to predict whether an uncorrected error occurred on a given day and with that coefficient they took a statistical test to assess whether or not that variable was statistically significant with an alpha = 0.05."
+        }
+      ],
+      "privatization": [
+        {
+          "type": "text",
+          "content": "We looked at how corrected errors predict uncorrected errors and dropped daily max temperature. We trained on the top thirty uncorrected errors as well, and dropped one due to large compute times, for a total of 29 different logistic regression models. Privacy was applied in the form of differentially private gradient descent, which means that for each step of gradient descent, a small amount of noise is added. This does mean that compute scales linearly with epsilon, as higher epsilons means more noisy gradient descent steps, thus we stopped at epsilon 1.5 for each of the models. In order to ensure that our alpha would have the same statistical power as the non-private version, we did a permutation test for each of the logistic regression models to empirically find a p-value for the private logistic regression models. Because of the long compute times with epsilon, we took 200 permutations for each private logistic regression model to compare our result against."
+        }
+      ],
+      "results": [
+        {
+          "type": "text",
+          "content": "Our main method of comparing against the baseline was by calculating the set intersection over union for the private models and the non-private models. Firstly, for a \"strong DP\" (epsilon = 1), the model severely under-shot the number of significant models. This means that it failed to find the correct relationship between corrected and uncorrected errors in a third (0.31) of the models."
+        },
+        {
+          "type": "image",
+          "src": "lr_pval_1.png",
+          "alt": "Confusion Matrix",
+          "caption": "Figure 1:  A diagram of the confusion matrix. Notice zero false positives and nine false negatives."
+        },
+        {
+          "type": "text",
+          "content": "Overall, as the epsilon increased from zero to 0.5, the intersection over union tended to increase. However, between 0.5 and 1.5, the intersection over union failed to approach the non-private model and failed to improve."
         }
       ]
     }

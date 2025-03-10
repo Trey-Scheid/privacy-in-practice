@@ -109,8 +109,8 @@ export function SplitView({
       const stepDuration = duration / steps;
 
       const timer = setInterval(() => {
-        currentNoise += increment;
-        setNoiseLevel(currentNoise);
+          currentNoise += increment;
+          setNoiseLevel(currentNoise);
         if (currentNoise >= targetNoise) {
           clearInterval(timer);
         }
