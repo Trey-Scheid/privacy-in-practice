@@ -1,0 +1,88 @@
+name: merged_env
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  # Core Python and essential tools
+  - python=3.10
+  - pip
+  - setuptools
+  - wheel
+  
+  # Scientific and data analysis
+  - numpy
+  - pandas
+  - scipy
+  - scikit-learn
+  - matplotlib
+  - seaborn
+  
+  # Machine learning and deep learning
+  - pytorch
+  - torchvision
+  
+  # Data processing
+  - pyarrow
+  - duckdb
+  
+  # Development tools
+  - ipykernel
+  - jupyter
+  - ipython
+  
+  # Utilities
+  - tqdm
+  - pyyaml
+  - pillow
+  
+  # pip packages from merged environments
+  - pip:
+      # Deep learning and ML
+      - tensorflow-macos
+      - tensorflow-metal
+      - keras
+      - xgboost
+      - lightgbm
+      - tensorboard
+      
+      # Visualization
+      - plotly
+      - altair
+      - altair-data-server
+      - altair-viewer
+      - kaleido
+      
+      # Data processing
+      - gensim
+      
+      # Utilities
+      - autodp
+      - typer
+      - pdfkit
+      - jax
+      
+      # Google utilities
+      - google-api-python-client
+      - google-auth
+      - google-auth-httplib2
+      - google-auth-oauthlib
+      - gspread
+      
+      # Development tools
+      - jupyter-lsp
+      - jupyterlab
+      - jupyter-server
+      
+      # Domain-specific tools
+      - otter-grader
+      - dsc40graph
+      
+      # Image processing
+      - scikit-image
+      - imageio
+      
+      # Utilities from tyler.yml
+      - tzlocal
+      - sounddevice
+      - js2py 

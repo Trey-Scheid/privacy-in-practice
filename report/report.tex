@@ -287,9 +287,16 @@ To calculate the utility for the Conditional Probability task, we defined the lo
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.8\textwidth]{report/figure/histoeps1.png}
-    \caption{Your plot caption here.}
-    \label{fig:yourplot}
+    \includegraphics[width=0.8\textwidth]{figure/histoeps1.png}
+    \caption{Corrected Error Count vs Uncorrected Error Probability at Epsilon = 1. With and without noise.}
+    \label{fig:histoeps}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figure/epsilon_vs_loss.png}
+    \caption{Mean Absolute Error vs Epsilon}
+    \label{fig:epsilon_vs_loss}
 \end{figure}
 
 \subsection{LR\_PVAL}
@@ -328,7 +335,7 @@ Our main method of comparing against the baseline was by calculating the set int
 Our work provides a road map for integrating differential privacy into production environments, ensuring that sensitive telemetry data can be analyzed without compromising user privacy. This is particularly relevant for industries handling large volumes of user data. 
 
 \subsubsection{COND PROB}
-Similar to established differential privacy theory and literature /cite{Dworkroth, we observed a tradeoff between privacy and utility. However, our focus on conditional probability tasks allowed us to explore this tradeoff in a more specific context, providing insights into how differential privacy impacts analytical accuracy in this domain.
+Similar to established differential privacy theory and literature \cite{Dworkroth}, we observed a tradeoff between privacy and utility. However, our focus on conditional probability tasks allowed us to explore this tradeoff in a more specific context, providing insights into how differential privacy impacts analytical accuracy in this domain.
 
 Our results show a significant increase in utility as ε increases. For instance, at ε = 0.1, the utility was approximately 0.65, which rose to nearly 0.99 at ε = 1 and reached almost 1 at ε = 100. This demonstrates that less stringent privacy guarantees (higher ε values) lead to higher utility.
 
