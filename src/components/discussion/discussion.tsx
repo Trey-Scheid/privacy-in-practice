@@ -375,7 +375,7 @@ function Discussion({ discussionRef }: DiscussionProps) {
                     Click here to catch up on our notes!
                   </a>
                 </p>
-                <p className="text-base md:text-xl mb-4 text-accent underline decoration-dotted hover:text-white transition-colors cursor-pointer">
+                <p className="text-base md:text-xl mb-4">
                   TL;DR: It&apos;s nuanced.
                 </p>
               </div>
