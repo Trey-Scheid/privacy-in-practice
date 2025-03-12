@@ -48,7 +48,7 @@ export function Hero({
             </p>
             <p className="text-primary-gray text-sm md:text-base mt-3 md:mt-4">
               <Link
-                href="https://github.com/Trey-Scheid/privacy-in-practice/blob/ee757cc36ed47c066e9ca56e669e176fce4c3b16/report/report.pdf"
+                href="https://github.com/Trey-Scheid/privacy-in-practice/blob/main/report/report.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-accent transition-colors cursor-pointer decoration-dotted underline"
@@ -57,7 +57,7 @@ export function Hero({
               </Link>
               {" | "}
               <Link
-                href="https://github.com/Trey-Scheid/privacy-in-practice/blob/0d7227a580447e6a25875b62a1351e1e744a90b7/poster.pdf"
+                href="poster.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-accent transition-colors cursor-pointer decoration-dotted underline"
