@@ -53,7 +53,7 @@ export function NavBar({
       }
     };
 
-    const container = document.querySelector(".h-screen.overflow-y-scroll");
+    const container = document.querySelector(".h-screen.overflow-y-auto");
     if (container) {
       container.addEventListener("scroll", handleScroll);
       handleScroll(); // Initial calculation
