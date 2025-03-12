@@ -106,7 +106,7 @@ In our paper, we will analyze two different types of errors. The Machine Check A
 
 \subsubsection{Hardware Power}
 
-Another concept is power, this is the rate of energy consumption by the device. Our analysis is on CPU's produced by Intel and AMD. \cite{Kwasnick2023}
+Another concept is device power usage, this is the rate of energy consumption by the hardware. The lasso task focuses analysis on U-series CPUs. Around 50 Watts of power is normal for these CPUs (this is comparable to an outdated or inefficient light bulb). One Watt is defined as 1 Joule / second: lower energy per time is better for battery life and thermal regulation, this leads to cleaner environmental impact. 
 
 \subsection{Applications}
 
@@ -116,7 +116,7 @@ We will get into the specifics of each task, however note that each one can be a
 
 \subsection{Related Work}
 
-We are building on a previous analysis on differentially private mechanisms for Logistic Regression  \cite{qtr1proj}. The paper investigates how privacy affects different mini-batch stochastic gradient descent algorithms for logistic regression classification. It is shown that privacy affects the batch size for optimal performance.
+We are building on a previous analysis on differentially private mechanisms for Logistic Regression \cite{qtr1proj}. The paper investigates how privacy affects different mini-batch stochastic gradient descent algorithms for logistic regression classification. It is shown that privacy affects the batch size for optimal performance. The each task has unique methods that build on previous work as well. 
 
 %%%%%%%%%%%%%%%%%%%
 %%%%  METHODS  %%%%%%%%
@@ -137,7 +137,7 @@ The tables once loaded to disc could be processed with SQL queries and filtered 
 
 \subsection{LR\_PVAL: Private Correlation (via Logistic Regression Coefficient)}
 
-This paper\cite{prodhealLR} seeks to identify whether a certain variable is disproportionately present for a certain outcome. 
+This paper \cite{prodhealLR} seeks to identify whether a certain variable is disproportionately present for a certain outcome. 
 More specifically, it takes a close look at two variables, max temperature on a day and whether a corrected error was present on that day. 
 They would take one of those two variables and train a logistic regression model with maximum likelihood estimation to predict whether an uncorrected error was present.
 From the model, they use the coefficient of the variable and make a hypothesis test whether that variable is equal to zero.
@@ -195,7 +195,20 @@ meaning that the higher the utility, the more similar the two results are.
 
 \subsection{LASSO Private Regression (via DP-Frank-Wolfe)}
 
+Lasso Regression (least absolute ) is a variant of linear regression which penalizes the size of the solution by its l1-norm. This means the model balances fitting the data with the size of the weights. It is known that depending on the level of regulation this results in a sparse solution, meaning many features are given no weight. This can be advantageous in many settings, it is used in \textbackslash{}cite\{} to identify key features that contribute to the response variable: cpu average power (Watts). 
 
+The model is typically trained by solving the linear optimization problem with a penalty term added, iterative methods can approximate the solution very quickly.
+
+Lasso regression (Least Absolute Shrinkage and Selection Operator) is a regularization technique that performs both variable selection and regularization to enhance prediction accuracy and model interpretability. It minimizes the residual sum of squares subject to a constraint on the sum of the absolute values of the coefficients (L1 penalty). This penalty can shrink some coefficients exactly to zero, effectively removing irrelevant features from the model, making it particularly useful for high-dimensional data where feature selection is desired. The L1 regularization in Lasso encourages sparse models, unlike L2 regularization (Ridge regression) which merely shrinks coefficients without eliminating them.
+
+To solve the Lasso problem while ensuring differential privacy, we implemented the Frank-Wolfe algorithm as described in the Nearly-Optimal Private Lasso paper \cite{NIPS2015_52d080a3}. The Frank-Wolfe algorithm is an iterative first-order optimization method for constrained convex optimization that, in each iteration, considers a linear approximation of the objective function and moves toward a minimizer of this linear function over the same domain. Unlike gradient descent methods that require projection steps, Frank-Wolfe naturally stays within the feasible set, making it particularly suitable for problems with L1 constraints. The algorithm iteratively computes the gradient of the loss function at the current point, finds the vertex of the constraint set that minimizes the inner product with this gradient, and then takes a convex combination of the current point and this vertex.
+
+To privatize the Frank-Wolfe algorithm, we incorporated the exponential mechanism. The exponential mechanism selects an output with probability proportional to the exponential of a utility function, which measures the quality of each possible output. In our implementation, at each iteration of Frank-Wolfe, instead of deterministically selecting the vertex that minimizes the inner product with the gradient, we use the exponential mechanism to probabilistically select a vertex, adding noise proportional to the sensitivity of the selection process. The exponential mechanism tends to select outputs with higher utility scores with higher probability. The resulting algorithm achieves an excess risk of approximately $O(1/n^{(2/3)})$, proven to be nearly optimal for private Lasso regression.
+\subsubsection{Non-private Lasso Regression}
+
+
+
+\subsubsection{Private Lasso Regression}
 % Since the model is predicting power\_mean [SUM(pw.nrs * pw.mean) / SUM(pw.nrs)] which is a weighted average of some power rate metric in Watts I did some research. I found that 50W is a normal CPU and they typically range 10-150W with GPU up to 500-1000W which aligns with some EDA.
 
 % Therefore, the features and coefficients found by LASSO represent the main culprits for energy consumption across all Intel devices which gets straight at the goal of the paper to reduce emissions! 
@@ -264,10 +277,6 @@ To calculate the utility for the Conditional Probability task, we defined the lo
 
 
 
-
-
-
-
 %%%%%%%%%%%%%%%%%%%
 %%%% RESULTS  %%%%%%%%%
 %%%%%%%%%%%%%%%%%%%
@@ -322,7 +331,11 @@ Our main method of comparing against the baseline was by calculating the set int
     \caption{Epsilon vs. Inertia compared to baseline non-private model}
     \label{fig:epsilon_inertia}
 \end{figure}
+
 \subsection{LASSO}
+
+% TODO
+Add results plot here
 
 %%%%%%%%%%%%%%%%%%%
 %%%% DISCUSSION  %%%%%%%
@@ -356,13 +369,12 @@ From the figure \ref{fig:epsilon_inertia}, we can see that as epsilon increases,
 
 \subsubsection{LASSO}
 
+% TODO Interpretation
+
 \subsubsection{Meta}
 % BRADLEY %
 For each of our tasks, the privacy-utility tradeoff is not identical. Each task has different sensitivities to added noise. Some tasks can tolerate higher amounts of noise without significantly affecting the utility of the results, while others rely on precision and can degrade very fast with even slight noise. Given by our combined plot, each task has signifcantly different curves as epsilon increases. 
 One potential factor that also is not considered is that the added noise may reduce overfitting and could help the model generalize better. 
-
-        
-
 
 \subsection{Reflecting On The Process}
 % CHRIS %
@@ -399,6 +411,7 @@ Additionally on replicating papers, some papers were difficult to replicate due 
 
 \subsection{State of DP and how it relates to us}
 The field of differential privacy is rapidly growing as more organizations and governments recognize the importance of protecting individuals' data in an increasingly data-driven world. It is crucial to be knowledgable about this field as it equips us with the understanding of how to protect sensitive data while enabling meaningful analysis.
+% TODO
 
 %%%%%%%%%%%%%%%%%%%
 %%%% CONCLUSION %%%%%%%
@@ -437,33 +450,33 @@ Beyond technical advancements, think-aloud studies and longitudinal research cou
 \section{Contributions}
 
 \subsection{Author Contributions}:
-T.S. focused on task22 LASSO Regression to highlight the exploratory capabilities of private data while implementing a previously theoretical framework (Franke-Wolfe). C.L. focused on private linear regression to be able to do Wald tests to asses the relationship between input and target variables B.N. analyzed and implemented non-private and private K-Means clustering.  T.K. analyzed the experimental results of applying privacy mechanisms to a conditional probability histogram. Y.W. supervised the research and provided guidance on the mathematical foundations. All authors contributed to writing and reviewing the manuscript.
+T.S. focused on task22 LASSO Regression to highlight the exploratory capabilities of private data while implementing a previously theoretical framework (Franke-Wolfe). C.L. focused on private logistic regression to be able to do Wald tests to asses the relationship between input and target variables. B.N. analyzed and implemented non-private and private K-Means clustering. T.K. analyzed the experimental results of applying privacy mechanisms to a conditional probability histogram. Y.W. supervised the research and provided guidance on the mathematical foundations. All authors contributed to writing and reviewing the manuscript.
 
 \subsection{Task Details}
 
 Trey Scheid
 \begin{itemize}
-    \item Replication of 
+    \item Replication of \cite{lassocarbon}
     \item Implementation of non-private franke-wolfe lasso regression
-    \item Ethics considerations webpage
-    \item [ ] Todo: Implementation of private franke-wolfe lasso regression
+    \item Ethical considerations of methods and impact
+    \item Implementation of private franke-wolfe lasso regression
 \end{itemize}
 
 Tyler Kurpanek
 \begin{itemize}
-    \item Replication of Exploration of CPU Error Dependencies and Prediction
+    \item Replication of Exploration of CPU Error Dependencies and Prediction \cite{Kwasnick2023}
     \item Implementation of Laplace Mechanism 
 \end{itemize}
 
 Bradley Nathanson
 \begin{itemize}
-    \item Replication of k-means clustering with Lloyd's algorithm
+    \item Replication of k-means clustering with Lloyd's algorithm \cite{kmeans}
     \item Implementation of privatized k-means clustering
 \end{itemize}
 
 Christopher Lum
 \begin{itemize}
-  \item Preprocess and replicate logistic regression paper privately and non-privately
+  \item Preprocess and replicate logistic regression paper privately and non-privately \cite{prodhealLR}
   \item Develop website
 \end{itemize}
 
