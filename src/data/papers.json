@@ -60,35 +60,61 @@
       "analysis": [
         {
           "type": "text",
-          "content": "This paper sought to assess whether a certain feature was significantly present on the same day that an uncorrected error occurred (think blue screen of death). There are many different types of uncorrected errors, so they looked at the top 30. They looked at two different features, daily max temperature and presence of a corrected error (an error that the OS manages to resolve). For each of these features, they made a univariate logistic regression model (two total times 30 uncorrected error types = 60 total models) to predict whether an uncorrected error occurred on a given day and with that coefficient they took a statistical test to assess whether or not that variable was statistically significant with an alpha = 0.05."
+          "content": "The goal of Cheon et. al. was to identify key areas which Intel could prioritize research on to reduce energy consumption by their devices, this would lead to a global reduction in emissions, their current belief was that hardware was the main cause of their worst performers. Study findings were that features related to user behavior of the device (such as choice of program type and amount they use the device) were the main causes. These causes were identified in many ways, one was through a Lasso regression model which produces a sparse solution vector, essentially identifying features with the most predictive power of cpu usage and therefore worst energy efficiency!"
         }
       ],
       "privatization": [
         {
           "type": "text",
-          "content": "We looked at how corrected errors predict uncorrected errors and dropped daily max temperature. We trained on the top thirty uncorrected errors as well, and dropped one due to large compute times, for a total of 29 different logistic regression models. Privacy was applied in the form of differentially private gradient descent, which means that for each step of gradient descent, a small amount of noise is added. This does mean that compute scales linearly with epsilon, as higher epsilons means more noisy gradient descent steps, thus we stopped at epsilon 1.5 for each of the models. In order to ensure that our alpha would have the same statistical power as the non-private version, we did a permutation test for each of the logistic regression models to empirically find a p-value for the private logistic regression models. Because of the long compute times with epsilon, we took 200 permutations for each private logistic regression model to compare our result against."
+          "content": "The traditional lasso regression model is an adaptation of linear regression which includes an l1 regularization term in the optimization. This is still solvable by coordinate descent algorithms and is performed in many common programming packages (e.g. sklearn). Following the outline in “Nearly Optimal Private Lasso” published by Google researchers, I implemented a different version of lasso regression, here the linear regression problem (ordinary least squares) is solved with the constraint that the solution must be in the l1 ball. This has a theoretically equivalent solution but we can take a different iterative approach to solve: Frank-Wolfe! By adding the private exponential mechanism to selecting a vertex at each iteration of the Frank-Wolfe solver, we guarantee differential privacy towards the training data and find a sparse solution vector!"
         }
       ],
       "results": [
         {
           "type": "text",
-          "content": "Our main method of comparing against the baseline was by calculating the set intersection over union for the private models and the non-private models. Firstly, for a \"strong DP\" (epsilon = 1), the model severely under-shot the number of significant models. This means that it failed to find the correct relationship between corrected and uncorrected errors in a third (0.31) of the models."
-        },
-        {
-          "type": "image",
-          "src": "lr_pval_1.png",
-          "alt": "Confusion Matrix",
-          "caption": "Figure 1:  A diagram of the confusion matrix. Notice zero false positives and nine false negatives."
+          "content": "The power consumption driven carbon footprint paper trains a lasso model using typical coordinate descent and yields an RMSE of 5.86 (Watts) on the test set. Their correlation coefficient (R2) is 0.33."
         },
         {
           "type": "text",
-          "content": "Overall, as the epsilon increased from zero to 0.5, the intersection over union tended to increase. However, between 0.5 and 1.5, the intersection over union failed to approach the non-private model and failed to improve."
+          "content": "For our results we see the convergence of the loss function to the optimal point for the Non-Private model which is the frank-wolfe lasso regression. We also see the path taken by the algorithm with exponential mechanism for differential privacy at various privacy budgets."
+        },
+        {
+          "type": "image",
+          "src": "lasso_convergence.png",
+          "alt": "Lasso Training Convergence",
+          "caption": "Figure 1:  Training Loss for private models beats trivial but does not quite achieve the non-private baseline."
+        },
+        {
+          "type": "text",
+          "content": "The best baseline is shown on the right, found when many iterations are performed, we see that the higher lambda values do better (0.1 error was too high to appear on the plot at all). private model is found best K=200 and the epsilon=100 model follows the same optimization path so the lines overlap, this is expected since almost no privacy is applied)."
+        },
+        {
+          "type": "text",
+          "content": "Then we see the performance of the models by viewing prediction error on a test set of data, the correlation coefficient R2, the similarity (0=none, 1=same features) found with the baseline Frank-Wolfe model, and the number of features that are kept in the solution."
+        },
+        {
+          "type": "image",
+          "src": "lasso_results.png",
+          "alt": "Lasso Model Performances",
+          "caption": "Figure 2:  Performance Metrics for Frank-Wolfe Exponential Mechanism Models against Baseline and Trivial"
+        },
+        {
+          "type": "text",
+          "content": "The Top row varies lambda which is the penalty applied to the loss function, we can see in the sparsity outcome that a smaller lambda actually penalizes the model more, leading to more sparse solutions. The bottom row varies the number of iterations the algorithm is performed on, there is no trend we can theorize since the exponential mechanism uses budget differently for different iterations and we don’t know in advance which will perform best. We can note that we view the top row at K=200 since that is the only one where the sparsity is close to the non-private solution at epsilon=1, our target budget."
         }
       ],
       "interpretation": [
         {
           "type": "text",
-          "content": "Insert interpretation here"
+          "content": "The RMSE estimates the average amount each prediction is off of the truth by. We know 5 Watts is about 1/10 the total power for a CPU so predictions that close are reasonable. The correlation coefficient then claims that R2% of the variation in the dataset can be explained by the model features. The authors additionally state that given many possible factors are not included in the telemetry data, 33% is a strong result."
+        },
+        {
+          "type": "text",
+          "content": "Therefore our results find an RMSE of 1.6 Watts for the new algorithm baseline and 2.28 Watts for the privatized at epsilon 1 is better performance than the original work. We see that the new baseline for explained portion of variance increased to 70%  by using frank-wolfe, and our private model is behind that at 50%. The sparsity of chosen features is held at a manageable number by choosing a good K during training, theres no inherent benefit to having a couple more or less features between the private and non-private model (18 of 212 features were in the solution)! The jaccard similarity measures how similar the feature sets are that the private model found compared to the non-private, this value is very low, indicating they found mostly different features, this means the features Intel should improve first is completely different! This shows the limitation of lasso as a means for finding causes, by simply minimizing prediction errors our models can perform almost as well but get very different conclusions. There is no way to know which set has better chosen features, when compared with the study’s original coordinate descent lasso, all the private and non-private Frank-Wolfe solutions had below 0.3 similarity!"
+        },
+        {
+          "type": "text",
+          "content": "In totality, the private model had comparable test set error, and correlation which indicates we got a well fitted private model which would be equally as informational and useful to Intel for their goal of reducing carbon emissions through targeted developments."
         }
       ]
     },
