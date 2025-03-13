@@ -37,7 +37,10 @@ def trivial(feat, correct_feats=None):
     
     r2 = r2_score(y_test, np.repeat(avg, y_test.shape[0]), force_finite=False)
     
-    similarity = jaccard_similarity(correct_feats, [k for k, v in coef_dict.items() if v > 0]) if not correct_feats is None else None
+    if correct_feats:
+        similarity = jaccard_similarity(correct_feats, [k for k, v in coef_dict.items() if v > 0]) if not correct_feats is None else None
+    else:
+        similarity = None
     
     return mse, coef_dict, r2, similarity
 
@@ -84,41 +87,43 @@ def train(feat, correct_feats=None, method='lasso', tol=1e-8, l=1, max_iter=1000
             model1 = FWLasso.LaplaceNoise(X_train, y_train, l=l, delta=delta, epsilon=epsilon, tol=tol, K=max_iter, normalize=normalize, clip_sd=clip_sd, trace=should_trace)
             model3 = FWLasso.ExponentialMechanism(X_train, y_train, l=l, delta=delta, epsilon=epsilon, tol=tol, K=max_iter, normalize=normalize, clip_sd=clip_sd, trace=should_trace)
             model2 = FWLasso.FW_NonPrivate(X_train, y_train, l=l, tol=tol, K=max_iter, normalize=normalize, clip_sd=clip_sd, trace=should_trace)
+            if not triv is None and not isinstance(triv, float):
+                triv = trivial(feat)[0]
+
             if plot:
                 trace1 = model1.get("plot")
                 trace2 = model2.get("plot")
                 trace3 = model3.get("plot")
                 plt.clf()
-                plt.figure(figsize=(12, 8))
-                plt.plot(range(len(trace1)), trace1, "#76ABAE", lw=1, label="Private Frank-Wolfe (Lap)") # / max(trace1)
-                plt.plot(range(len(trace3)), trace3, "darkgreen", lw=1, label="Private Frank-Wolfe (Exp)")
-                plt.plot(range(len(trace2)), trace2, "#31363F", lw=1, label="Non-Private Baseline")
+                fig = plt.figure(figsize=(8, 6), facecolor='#EEEEEE', edgecolor='#EEEEEE')
+                ax = fig.add_subplot(1, 1, 1)
+                ax.set_facecolor("#EEEEEE")
                 if not triv is None:
-                    plt.plot(range(max(len(trace2), len(trace1))), np.repeat(triv, max(len(trace2), len(trace1))), "#222831", lw=1, label="Trivial Error")
-                # plt.yscale('log')
-                # plt.xlabel('Number of iterations')
-                # plt.ylabel('Training Lasso Loss')
-                # plt.title(f'{method} Convergence')
-                # plt.xlim()
-                # plt.grid()
+                    ax.plot(range(max(len(trace2), len(trace1))), np.repeat(triv, max(len(trace2), len(trace1))), "#222831", lw=1, label="Trivial Error", linestyle="--")
+                ax.plot(range(len(trace2)), trace2, "#31363F", lw=1, label="Non-Private Baseline")
+                plt.plot(range(len(trace1)), trace1, "#76ABAE", lw=1, label="Private Frank-Wolfe (Lap)") # / max(trace1)
+                ax.plot(range(len(trace3)), trace3, "#76ABAE", lw=1, label="Private Frank-Wolfe (Exp)")
+                plt.xlabel('Iterations')
+                plt.ylabel('Least Square Error')
+                plt.title(f'Training Loss')
                 # plt.tight_layout()
-                # plt.legend(frameon=False, fontsize="small")
-                plt.ylim(0, 20)
-                plt.savefig(plot, dpi=300, facecolor='#EEEEEE', edgecolor='#EEEEEE', pad_inches=1)
+                plt.legend(frameon=False, fontsize="small")
+                ax.set_ylim(0, max(trace3[int(len(trace3) * 0.08):]))
+                plt.savefig(plot, dpi=300, pad_inches=2)
 
-                y_pred = X_train @ model1.get("model")
-                mse11 = mean_squared_error(y_train, y_pred)
+                y_pred = X_train @ model3.get("model")
+                exp_train = mean_squared_error(y_train, y_pred)
 
                 y_pred = X_train @ model2.get("model")
-                mse21 = mean_squared_error(y_train, y_pred)
+                baseline_train = mean_squared_error(y_train, y_pred)
 
 
-                y_pred = X_test @ model1.get("model")
-                mse12 = mean_squared_error(y_test, y_pred)
+                y_pred = X_test @ model3.get("model")
+                exp_test = mean_squared_error(y_test, y_pred)
 
                 y_pred = X_test @ model2.get("model")
-                mse22 = mean_squared_error(y_test, y_pred)
-                return mse11, mse21, mse12, mse22
+                baseline_test = mean_squared_error(y_test, y_pred)
+                return exp_train, baseline_train, exp_test, baseline_test
         
         model = model(X_train, y_train, l=l, tol=tol, delta=delta, epsilon=epsilon, K=max_iter, normalize=normalize, clip_sd=clip_sd, trace=should_trace)
 
@@ -148,11 +153,11 @@ def train(feat, correct_feats=None, method='lasso', tol=1e-8, l=1, max_iter=1000
     if plot:
         trace = model.get("plot")
         plt.clf()
-        plt.plot(range(len(trace)), trace / max(trace), color="#31363F", lw=1.33)
+        plt.plot(range(len(trace)), trace, color="#31363F", lw=1.33)
         plt.xlabel('Iteration')
-        plt.ylabel('Lasso Loss')
+        plt.ylabel('Lasso Training Loss')
         plt.title(f'{method} Convergence')
-        plt.ylim(0, 20)
+        plt.ylim(0, max(trace))
         plt.tight_layout()
         plt.savefig(plot, dpi=300, facecolor='#EEEEEE', edgecolor='#EEEEEE')
     return mse, coef_dict, r2, similarity
