@@ -18,7 +18,11 @@ The database our analsis was completed on is confidential, so only the resulting
   
 ### Building the project stages using `run.py`
 
-To run the file, in your terminal, run `python run.py` 
+To run the file, in your terminal, run `python run.py` followed by specific task names, or blank and let task in the run.json config take care of it! Choose however many from:
+- `lasso`
+- `kmeans`
+- `cond_prob`
+- `lr_pval`
 <!---
 [target arguments]`.
 - `all` runs `all` targets from scratch (
@@ -39,8 +43,8 @@ the methods inputted into the target arguments.
 
 ```
 .
-├─ LICENSE               <- Open-source license if one is chosen
-├─ README.md             <- Top level breakdown of repo
+├─ LICENSE
+├─ README.md
 ├─ run.py                <- Catch all function to build project from scratch
 │
 ├─ src                   <- all source code
@@ -67,7 +71,7 @@ the methods inputted into the target arguments.
 │
 ├─ poster.pdf            <- Conference Poster
 │
-├─ environment.yml      <- Built with conda for executing run.py
+├─ environment.yml       <- Built with conda for executing run.py
 │
 ├─ config/               <- parameters for run.py and each other .py
 │
@@ -75,9 +79,9 @@ the methods inputted into the target arguments.
 │  ├─ dynamic_output/    <- Stores output plots and tables from run.py
 │  └─ static_output/     <- Output plots/tables from Intel Telemetry Data 
 │
-├─ dummy_data/           <- parquets for each task, random noise in schema
+├─ dummy_data/           <- synthetic (random noise) data according to schema
 │  ├─ raw/               <- "read only" parquets used by tasks
-│  └─ processed/         <- results of etl work for faster re-runs
+│  └─ processed/         <- results of etl processing
 │
 ├─ .github/workflows/nextjs.yml      <- Builds github.io website from branch│
 │
