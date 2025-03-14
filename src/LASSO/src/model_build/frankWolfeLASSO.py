@@ -558,7 +558,8 @@ def FW_NonPrivate(A, y, l=1.0, K=15000, tol=1e-4, trace=False, normalize=False, 
             convergence_criteria.append(f_new)
         if (k > 1) and (abs(f_new - f_prev) < tol):
             t = k
-            print(f"converged at: {t}")
+            if log:
+                print(f"converged at: {t}")
             break
 
         x_prev = x_new

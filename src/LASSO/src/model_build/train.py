@@ -14,7 +14,7 @@ import os
 import pandas as pd
 import matplotlib.cm as cm
 
-from src.model_build import frankWolfeLASSO as FWLasso
+from src.LASSO.src.model_build import frankWolfeLASSO as FWLasso
 
 y_name = 'power_mean'
 
@@ -201,11 +201,11 @@ def train(feat, correct_feats=None, method='lasso', tol=1e-8, l=1, max_iter=1000
 
 def train_run_eps(eps_vals, model, data, delta, tol, l, K, plot_dir, baseline, normalize, clip, triv, c, verbose):
 
-    baseline_mse, _, _, _ = train.train(data, None, baseline, tol=tol, l=l, epsilon=eps, max_iter=K, plot= plot_dir / f'{model}_{eps}_convergence.png', log=verbose)
+    baseline_mse, _, _, _ = train(data, None, baseline, tol=tol, l=l, epsilon=None, max_iter=K, plot= plot_dir / f'{baseline}_convergence.png', log=verbose)
     # run model on each epsilon value
     epsresults = []
     for eps in eps_vals:
-        test_mse, feat_dict, r2, sim = train.train(data, None, model, tol=tol, l=l, epsilon=eps, max_iter=K, epsilon=eps, delta=delta, plot= plot_dir / f'{model}_{eps}_convergence.png', normalize=normalize, clip_sd=clip, triv=triv, log=verbose)
+        test_mse, feat_dict, r2, sim = train(data, None, model, tol=tol, l=l, epsilon=eps, max_iter=K, delta=delta, plot= plot_dir / f'{model}_{eps}_convergence.png', normalize=normalize, clip_sd=clip, triv=triv, log=verbose)
         
         epsresults.append(test_mse)
 

@@ -1,6 +1,5 @@
 import os
-from src.feat_build import load_data, process
-from src.feat_build.utils import global_data
+from src.LASSO.src.feat_build import load_data, process
 
 import pandas as pd
 import numpy as np
@@ -10,7 +9,7 @@ def main(dummy_data_dir,  n_samples=1000):
     Generate random noise following the schema provided in the feat_schema.csv file.
     The generated data is saved in the dummy_data_dir as synthetic_data.parquet.
     """
-    schema = pd.read_csv(global_data / 'feat_schema.csv', columns=['column_names', 'data_type'])
+    schema = pd.read_csv(dummy_data_dir / 'feat_schema.csv', columns=['column_names', 'data_type'])
 
     # Create random number generator
     rng = np.random.default_rng(seed=12345)  # Use seed for reproducibility

@@ -10,8 +10,8 @@ from src.LASSO.src.feat_build import main
 
 def main(**data_params):
     # read in parameters from command line
-    eps_vals = data_params["eps_vals"]
-    data_fp = data_params.get("fp")
+    eps_vals = data_params["epsilons"]
+    data_fp = data_params.get("data")
     output_fp = data_params.get("output")
     target_eps = data_params.get("single_epsilon")
     delta = data_params.get("delta")
@@ -29,6 +29,7 @@ def main(**data_params):
     c = lasso_params.get("c")
     directories = lasso_params.get("directories")
     sample_guids_parquet = lasso_params.get("sample_guids_parquet")
+    feat_parquet = lasso_params.get("feat_parquet")
     model = lasso_params.get("model")
 
     # set default values if not specified
@@ -61,7 +62,7 @@ def main(**data_params):
     # read data
     feat = pd.read_parquet(processed_dir / feat_parquet)
 
-    output_fp = output_fp / 'LASSO'
+    output_fp = Path(os.path.join(*output_fp)) / 'LASSO'
     if not output_fp.exists():
         os.mkdir(output_fp)
     

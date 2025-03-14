@@ -3,8 +3,8 @@ import os
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-from src.feat_build import sysinfo_process
-from src.feat_build.utils import software_categories
+from src.LASSO.src.feat_build import sysinfo_process
+from src.LASSO.src.feat_build.utils import software_categories
 
 def create_software_category_map(sw_raw):
     # Read the CSV file
