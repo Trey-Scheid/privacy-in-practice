@@ -1,7 +1,9 @@
-# source: https://github.com/paulmelki/Frank-Wolfe-Algorithm-Python
-
-# IMPLEMENTATION OF THE FRANK-WOLFE ALGORITHM
-# In this file, we define the functions required for the implementation of the algorithm.
+"""
+File: frankWolfeLASSO_paulmelki.py
+Author: Trey Scheid
+Date: last modified 03/2025
+Description: IMPLEMENTATION OF THE FRANK-WOLFE ALGORITHM, In this file, we define the functions required for the implementation of the algorithm. source: https://github.com/paulmelki/Frank-Wolfe-Algorithm-Python
+"""
 import numpy as np
 
 # %% Define the function f(x)

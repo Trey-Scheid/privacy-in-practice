@@ -1,3 +1,9 @@
+"""
+File: train.py
+Author: Trey Scheid
+Date: last modified 03/2025
+Description: process data and train lasso regression models based on parameters, compute performance metrics
+"""
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression, Lasso
 from sklearn.metrics import mean_squared_error, r2_score#, jaccard_score
@@ -13,11 +19,34 @@ from src.model_build import frankWolfeLASSO as FWLasso
 y_name = 'power_mean'
 
 def jaccard_similarity(set1, set2):
+    """
+    Intersection / Union of two sets
+
+    Args:
+        set1 (array-like): list of objects
+        set2 (array-like): comparison list of objects
+
+    Returns:
+        float: Jaccard similarity
+    """
     intersection = len(set(set1).intersection(set2))
     union = len(set(set1).union(set2))
     return intersection / union
 
 def trivial(feat, correct_feats=None):
+    """
+    Train and evaluate the trivial model for lasso regression error function, predicts mean of y for all x
+
+    Args:
+        feat (array-like): dataset (will be split for eval)
+        correct_feats (array-like, optional): will compute similarity of solution features with correct_feats list. Defaults to None.
+
+    Returns:
+        mse: test set mean square error
+        coef_dict: model coefficients
+        r2: correlation coefficient between predictions and outcomes
+        similarity: jaccard similarity between non-zero coeficients and correct_feats if any
+    """
     # prep feature data and prediction array
     X, y = feat.drop(y_name, axis=1), feat[y_name]
     ones_column = np.ones((X.shape[0], 1))
@@ -48,9 +77,15 @@ def train(feat, correct_feats=None, method='lasso', tol=1e-8, l=1, max_iter=1000
     """
     Train linear model for power usage
 
-    :param feat: featureized data as pandas DataFrame
-    :param method: type of linear model ('lstsq' or 'lasso')
-    :return: model, coefficient dictionary, r2 score, convergence trace
+    Args:
+        feat (array-like): featureized data as pandas DataFrame
+        method (str): type of linear model ('lstsq', 'lasso', 'fw-lasso-exp', 'fw-lasso-lap', 'compare-fw-plot')
+    
+    Returns: 
+        mse (float): test error
+        coefficient dictionary (dict): model
+        r2 (float): score
+        convergence trace (array-like): plot values
     """
     type_fw = False
     if method == 'lstsq':
@@ -163,7 +198,32 @@ def train(feat, correct_feats=None, method='lasso', tol=1e-8, l=1, max_iter=1000
     return mse, coef_dict, r2, similarity
 
 def research_plots(feat, correct_feats=None, methods='lasso', baseline=None, l=None, max_iter=10000, epsilon=None, target_eps=None, delta=None, plot=False, triv=False, nonpriv=None, normalize=False, clip_sd=None, log=False):
-    """Generates all the plots in the report.pdf"""
+    """
+    Convergence and performance results plots for many models
+
+    Args:
+        feat (array-like): data
+        correct_feats (array-like str, optional): correct comparable feature list. Defaults to None.
+        methods (array-like or str, optional): methods to test against baseline. Defaults to 'lasso'.
+        baseline (str, optional): one model to use as baseline. Defaults to None.
+        l (float, optional): constraint size. Defaults to None.
+        max_iter (int, optional): Defaults to 10000.
+        epsilon (float, optional): privacy budget. Defaults to None.
+        target_eps (float, optional): eps to check sparsity with baseline. Defaults to None.
+        delta (float, optional): privacy parameter. Defaults to None.
+        plot (str, optional): filepath for plots if any. Defaults to False.
+        triv (bool, optional): add line for trivial model to plots. Defaults to False.
+        nonpriv (_type_, optional): add line for baseline to plots. Defaults to None.
+        normalize (bool, optional): normalize the input feat during training. Defaults to False.
+        clip_sd (float, optional): clip. Defaults to None.
+        log (bool, optional): Defaults to False.
+
+    Raises:
+        ValueError: Baseline and methods must be in list
+
+    Returns:
+        super_df: results from each trained model and its configuration.
+    """             
     if isinstance(methods, str):
         methods = [methods]
     if isinstance(l, (int, float)):
