@@ -1,3 +1,9 @@
+"""
+File: train.py
+Author: Trey Scheid
+Date: last modified 03/2025
+Description: process data and train lasso regression models based on parameters, compute performance metrics
+"""
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression, Lasso
 from sklearn.metrics import mean_squared_error, r2_score#, jaccard_score
@@ -8,16 +14,39 @@ import os
 import pandas as pd
 import matplotlib.cm as cm
 
-from src.model_build import frankWolfeLASSO as FWLasso
+from src.LASSO.src.model_build import frankWolfeLASSO as FWLasso
 
 y_name = 'power_mean'
 
 def jaccard_similarity(set1, set2):
+    """
+    Intersection / Union of two sets
+
+    Args:
+        set1 (array-like): list of objects
+        set2 (array-like): comparison list of objects
+
+    Returns:
+        float: Jaccard similarity
+    """
     intersection = len(set(set1).intersection(set2))
     union = len(set(set1).union(set2))
     return intersection / union
 
 def trivial(feat, correct_feats=None):
+    """
+    Train and evaluate the trivial model for lasso regression error function, predicts mean of y for all x
+
+    Args:
+        feat (array-like): dataset (will be split for eval)
+        correct_feats (array-like, optional): will compute similarity of solution features with correct_feats list. Defaults to None.
+
+    Returns:
+        mse: test set mean square error
+        coef_dict: model coefficients
+        r2: correlation coefficient between predictions and outcomes
+        similarity: jaccard similarity between non-zero coeficients and correct_feats if any
+    """
     # prep feature data and prediction array
     X, y = feat.drop(y_name, axis=1), feat[y_name]
     ones_column = np.ones((X.shape[0], 1))
@@ -28,7 +57,7 @@ def trivial(feat, correct_feats=None):
     coef = np.append(np.array([avg]), np.zeros(X.shape[1]))
 
     # compute metrics
-    print(f'Train MSE sklearn: {mean_squared_error(y_train, np.repeat(avg, y_train.shape[0])):.2f} ({100*sum(coef>0)/coef.shape[0]:.1f}% sparse)')
+    # print(f'Train MSE sklearn: {mean_squared_error(y_train, np.repeat(avg, y_train.shape[0])):.2f} ({100*sum(coef>0)/coef.shape[0]:.1f}% sparse)')
     
     mse = mean_squared_error(y_test, np.repeat(avg, y_test.shape[0]))
     # print(f'Test MSE sklearn: {mse:.2f} ({100*sum(model.coef_>0)/model.coef_.shape[0]:.1f}% sparse)')
@@ -44,13 +73,19 @@ def trivial(feat, correct_feats=None):
     
     return mse, coef_dict, r2, similarity
 
-def train(feat, correct_feats=None, method='lasso', tol=1e-8, l=1, max_iter=10000, epsilon=None, delta=1e-6, plot=False, normalize=False, clip_sd=None, triv=None, nonpriv=None):
+def train(feat, correct_feats=None, method='lasso', tol=1e-8, l=1, max_iter=10000, epsilon=None, delta=1e-6, plot=False, normalize=False, clip_sd=None, triv=None, log=True):
     """
     Train linear model for power usage
 
-    :param feat: featureized data as pandas DataFrame
-    :param method: type of linear model ('lstsq' or 'lasso')
-    :return: model, coefficient dictionary, r2 score, convergence trace
+    Args:
+        feat (array-like): featureized data as pandas DataFrame
+        method (str): type of linear model ('lstsq', 'lasso', 'fw-lasso-exp', 'fw-lasso-lap', 'compare-fw-plot')
+    
+    Returns: 
+        mse (float): test error
+        coefficient dictionary (dict): model
+        r2 (float): score
+        convergence trace (array-like): plot values
     """
     type_fw = False
     if method == 'lstsq':
@@ -127,7 +162,7 @@ def train(feat, correct_feats=None, method='lasso', tol=1e-8, l=1, max_iter=1000
         
         model = model(X_train, y_train, l=l, tol=tol, delta=delta, epsilon=epsilon, K=max_iter, normalize=normalize, clip_sd=clip_sd, trace=should_trace)
 
-        print(f'Train MSE fw: {mean_squared_error(y_train, X_train @ model.get("model")):.2f} ({100*sum(model.get("model")>0)/model.get("model").shape[0]:.1f}% sparse)')
+        # print(f'Train MSE fw: {mean_squared_error(y_train, X_train @ model.get("model")):.2f} ({100*sum(model.get("model")>0)/model.get("model").shape[0]:.1f}% sparse)')
         y_pred = X_test @ model.get("model")
         mse = mean_squared_error(y_test, y_pred)
         # print(f'Test MSE {method}: {mse:.2f} ({100*sum(model>0)/model.shape[0]:.1f}% sparse)')
@@ -140,7 +175,7 @@ def train(feat, correct_feats=None, method='lasso', tol=1e-8, l=1, max_iter=1000
         model.fit(X_train, y_train)
         # MSE calculation
         y_pred = model.predict(X_test)
-        print(f'Train MSE sklearn: {mean_squared_error(y_train, model.predict(X_train)):.2f} ({100*sum(model.coef_>0)/model.coef_.shape[0]:.1f}% sparse)')
+        # print(f'Train MSE sklearn: {mean_squared_error(y_train, model.predict(X_train)):.2f} ({100*sum(model.coef_>0)/model.coef_.shape[0]:.1f}% sparse)')
         mse = mean_squared_error(y_test, y_pred)
         # print(f'Test MSE sklearn: {mse:.2f} ({100*sum(model.coef_>0)/model.coef_.shape[0]:.1f}% sparse)')
         # Coefficient dictionary with feature name
@@ -160,10 +195,61 @@ def train(feat, correct_feats=None, method='lasso', tol=1e-8, l=1, max_iter=1000
         plt.ylim(0, max(trace))
         plt.tight_layout()
         plt.savefig(plot, dpi=300, facecolor='#EEEEEE', edgecolor='#EEEEEE')
+
     return mse, coef_dict, r2, similarity
 
-def research_plots(feat, correct_feats=None, methods='lasso', baseline=None, l=None, max_iter=10000, epsilon=None, target_eps=None, delta=None, plot=False, triv=False, nonpriv=None, normalize=False, clip_sd=None, log=False):
-    """Generates all the plots in the report.pdf"""
+
+def train_run_eps(eps_vals, model, data, delta, tol, l, K, plot_dir, baseline, normalize, clip, triv, c, verbose):
+
+    baseline_mse, _, _, _ = train(data, None, baseline, tol=tol, l=l, epsilon=None, max_iter=K, plot= plot_dir / f'{baseline}_convergence.png', log=verbose)
+    # run model on each epsilon value
+    epsresults = []
+    for eps in eps_vals:
+        test_mse, feat_dict, r2, sim = train(data, None, model, tol=tol, l=l, epsilon=eps, max_iter=K, delta=delta, plot= plot_dir / f'{model}_{eps}_convergence.png', normalize=normalize, clip_sd=clip, triv=triv, log=verbose)
+        
+        epsresults.append(test_mse)
+
+    # convert mse to utility
+    rmses = np.sqrt(np.array(epsresults))
+    # max_rmse = np.max(rmses)
+    # for higher values of c, punish rmse more. c in (0, inf)
+    # utility = 2 / (1 + np.exp(c * rmses / max_rmse)) # use sigmoid function to normalize
+    # c is worst case rmse = 0 utility, use domain knowledge
+    utility = 1 - (rmses - baseline_mse**.5) / (c - baseline_mse ** .5)
+    
+    df = pd.DataFrame({'epsilon': eps_vals,
+                'task': ["Lasso Regression" for i in range(len(eps_vals))],  
+                'utility': utility.tolist()})#.to_csv("lasso_results.csv", index_label="Index")
+
+    return df
+
+
+def research_plots(feat, correct_feats=None, methods='lasso', baseline=None, l=None, max_iter=10000, epsilon=None, target_eps=None, delta=None, plot=False, triv=False, normalize=False, clip_sd=None, log=False):
+    """
+    Convergence and performance results plots for many models
+
+    Args:
+        feat (array-like): data
+        correct_feats (array-like str, optional): correct comparable feature list. Defaults to None.
+        methods (array-like or str, optional): methods to test against baseline. Defaults to 'lasso'.
+        baseline (str, optional): one model to use as baseline. Defaults to None.
+        l (float, optional): constraint size. Defaults to None.
+        max_iter (int, optional): Defaults to 10000.
+        epsilon (float, optional): privacy budget. Defaults to None.
+        target_eps (float, optional): eps to check sparsity with baseline. Defaults to None.
+        delta (float, optional): privacy parameter. Defaults to None.
+        plot (str, optional): filepath for plots if any. Defaults to False.
+        triv (bool, optional): add line for trivial model to plots. Defaults to False.
+        normalize (bool, optional): normalize the input feat during training. Defaults to False.
+        clip_sd (float, optional): clip. Defaults to None.
+        log (bool, optional): Defaults to False.
+
+    Raises:
+        ValueError: Baseline and methods must be in list
+
+    Returns:
+        super_df: results from each trained model and its configuration.
+    """             
     if isinstance(methods, str):
         methods = [methods]
     if isinstance(l, (int, float)):

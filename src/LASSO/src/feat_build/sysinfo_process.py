@@ -5,7 +5,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 
-from src.feat_build.utils import sysinfo_cols, screensize_mapping, age_cat, portable, global_data
+from src.LASSO.src.feat_build.utils import sysinfo_cols, screensize_mapping, age_cat, portable
 
 
 def main():

@@ -1,22 +1,22 @@
 import os
-from sqlalchemy.engine.url import URL
+# from sqlalchemy.engine.url import URL
 from pathlib import Path
 
 # Directories
-abspath = os.path.dirname(os.path.abspath(__file__))
-src = Path(abspath).parent
-root = src.parent
-global_data = root.parent.parent / 'private_data'
+# abspath = os.path.dirname(os.path.abspath(__file__))
+# src = Path(abspath).parent
+# root = src.parent
+# global_data = root.parent.parent / 'private_data'
 
 # Database URL (removed for security purposes)
-url = URL.create(
-    drivername='', # indicate redshift_connector driver and dialect will be used
-    host='', # Amazon Redshift host
-    port=0, # Amazon Redshift port
-    database='', # Amazon Redshift database
-    username='', # Amazon Redshift username
-    password='' # Amazon Redshift password
-)
+# url = URL.create(
+#     drivername='', # indicate redshift_connector driver and dialect will be used
+#     host='', # Amazon Redshift host
+#     port=0, # Amazon Redshift port
+#     database='', # Amazon Redshift database
+#     username='', # Amazon Redshift username
+#     password='' # Amazon Redshift password
+# )
 
 # Portable, Desktop Chassis Types
 portable = ['Notebook', '2 in 1', 'Tablet']
