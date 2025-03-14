@@ -7,10 +7,27 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 
-from src.LASSO import run as runLasso
-from src.COND_PROB.src import private as runCondProb
-from src.KMEANS import run as runKMeans
-from src.LR_PVAL import run as runLRPval
+tasks = {}
+try:
+    from src.LASSO import run as runLasso
+    tasks["lasso"] = runLasso
+except (ImportError, ModuleNotFoundError) as e:
+    print(f"Failed to import one or more modules: {e}")
+try:
+    from src.COND_PROB.src import private as runCondProb
+    tasks["cond_prob"] = runCondProb
+except (ImportError, ModuleNotFoundError) as e:
+    print(f"Failed to import one or more modules: {e}")
+try:
+    from src.KMEANS import run as runKMeans
+    tasks["kmeans"] = runKMeans
+except (ImportError, ModuleNotFoundError) as e:
+    print(f"Failed to import one or more modules: {e}")
+try:
+    from src.LR_PVAL import run as runLRPval
+    tasks["lr_pval"] = runLRPval
+except (ImportError, ModuleNotFoundError) as e:
+    print(f"Failed to import one or more modules: {e}")
 
 
 
@@ -24,19 +41,22 @@ def main(targets):
     # if no target is specified, run all methods
     target_methods = set(all_methods).intersection(set(targets))
     if len(set(all_methods).intersection(set(targets))) == 0:
-        tasks = params.get("task")
-        if not tasks is None or len(tasks) == 0:
-            target_methods = tasks
+        if len(set(target_methods).intersection(set(tasks.keys()))) == 0:
+            print("Tasks not imported")
+        task_config = params.get("task")
+        if not task_config is None or len(task_config) == 0:
+            target_methods = task_config
         else:
             print("No tasks specified in json or terminal")
         print("Run all data tasks:")
 
     combined_df = []
-    for method, obj in zip(all_methods, all_objects):
+    for method, obj in tasks.items():
         if method not in target_methods:
             continue
 
-        print(f"Running {method}")
+        if params.get("verbose"):
+            print(f"Running {method}")
         combine_df = obj.main(**params)
         combined_df.append(combine_df)
 
