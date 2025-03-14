@@ -18,7 +18,9 @@ The database our analsis was completed on is confidential, so only the resulting
   
 ### Building the project stages using `run.py`
 
-To run the file, in your terminal, run `python run.py [target arguments]`.
+To run the file, in your terminal, run `python run.py` 
+<!---
+[target arguments]`.
 - `all` runs `all` targets from scratch (
   - clean → data → build → test
 - `test` runs `all` targets on unit test data.
@@ -29,6 +31,7 @@ To run the file, in your terminal, run `python run.py [target arguments]`.
 - `build` executes code for specified tasks in config from processed data
 - `test_build` runs unit tests on models (must be already built)
 - `report` runs all but with save figs on and shows output.
+-->
 * Some of the methods take a while to train to effectively compare the data. If you use no arguments,
 the script will run all five methods. If you include one or more arguments, the script will only run
 the methods inputted into the target arguments.
