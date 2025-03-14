@@ -4,39 +4,37 @@ import pandas as pd
 import numpy as np
 import json
 
-from src.model_build import train
-from src.feat_build import main
+from src.LASSO.src.model_build import train
+from src.LASSO.src.feat_build import main
 
-def main(targets):
+def main(**params):
     # read in parameters from command line
-    if '' in targets:
-        with open('config.json') as fh:
-            data_params = json.load(fh)
-            eps_vals = data_params["eps_vals"]
-            data_fp = data_params.get("fp")
-            output_fp = data_params.get("output")
+    data_params = params
+    eps_vals = data_params["eps_vals"]
+    data_fp = data_params.get("fp")
+    output_fp = data_params.get("output")
 
-            lasso_params = data_params["lasso-params"]
-            
-            l = lasso_params.get("l")
-            tol = lasso_params.get("tol")
-            max_iter = lasso_params.get("max_iter")
-            c = lasso_params.get("c")
-            directories = lasso_params.get("directories")
-            sample_guids_parquet = lasso_params.get("sample_guids_parquet")
-            model = lasso_params.get("model")
-    else:
-        eps_vals = None
-        l = None
-        tol = None
-        max_iter = None
-        c = None
-        directories = None
-        sample_guids_parquet = None
-        model = None
-        feat_parquet = None
-        directories = None
-        sample_guids_parquet = None
+    lasso_params = data_params["lasso-params"]
+    
+    l = lasso_params.get("l")
+    tol = lasso_params.get("tol")
+    max_iter = lasso_params.get("max_iter")
+    c = lasso_params.get("c")
+    directories = lasso_params.get("directories")
+    sample_guids_parquet = lasso_params.get("sample_guids_parquet")
+    model = lasso_params.get("model")
+    # else:
+    #     eps_vals = None
+    #     l = None
+    #     tol = None
+    #     max_iter = None
+    #     c = None
+    #     directories = None
+    #     sample_guids_parquet = None
+    #     model = None
+    #     feat_parquet = None
+    #     directories = None
+    #     sample_guids_parquet = None
     # set default values if not specified
     if eps_vals is None: epss = [0.01, 0.1, 1, 10, 100]
     if l is None: l=10
@@ -82,4 +80,7 @@ def main(targets):
                          'utility': utility.tolist()})
 
 if __name__ == "__main__":
-    main()
+    with open("config/run.json") as fh:
+        params = json.load(fh)
+
+    main(**params)
