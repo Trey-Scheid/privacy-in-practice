@@ -81,7 +81,7 @@ def find_L1(X, l):
 
 ###### METHOD ONE #######
 
-def ExponentialMechanism(A, y, l=1.0, tol=1e-4, epsilon=None, delta=1e-6, K=15000, trace=True, normalize=True, clip_sd=np.inf):
+def ExponentialMechanism(A, y, l=1.0, tol=1e-4, epsilon=None, delta=1e-6, K=15000, trace=True, normalize=True, clip_sd=np.inf, log=True):
     """
     Private Frank-Wolfe Lasso Regression model using the exponential mechanism for vertex selection.
 
@@ -176,7 +176,8 @@ def ExponentialMechanism(A, y, l=1.0, tol=1e-4, epsilon=None, delta=1e-6, K=1500
         x_new = (1 - rho) * x_prev #+ rho * s on next line
         x_new[selected_idx % p] += s*rho
         f_new = f(x_new, A, y)
-        check_l_ball(x_new, l, log=True)
+        if k % int(K/10) == 0:
+            check_l_ball(x_new, l, log=log)
         if trace:
             convergence_criteria.append(f_new)#grad @ x_new)
         # if (k > 1) and (abs(f_new - f_prev) < tol):# or (grad @ x_new) < tol: #or np.linalg.norm(x_new - x_prev, ord=np.inf) < tol:
@@ -266,7 +267,7 @@ def fwOracle(grad, l):
     s[i] = -np.sign(grad[i]) * l
     return s
 
-def LaplaceNoise(A, y, l=1.0, tol=0.0001, K=15000, delta=1e-6, epsilon=None, trace=True, normalize=True, clip_sd=np.inf):
+def LaplaceNoise(A, y, l=1.0, tol=0.0001, K=15000, delta=1e-6, epsilon=None, trace=True, normalize=True, clip_sd=np.inf, log=True):
     """
     Private Frank-Wolfe Lasso Regression model adding Laplace noise to gradient before oracle selection
 
@@ -348,7 +349,8 @@ def LaplaceNoise(A, y, l=1.0, tol=0.0001, K=15000, delta=1e-6, epsilon=None, tra
         s = fwOracle(grad+noise, l)
         x_new = (1 - rho) * x_prev + rho * s
         f_new = f(x_new, A, y)
-        check_l_ball(x_new, l, log=True)
+        if k % int(K/10) == 0:
+            check_l_ball(x_new, l, log=log)
         if trace:
             convergence_criteria.append(f_new)#grad @ x_new)
         # if  (k > 1) and (abs(f_new - f_prev) < tol):# or (grad @ x_new) < tol: #or np.linalg.norm(x_new - x_prev, ord=np.inf) < tol:
@@ -476,7 +478,7 @@ def check_normalization(X):
 
 #### FOR NON PRIVATE ####
 
-def FW_NonPrivate(A, y, l=1.0, K=15000, tol=1e-4, trace=False, normalize=False, clip_sd=None, epsilon=None, delta=None):
+def FW_NonPrivate(A, y, l=1.0, K=15000, tol=1e-4, trace=False, normalize=False, clip_sd=None, epsilon=None, delta=None, log=True):
     """
     Frank-Wolfe Lasso Regression model.
 
@@ -550,7 +552,8 @@ def FW_NonPrivate(A, y, l=1.0, K=15000, tol=1e-4, trace=False, normalize=False, 
         x_new = (1 - rho) * x_prev #+ rho * s on next line
         x_new[selected_idx % p] += s*rho
         f_new = f(x_new, A, y)
-        check_l_ball(x_new, l, log=True)
+        if k % int(K/10) == 0:
+            check_l_ball(x_new, l, log=log)
         if trace:
             convergence_criteria.append(f_new)
         if (k > 1) and (abs(f_new - f_prev) < tol):

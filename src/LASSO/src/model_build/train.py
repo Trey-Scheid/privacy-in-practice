@@ -57,7 +57,7 @@ def trivial(feat, correct_feats=None):
     coef = np.append(np.array([avg]), np.zeros(X.shape[1]))
 
     # compute metrics
-    print(f'Train MSE sklearn: {mean_squared_error(y_train, np.repeat(avg, y_train.shape[0])):.2f} ({100*sum(coef>0)/coef.shape[0]:.1f}% sparse)')
+    # print(f'Train MSE sklearn: {mean_squared_error(y_train, np.repeat(avg, y_train.shape[0])):.2f} ({100*sum(coef>0)/coef.shape[0]:.1f}% sparse)')
     
     mse = mean_squared_error(y_test, np.repeat(avg, y_test.shape[0]))
     # print(f'Test MSE sklearn: {mse:.2f} ({100*sum(model.coef_>0)/model.coef_.shape[0]:.1f}% sparse)')
@@ -73,7 +73,7 @@ def trivial(feat, correct_feats=None):
     
     return mse, coef_dict, r2, similarity
 
-def train(feat, correct_feats=None, method='lasso', tol=1e-8, l=1, max_iter=10000, epsilon=None, delta=1e-6, plot=False, normalize=False, clip_sd=None, triv=None, nonpriv=None):
+def train(feat, correct_feats=None, method='lasso', tol=1e-8, l=1, max_iter=10000, epsilon=None, delta=1e-6, plot=False, normalize=False, clip_sd=None, triv=None, log=True):
     """
     Train linear model for power usage
 
@@ -162,7 +162,7 @@ def train(feat, correct_feats=None, method='lasso', tol=1e-8, l=1, max_iter=1000
         
         model = model(X_train, y_train, l=l, tol=tol, delta=delta, epsilon=epsilon, K=max_iter, normalize=normalize, clip_sd=clip_sd, trace=should_trace)
 
-        print(f'Train MSE fw: {mean_squared_error(y_train, X_train @ model.get("model")):.2f} ({100*sum(model.get("model")>0)/model.get("model").shape[0]:.1f}% sparse)')
+        # print(f'Train MSE fw: {mean_squared_error(y_train, X_train @ model.get("model")):.2f} ({100*sum(model.get("model")>0)/model.get("model").shape[0]:.1f}% sparse)')
         y_pred = X_test @ model.get("model")
         mse = mean_squared_error(y_test, y_pred)
         # print(f'Test MSE {method}: {mse:.2f} ({100*sum(model>0)/model.shape[0]:.1f}% sparse)')
@@ -175,7 +175,7 @@ def train(feat, correct_feats=None, method='lasso', tol=1e-8, l=1, max_iter=1000
         model.fit(X_train, y_train)
         # MSE calculation
         y_pred = model.predict(X_test)
-        print(f'Train MSE sklearn: {mean_squared_error(y_train, model.predict(X_train)):.2f} ({100*sum(model.coef_>0)/model.coef_.shape[0]:.1f}% sparse)')
+        # print(f'Train MSE sklearn: {mean_squared_error(y_train, model.predict(X_train)):.2f} ({100*sum(model.coef_>0)/model.coef_.shape[0]:.1f}% sparse)')
         mse = mean_squared_error(y_test, y_pred)
         # print(f'Test MSE sklearn: {mse:.2f} ({100*sum(model.coef_>0)/model.coef_.shape[0]:.1f}% sparse)')
         # Coefficient dictionary with feature name
@@ -199,21 +199,23 @@ def train(feat, correct_feats=None, method='lasso', tol=1e-8, l=1, max_iter=1000
     return mse, coef_dict, r2, similarity
 
 
-def train_run_eps(eps_vals, model, data, tol, l, K, plot_dir, baseline):
+def train_run_eps(eps_vals, model, data, delta, tol, l, K, plot_dir, baseline, normalize, clip, triv, c, verbose):
 
+    baseline_mse, _, _, _ = train.train(data, None, baseline, tol=tol, l=l, epsilon=eps, max_iter=K, plot= plot_dir / f'{model}_{eps}_convergence.png', log=verbose)
     # run model on each epsilon value
     epsresults = []
     for eps in eps_vals:
-        test_mse, feat_dict, r2, sim = train.train(data, model, tol=tol, l=l, epsilon=eps, max_iter=K, plot= plot_dir / f'{model}_{eps}_convergence.png')
+        test_mse, feat_dict, r2, sim = train.train(data, None, model, tol=tol, l=l, epsilon=eps, max_iter=K, epsilon=eps, delta=delta, plot= plot_dir / f'{model}_{eps}_convergence.png', normalize=normalize, clip_sd=clip, triv=triv, log=verbose)
         
         epsresults.append(test_mse)
 
     # convert mse to utility
     rmses = np.sqrt(np.array(epsresults))
-    max_rmse = np.max(rmses)
+    # max_rmse = np.max(rmses)
     # for higher values of c, punish rmse more. c in (0, inf)
-    utility = 2 / (1 + np.exp(c * rmses / max_rmse)) # use sigmoid function to normalize
-    utility = 1 - (rmses - baseline_mse**.5) / (50 - baseline_mse ** .5)
+    # utility = 2 / (1 + np.exp(c * rmses / max_rmse)) # use sigmoid function to normalize
+    # c is worst case rmse = 0 utility, use domain knowledge
+    utility = 1 - (rmses - baseline_mse**.5) / (c - baseline_mse ** .5)
     
     df = pd.DataFrame({'epsilon': eps_vals,
                 'task': ["Lasso Regression" for i in range(len(eps_vals))],  
@@ -222,7 +224,7 @@ def train_run_eps(eps_vals, model, data, tol, l, K, plot_dir, baseline):
     return df
 
 
-def research_plots(feat, correct_feats=None, methods='lasso', baseline=None, l=None, max_iter=10000, epsilon=None, target_eps=None, delta=None, plot=False, triv=False, nonpriv=None, normalize=False, clip_sd=None, log=False):
+def research_plots(feat, correct_feats=None, methods='lasso', baseline=None, l=None, max_iter=10000, epsilon=None, target_eps=None, delta=None, plot=False, triv=False, normalize=False, clip_sd=None, log=False):
     """
     Convergence and performance results plots for many models
 
@@ -238,7 +240,6 @@ def research_plots(feat, correct_feats=None, methods='lasso', baseline=None, l=N
         delta (float, optional): privacy parameter. Defaults to None.
         plot (str, optional): filepath for plots if any. Defaults to False.
         triv (bool, optional): add line for trivial model to plots. Defaults to False.
-        nonpriv (_type_, optional): add line for baseline to plots. Defaults to None.
         normalize (bool, optional): normalize the input feat during training. Defaults to False.
         clip_sd (float, optional): clip. Defaults to None.
         log (bool, optional): Defaults to False.

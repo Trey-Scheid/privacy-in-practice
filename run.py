@@ -24,7 +24,11 @@ def main(targets):
     # if no target is specified, run all methods
     target_methods = set(all_methods).intersection(set(targets))
     if len(set(all_methods).intersection(set(targets))) == 0:
-        target_methods = all_methods
+        tasks = params.get("task")
+        if not tasks is None or len(tasks) == 0:
+            target_methods = tasks
+        else:
+            print("No tasks specified in json or terminal")
         print("Run all data tasks:")
 
     combined_df = []
