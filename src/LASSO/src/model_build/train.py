@@ -195,7 +195,32 @@ def train(feat, correct_feats=None, method='lasso', tol=1e-8, l=1, max_iter=1000
         plt.ylim(0, max(trace))
         plt.tight_layout()
         plt.savefig(plot, dpi=300, facecolor='#EEEEEE', edgecolor='#EEEEEE')
+
     return mse, coef_dict, r2, similarity
+
+
+def train_run_eps(eps_vals, model, data, tol, l, K, plot_dir, baseline):
+
+    # run model on each epsilon value
+    epsresults = []
+    for eps in eps_vals:
+        test_mse, feat_dict, r2, sim = train.train(data, model, tol=tol, l=l, epsilon=eps, max_iter=K, plot= plot_dir / f'{model}_{eps}_convergence.png')
+        
+        epsresults.append(test_mse)
+
+    # convert mse to utility
+    rmses = np.sqrt(np.array(epsresults))
+    max_rmse = np.max(rmses)
+    # for higher values of c, punish rmse more. c in (0, inf)
+    utility = 2 / (1 + np.exp(c * rmses / max_rmse)) # use sigmoid function to normalize
+    utility = 1 - (rmses - baseline_mse**.5) / (50 - baseline_mse ** .5)
+    
+    df = pd.DataFrame({'epsilon': eps_vals,
+                'task': ["Lasso Regression" for i in range(len(eps_vals))],  
+                'utility': utility.tolist()})#.to_csv("lasso_results.csv", index_label="Index")
+
+    return df
+
 
 def research_plots(feat, correct_feats=None, methods='lasso', baseline=None, l=None, max_iter=10000, epsilon=None, target_eps=None, delta=None, plot=False, triv=False, nonpriv=None, normalize=False, clip_sd=None, log=False):
     """

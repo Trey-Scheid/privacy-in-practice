@@ -25,6 +25,7 @@ def main(targets):
     target_methods = set(all_methods).intersection(set(targets))
     if len(set(all_methods).intersection(set(targets))) == 0:
         target_methods = all_methods
+        print("Run all data tasks:")
 
     combined_df = []
     for method, obj in zip(all_methods, all_objects):
@@ -37,9 +38,9 @@ def main(targets):
 
     fp = params.get("output")
     try:
-        combine_plot(combined_df, fp)
+        return combine_plot(combined_df, fp)
     except Exception as e:
-        print(f"Error plotting {method}: {e}")
+        print(f"Error plotting: {e}")
 
 
 
@@ -62,6 +63,7 @@ def combine_plot(combined_df, fp):
 
     plt.tight_layout()
     plt.savefig(os.path.join(*fp, "results.png"))
+    return big_df
 
 
 if __name__ == "__main__":

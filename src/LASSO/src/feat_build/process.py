@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 from src.feat_build import sysinfo_process
-from src.feat_build.utils import global_data, software_categories
+from src.feat_build.utils import software_categories
 
 def create_software_category_map(sw_raw):
     # Read the CSV file
@@ -29,9 +29,9 @@ def create_software_category_map(sw_raw):
     software_mapping = sw_raw[['frgnd_proc_name', 'Category']].set_index('frgnd_proc_name').to_dict()['Category']
 
     # Save to pickle
-    with open(os.join(global_data, 'software_data.pkl'), 'wb') as f:
+    with open(os.join(raw_dir, 'software_data.pkl'), 'wb') as f:
         pickle.dump(software_mapping, f)
-        print(f'Software category mapping saved to {global_data}/software_data.pkl')
+        print(f'Software category mapping saved to {raw_dir}/software_data.pkl')
     f.close()
     return
 
@@ -90,26 +90,24 @@ def proc_temp(df):
 
     return df.groupby(['guid', 'dt'])[['prod']].sum().reset_index().rename(columns={'prod': 'temp_avg'})
 
-def main(data_folder, proc_sysinfo=False):
+def main(raw_dir, proc_dir, proc_sysinfo=False):
     """
     main function to featureize non-sysinfo data
     
-    :param data_folder: path to data folder for the investigation (not the global data folder)
+    :param data_folder: path to data folder for the investigation (not the raw data folder)
     :param proc_sysinfo: boolean to process sysinfo data, 
                          should be True only if sysinfo data is new
     """
 
-    raw_folder = data_folder / 'raw'
-
     # load raw sample data
     print('Loading raw data...')
-    sw_raw = pd.read_parquet(raw_folder / 'sw_usage')  # software usage
-    web_raw = pd.read_parquet(raw_folder / 'web_usage')  # web usage
-    temp_raw = pd.read_parquet(raw_folder / 'temp')  # temperature
-    cpu_raw = pd.read_parquet(raw_folder / 'cpu_util')  # temperature
-    power_raw = pd.read_parquet(raw_folder / 'power')  # power (predictor variable)
+    sw_raw = pd.read_parquet(proc_dir / 'sw_usage')  # software usage
+    web_raw = pd.read_parquet(proc_dir / 'web_usage')  # web usage
+    temp_raw = pd.read_parquet(proc_dir / 'temp')  # temperature
+    cpu_raw = pd.read_parquet(proc_dir / 'cpu_util')  # temperature
+    power_raw = pd.read_parquet(proc_dir / 'power')  # power (predictor variable)
 
-    if not os.path.exists(global_data / 'software_data.pkl'):
+    if not os.path.exists(raw_dir / 'software_data.pkl'):
         print('Creating software category mapping pickle')
         # creates mapping file
         create_software_category_map(sw_raw)
@@ -117,7 +115,7 @@ def main(data_folder, proc_sysinfo=False):
     print('Processing raw data...')
 
     # load software category data (mapping vocab from ChatGPT)
-    with open(global_data / 'software_data.pkl', 'rb') as file:
+    with open(raw_dir / 'software_data.pkl', 'rb') as file:
         sw_cat = pickle.load(file)
 
     # process software usage data for pivoting
