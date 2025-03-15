@@ -110,7 +110,7 @@ Another concept is device power usage, this is the rate of energy consumption by
 
 \subsection{Applications}
 
-Telemetry is one narrow domain which privacy is a concern, many other types of data require sensitive handling and sharing practices. For example the US Census \footnote{https://www.census.gov/about/policies/privacy/privacy-policy.html}. 
+Telemetry is one narrow domain which privacy is a concern, many other types of data require sensitive handling and sharing practices. For example the US Census \footnote{\url{https://www.census.gov/about/policies/privacy/privacy-policy.html}}. 
 
 We will get into the specifics of each task, however note that each one can be applied to datasets in any domain. Probabilities of political party affiliation, Lasso/kmeans for gene identification, or correlation for stock prices. 
 
@@ -285,23 +285,46 @@ To calculate the utility for the Conditional Probability task, we defined the lo
 
 \subsection{All Tasks: Privacy vs Utility}
 
+<<<<<<< Updated upstream
 \begin{figure}[H] % 'h' specifies to place the figure here in the text
   \centering
   \includegraphics[width=0.6\textwidth]{figure/meta.png} % Path to the image
   \caption{Privacy vs Normalized Utility for all tasks. Non-private models have a utility of 1.}
+=======
+\subsection{Cross-Task Privacy-Utility Evaluation}
+
+Figure \ref{fig:meta} composes the performance of each task to conclude the findings of the study. Results from each method are uniquely transformed to a normalized utility metric. This allows even comparisons of Pareto curves at all privacy budgets from highly private $\epsilon=0.01$ to a weaker guarantee at $\epsilon=100$.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth]{figure/meta.png}
+  \caption{Comparative Utility Analysis Across Privacy Budget ($\epsilon$) Levels. Non-private baselines for each task determines the maximum utility.}
+>>>>>>> Stashed changes
   \label{fig:meta}
 \end{figure}
 
 \subsection{COND\_PROB}
 
+<<<<<<< Updated upstream
 \begin{figure}[h!]
+=======
+Figure \ref{fig:histoeps} compares differences in private and non-private release of proportions for two error codes. Privacy budget total for this task was set to $\epsilon=1$. Uncorrected errors are coded 41, corrected errors are coded 1001. 
+
+\begin{figure}[H]
+>>>>>>> Stashed changes
     \centering
     \includegraphics[width=0.8\textwidth]{figure/histoeps1.png}
     \caption{Corrected Error Count vs Uncorrected Error Probability at Epsilon = 1. With and without noise.}
     \label{fig:histoeps}
 \end{figure}
 
+<<<<<<< Updated upstream
 \begin{figure}[h!]
+=======
+Before transforming to utility, the conditional probabilities from Figure \ref{fig:histoeps} and releases at many other epsilons are measured in Mean Absolute Error. Figure \ref{fig:epsilon_vs_loss} shows a clear exponential decay even on log scaled epsilons, this indicates a super-exponential relationship between release error and budget. 
+
+\begin{figure}[H]
+>>>>>>> Stashed changes
     \centering
     \includegraphics[width=0.8\textwidth]{figure/epsilon_vs_loss.png}
     \caption{Mean Absolute Error vs Epsilon}
@@ -319,13 +342,27 @@ Our main method of comparing against the baseline was by calculating the set int
 \end{figure}
 
 \subsection{KMEANS}
+<<<<<<< Updated upstream
 \begin{figure}[H] % 'h' specifies to place the figure here in the text
+=======
+
+Recreating the cluster visual from a previous study, in Figure \ref{fig:centroids} we display clusters of high dimensional data in terms of their scaled $L1$ Distance. There are three centers chosen for this model and they are spread in relation to data point densities.
+
+\begin{figure}[H]
+>>>>>>> Stashed changes
     \centering
     \includegraphics[width=0.6\textwidth]{figure/1d_clusters.png} % Path to the image
     \caption{Centroid locations overlaid over data points $\epsilon=1$}
     \label{fig:centroids}
 \end{figure}
+<<<<<<< Updated upstream
 \begin{figure}[H] % 'h' specifies to place the figure here in the text
+=======
+
+The model training evaluation at many privacy budgets is computed in Figure \ref{fig:epsilon_inertia}. Inertia measures total data spread from centroids and can fluctuate when any point is reassigned.
+
+\begin{figure}[H]
+>>>>>>> Stashed changes
     \centering
     \includegraphics[width=0.6\textwidth]{figure/dpk_plot.png} % Path to the image
     \caption{Epsilon vs. Inertia compared to baseline non-private model}
@@ -409,9 +446,14 @@ The applicability of our study as a commentary of the feasibility of DP methods 
 Additionally on replicating papers, some papers were difficult to replicate due to obscurity in their writing or lack of general information. A common pitfall was not knowing exactly which "temperature" a paper was referring to. One of us had to assess several papers before being able to find one that would be able to be replicated.
 
 
+<<<<<<< Updated upstream
 \subsection{State of DP and how it relates to us}
 The field of differential privacy is rapidly growing as more organizations and governments recognize the importance of protecting individuals' data in an increasingly data-driven world. It is crucial to be knowledgable about this field as it equips us with the understanding of how to protect sensitive data while enabling meaningful analysis.
 % TODO
+=======
+\subsection{The State of Differential Privacy}
+The field of differential privacy is rapidly growing as more organizations and governments recognize the importance of protecting individuals' data in an increasingly data-driven world. It is crucial to be knowledgeable about this field as it equips us with the understanding of how to protect sensitive data while enabling meaningful analysis. Therefore it can be difficult to ensure your implementation has the best method, best budget and best interpretation for your task. Fortunately, even if your formulation is outdated, the guarantees will still hold and you will only be missing some marginal utility. 
+>>>>>>> Stashed changes
 
 %%%%%%%%%%%%%%%%%%%
 %%%% CONCLUSION %%%%%%%
@@ -443,16 +485,50 @@ Another promising direction is leveraging off-the-shelf differential privacy pac
 Beyond technical advancements, think-aloud studies and longitudinal research could provide valuable insights into how users interact with differentially private systems in real-world settings. By observing users over time, we can refine privacy mechanisms to better align with practical workflows. Finally, validating utility results through alternative testing methods would help ensure that privacy-preserving models maintain effectiveness across different evaluation metrics, strengthening confidence in their real-world applicability
 
 
+\subsection{Acknowledgments}
+
+We would like to recognize the support of our instructor, Yu-Xiang Wang, for his guidance and feedback throughout the project. We would also like to thank the teaching staff Umesh Bellur and Shriniwas Kulkarni for their support and feedback. The tasks database was a foundational part of our work and was created by another student researcher: Qiyu Li. We also attended a workshop called "Workshop on Defining Holistic Private Data Science for Practice" hosted by ENCORE at UC San Diego, which helped greatly with our broad understanding of the state of the field of differential privacy in practice.
+
+We also would like to thank the authors of the papers we referenced in our literature review. Their work was instrumental in our understanding of the topic and the development of our project. Our understandings of differential privacy has been built on the work of many researchers in the field. Especially those which engaged in discussion with us about the field (Smith, Ulman, Kamath and others). We are grateful for their passion and for making their work freely accessible.
+
+% COMMENT THIS BEFORE RENDERING
+%\input{example_tex_section_6.tex}
+% COMMENT THIS BEFORE RENDERING
+
+%%%%%%%%%%%%%%%%%%%
+%%%% REFERENCES%%%%%%%
+%%%%%%%%%%%%%%%%%%%
+\makereference
+
+\bibliographystyle{style/dsc180bibstyle}
+
+
+\bibliography{reference}
+% To edit the contents of the ``References" section, edit \texttt{reference.bib}. Many conference websites format citations in BibTeX that you can copy into \texttt{reference.bib} directly; you can also search for the paper on Google Scholar, click ``Cite", and then click ``BibTeX" (\href{https://scholar.google.com/scholar?hl=en&as_sdt=0%2C23&q=attention+is+all+you+need&btnG=#d=gs_cit&t=1700436667623&u=%2Fscholar%3Fq%3Dinfo%3A5Gohgn6QFikJ%3Ascholar.google.com%2F%26output%3Dcite%26scirp%3D0%26hl%3Den}{here}'s an example).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% Appendix
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\clearpage
+\makeappendix
+
 %%%%%%%%%%%%%%%%%%%%%%
 %%%% CONTRIBUTIONS %%%
 %%%%%%%%%%%%%%%%%%%%%%
 
-\section{Contributions}
+\subsection{Contributions}
 
+<<<<<<< Updated upstream
 \subsection{Author Contributions}:
 T.S. focused on task22 LASSO Regression to highlight the exploratory capabilities of private data while implementing a previously theoretical framework (Franke-Wolfe). C.L. focused on private logistic regression to be able to do Wald tests to asses the relationship between input and target variables. B.N. analyzed and implemented non-private and private K-Means clustering. T.K. analyzed the experimental results of applying privacy mechanisms to a conditional probability histogram. Y.W. supervised the research and provided guidance on the mathematical foundations. All authors contributed to writing and reviewing the manuscript.
+=======
+\subsubsection{Author Contributions}
+T.S. focused on lasso regression to highlight the exploratory capabilities of private data while implementing a previously theoretical framework (private Franke-Wolfe \cite{NIPS2015_52d080a3}). C.L. focused on private logistic regression to be able to do Wald tests to asses the relationship between input and target variables. B.N. analyzed and implemented non-private and private K-Means clustering. T.K. analyzed the experimental results of applying privacy mechanisms to a conditional probability histogram. Y.W. supervised the research and provided guidance on the mathematical foundations. All authors contributed to writing and reviewing the manuscript.
+>>>>>>> Stashed changes
 
-\subsection{Task Details}
+\subsubsection{Task Details}
 
 Trey Scheid
 \begin{itemize}
@@ -489,37 +565,9 @@ Yu-Xiang Wang
 \end{itemize}
 
 
-\subsection{Acknowledgements}
-
-We would like to recognize the support of our instructor, Yu-Xiang Wang, for his guidance and feedback throughout the project. We would also like to thank the teaching staff Umesh Bellur and Shriniwas Kulkarni for their support and feedback. The tasks database was a foundational part of our work and was created by another student researcher: Qiyu Li. We also attended a workshop called "Workshop on Defining Holistic Private Data Science for Practice" hosted by ENCORE at UC San Diego, which helped greatly with our broad understanding of the state of the field of differential privacy in practice.
-
-We also would like to thank the authors of the papers we referenced in our literature review. Their work was instrumental in our understanding of the topic and the development of our project. Our understandings of differential privacy has been built on the work of many researchers in the field. Especially those which engaged in discussion with us about the field (Smith, Ulman, Guatam et al.). We are grateful for their contributions.
-
-% COMMENT THIS BEFORE RENDERING
-%\input{example_tex_section_6.tex}
-% COMMENT THIS BEFORE RENDERING
-
-%%%%%%%%%%%%%%%%%%%
-%%%% REFERENCES%%%%%%%
-%%%%%%%%%%%%%%%%%%%
-\makereference
-
-\bibliographystyle{style/dsc180bibstyle}
-
-
-\bibliography{reference}
-% To edit the contents of the ``References" section, edit \texttt{reference.bib}. Many conference websites format citations in BibTeX that you can copy into \texttt{reference.bib} directly; you can also search for the paper on Google Scholar, click ``Cite", and then click ``BibTeX" (\href{https://scholar.google.com/scholar?hl=en&as_sdt=0%2C23&q=attention+is+all+you+need&btnG=#d=gs_cit&t=1700436667623&u=%2Fscholar%3Fq%3Dinfo%3A5Gohgn6QFikJ%3Ascholar.google.com%2F%26output%3Dcite%26scirp%3D0%26hl%3Den}{here}'s an example).
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%% Appendix
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\clearpage
-\makeappendix
-
 \subsection{Project Proposal}
 
+\textit{Proposed in coordination with mentor Yu-Xiang to the capstone faculty on 04 December, 2024.}
 
 % style bad
 % \input{project_proposal.tex}
@@ -561,6 +609,68 @@ The other requirements for this project rely on data access and task availabilit
 
 Lastly, although we have not reviewed the dataset and tasks yet (no access), the intel program is sharing genuine telemetry information from devices with given consent as part of their program. Additionally, this HDSI-Intel partnership has been cooperating since 2020 and HDSI has used hundreds of terabytes of information.
 
+<<<<<<< Updated upstream
+=======
+\subsection{Additional Materials}
+
+\subsubsection{Privacy Theorems and Definitions}
+
+\begin{definition}[\cite{ExpMech} Exponential Mechanism]
+    \label{def:ExpMech}
+    Let $\mathcal{D}$ be a domain of datasets, $\mathcal{R}$ be a range of possible outputs, and $q: \mathcal{D} \times \mathcal{R} \rightarrow \mathbb{R}$ be a quality function that maps dataset-output pairs to real-valued scores. The sensitivity of $q$ is defined as:
+    \[
+    \Delta q = \max_{r \in \mathcal{R}, D, D' \text{ adjacent}} |q(D,r) - q(D',r)|
+    \]
+    
+    The Exponential Mechanism $\mathcal{M}_q^{\epsilon}(D)$ selects and outputs an element $r \in \mathcal{R}$ with probability proportional to:
+    \[
+    \Pr[\mathcal{M}_q^{\epsilon}(D) = r] \propto \exp\left(\frac{\epsilon q(D,r)}{2\Delta q}\right)
+    \]
+    
+    The Exponential Mechanism satisfies $\epsilon$-differential privacy. Furthermore, if we define $OPT(D) = \max_{r \in \mathcal{R}} q(D,r)$ as the maximum quality score, then with probability at least $1-\delta$:
+    \[
+    q(D, \mathcal{M}_q^{\epsilon}(D)) \geq OPT(D) - \frac{2\Delta q}{\epsilon}\left(\ln\left(\frac{|\mathcal{R}|}{\delta}\right)\right)
+    \]
+\end{definition}
+
+\begin{theorem}[\cite{NIPS2015_52d080a3} Privacy Guarantee]
+    \label{thm:dp}
+    The Private Frank-Wolfe Algorithm is $(\epsilon, \delta)$-differentially private.
+    Since each data item is assumed to have bounded $\ell_{\infty}$ norm, for two neighboring databases $D$ and $D'$ and any $\theta \in \mathcal{C}$, $s \in S$, we have that
+    \[
+    |\langle s, \nabla \mathcal{L}(\theta; D) \rangle - \langle s, \nabla \mathcal{L}(\theta; D') \rangle| = O(L_1 \|\mathcal{C}\|_1/n)
+    \]
+\end{theorem}
+
+\begin{theorem}[\cite{NIPS2015_52d080a3} Utility Guarantee]
+    \label{thm:util}
+    Let $L_1$, $S$ and $\|\mathcal{C}\|_1$ be defined as in the algorithm. Let $\Gamma_{\mathcal{L}}$ be an upper bound on the curvature constant for the loss function $\mathcal{L}(\cdot; d)$ that holds for all $d \in \mathcal{D}$. If we set $T = \frac{\Gamma_{\mathcal{L}}^{2/3}(n\epsilon)^{2/3}}{(L_1\|\mathcal{C}\|_1)^{2/3}}$, then:
+    \[
+    \mathbb{E}[\mathcal{L}(\theta^{\text{priv}}; D)] - \min_{\theta \in \mathcal{C}}\mathcal{L}(\theta; D) = O\left(\frac{\Gamma_{\mathcal{L}}^{1/3}(L_1\|\mathcal{C}\|_1)^{2/3}\log(n|S|)\sqrt{\log(1/\delta)}}{(n\epsilon)^{2/3}}\right)
+    \]
+    where the expectation is over the randomness of the algorithm.
+\end{theorem}
+
+For the specific case of LASSO with bounded features ($\|x\|_{\infty} \leq 1$ and $|y| \leq 1$), this simplifies to:
+
+\begin{corollary}[\cite{NIPS2015_52d080a3} Lasso Utility]
+    \label{thm:utilcor}
+    For the LASSO problem with $\|x\|_{\infty} \leq 1$ and $|y| \leq 1$, the output $\theta^{\text{priv}}$ ensures:
+    \[
+    \mathbb{E}[\mathcal{L}(\theta^{\text{priv}}; D) - \min_{\theta \in \mathcal{C}}\mathcal{L}(\theta; D)] = O\left(\frac{\log(np/\delta)}{(n\epsilon)^{2/3}}\right)
+    \]
+\end{corollary}
+
+This algorithm reaches near optimal private performance: 
+
+\begin{theorem}[\cite{NIPS2015_52d080a3} Near-Optimality]
+    \label{thm:NearOpt}
+    For the sparse linear regression problem where $\|x_i\|_{\infty} \leq 1$, for $\epsilon = 0.1$ and $\delta = o(1/n^2)$, any $(\epsilon, \delta)$-differentially private algorithm $\mathcal{A}$ must have:
+    \[
+    \mathbb{E}[\mathcal{L}(\mathcal{A}(D); D) - \min_{\theta \in \mathcal{C}}\mathcal{L}(\theta; D)] = \Omega\left(\frac{1}{(n\log n)^{2/3}}\right)
+    \]
+\end{theorem}
+>>>>>>> Stashed changes
 
 
 
