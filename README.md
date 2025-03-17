@@ -18,7 +18,13 @@ The database our analsis was completed on is confidential, so only the resulting
   
 ### Building the project stages using `run.py`
 
-To run the file, in your terminal, run `python run.py [target arguments]`.
+To run the file, in your terminal, run `python run.py` followed by specific task names, or blank and let task in the run.json config take care of it! Choose however many from:
+- `lasso`
+- `kmeans`
+- `cond_prob`
+- `lr_pval`
+<!---
+[target arguments]`.
 - `all` runs `all` targets from scratch (
   - clean → data → build → test
 - `test` runs `all` targets on unit test data.
@@ -29,6 +35,7 @@ To run the file, in your terminal, run `python run.py [target arguments]`.
 - `build` executes code for specified tasks in config from processed data
 - `test_build` runs unit tests on models (must be already built)
 - `report` runs all but with save figs on and shows output.
+-->
 * Some of the methods take a while to train to effectively compare the data. If you use no arguments,
 the script will run all five methods. If you include one or more arguments, the script will only run
 the methods inputted into the target arguments.
@@ -36,8 +43,8 @@ the methods inputted into the target arguments.
 
 ```
 .
-├─ LICENSE               <- Open-source license if one is chosen
-├─ README.md             <- Top level breakdown of repo
+├─ LICENSE
+├─ README.md
 ├─ run.py                <- Catch all function to build project from scratch
 │
 ├─ src                   <- all source code
@@ -64,7 +71,7 @@ the methods inputted into the target arguments.
 │
 ├─ poster.pdf            <- Conference Poster
 │
-├─ environment.yml      <- Built with conda for executing run.py
+├─ environment.yml       <- Built with conda for executing run.py
 │
 ├─ config/               <- parameters for run.py and each other .py
 │
@@ -72,9 +79,9 @@ the methods inputted into the target arguments.
 │  ├─ dynamic_output/    <- Stores output plots and tables from run.py
 │  └─ static_output/     <- Output plots/tables from Intel Telemetry Data 
 │
-├─ dummy_data/           <- parquets for each task, random noise in schema
+├─ dummy_data/           <- synthetic (random noise) data according to schema
 │  ├─ raw/               <- "read only" parquets used by tasks
-│  └─ processed/         <- results of etl work for faster re-runs
+│  └─ processed/         <- results of etl processing
 │
 ├─ .github/workflows/nextjs.yml      <- Builds github.io website from branch│
 │
