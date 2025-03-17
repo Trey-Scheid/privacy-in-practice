@@ -18,6 +18,7 @@
         "c":50,
         "feat_parquet":"synthetic_feat.parquet",
         "directories":["frgnd_backgrnd_apps_v4_hist", "web_cat_usage_v2","power_acdc_usage_v4_hist","os_c_state", "hw_pack_run_avg_pwr"],
+        "system_info_parquet":"system_sysinfo_unique_normalized",
         "sample_guids_parquet":"synthetic_guids.parquet"
     },
     "cond-prob-params": {

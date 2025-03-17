@@ -8,11 +8,11 @@ from sklearn.impute import SimpleImputer
 from src.LASSO.src.feat_build.utils import sysinfo_cols, screensize_mapping, age_cat, portable
 
 
-def main():
+def main(raw, proc):
     """
-    process sysinfo data to merge with other tables
+    process sysinfo data to merge with other tables (create sysinfo_ohe.parquet and chastype.parquet)
     """
-    sysinfo_file = global_data / 'sysinfo.parquet'
+    sysinfo_file = proc / 'sysinfo.parquet'
 
     # Load raw sysinfo data
     full_sysinfo = pd.read_parquet(sysinfo_file)
@@ -80,14 +80,14 @@ def main():
     all_cols = np.concatenate([ohe_cols, ord_cols, num_cols, guid])
 
     # Save processed sysinfo data
-    proc_file_name = global_data / 'sysinfo_ohe.parquet'
+    proc_file_name = proc / 'sysinfo_ohe.parquet'
     pd.DataFrame(sysinfo_proc, columns=all_cols).to_parquet(proc_file_name, index=False)
 
     # Save chastype
     # Create column for portable (1) or desktop/server (0)
     chastype['portable'] = chastype['chassistype'].isin(portable).astype(int)
 
-    chastype_file_name = global_data / 'chastype.parquet'
+    chastype_file_name = proc / 'chastype.parquet'
 
     chastype.to_parquet(chastype_file_name, index=False)
 

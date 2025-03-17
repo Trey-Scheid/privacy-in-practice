@@ -30,6 +30,7 @@ def main(**data_params):
     directories = lasso_params.get("directories")
     sample_guids_parquet = lasso_params.get("sample_guids_parquet")
     feat_parquet = lasso_params.get("feat_parquet")
+    sys_info = lasso_params.get("system_info_parquet")
     model = lasso_params.get("model")
 
     # set default values if not specified
@@ -44,6 +45,7 @@ def main(**data_params):
     if triv is None: triv=False
     if c is None: c=0
     if feat_parquet is None: feat_parquet = 'feat.parquet'
+    if sys_info is None: sys_info = "system_sysinfo_unique_normalized"
     if directories is None: directories = ["frgnd_backgrnd_apps_v4_hist", "web_cat_usage_v2","power_acdc_usage_v4_hist","os_c_state", "hw_pack_run_avg_pwr"]
     if sample_guids_parquet is None: sample_guids_parquet = 'sample_guids.parquet'
 
@@ -53,7 +55,7 @@ def main(**data_params):
 
     # create feat.parquet if it doesn't exist
     if feat_parquet not in os.listdir(processed_dir):
-        status = main.generate_features(raw_dir / sample_guids_parquet, raw_dir, processed_dir, directories)
+        status = main.generate_features(raw_dir / sample_guids_parquet, raw_dir, processed_dir, directories, sys_info)
         if v:
             print(f"Features saved to {feat_parquet}") if status else print("unknown failure")
     elif v:

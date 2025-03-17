@@ -145,8 +145,9 @@ def ExponentialMechanism(A, y, l=1.0, tol=1e-4, epsilon=None, delta=1e-6, K=1500
         # L1 = np.max(np.linalg.norm(Ay, ord=1, axis=0))
         L1 = find_L1(A, l)
         # print("L1:", L1)
-        tK = int((L1**(2/3) * (n*epsilon)**(2/3)) / l**(2/3))
-        if tK < K: print(tK, "iterations is more optimal")
+        Tl = 4 * l**2 * np.max(A) **2
+        tK = int((Tl**(2/3) * (n*epsilon)**(2/3)) / (L1*l)**(2/3))
+        if tK < K: print(tK, f"iterations is more optimal than {K} for eps:{epsilon}&l:{l}")
         K = max(min(tK, K), 1)
         t = K
     else:
@@ -160,7 +161,9 @@ def ExponentialMechanism(A, y, l=1.0, tol=1e-4, epsilon=None, delta=1e-6, K=1500
     vertices = get_vertices(p) * l
     
     # Privacy budget per iteration
-    # epsilon_t = epsilon / K if not epsilon is None else None
+    epsilon_t = epsilon / np.sqrt(8 * K * np.log(1/delta)) if not epsilon is None else None
+
+    valid = []
     
     for k in range(1, K+1):
         rho = 2 / (k + 2)
@@ -169,15 +172,14 @@ def ExponentialMechanism(A, y, l=1.0, tol=1e-4, epsilon=None, delta=1e-6, K=1500
         scores = vertices @ grad
         
         # Select vertex using exponential mechanism
-        selected_idx = exponential_mechanism(scores, epsilon, l, L1, n)
+        selected_idx = exponential_mechanism(scores, epsilon_t, l, L1, n)
     
-        # x_new = (1 - rho) * x_prev + rho * vertices[selected_idx, :]
         s = l if selected_idx < p else -l
         x_new = (1 - rho) * x_prev #+ rho * s on next line
         x_new[selected_idx % p] += s*rho
         f_new = f(x_new, A, y)
-        if k % int(K/10) == 0:
-            check_l_ball(x_new, l, log=log)
+        if log:
+            valid.append(check_l_ball(x_new, l, log=False))
         if trace:
             convergence_criteria.append(f_new)#grad @ x_new)
         # if (k > 1) and (abs(f_new - f_prev) < tol):# or (grad @ x_new) < tol: #or np.linalg.norm(x_new - x_prev, ord=np.inf) < tol:
@@ -187,6 +189,12 @@ def ExponentialMechanism(A, y, l=1.0, tol=1e-4, epsilon=None, delta=1e-6, K=1500
 
         x_prev = x_new
         f_prev = f_new
+
+    if log:
+        check_l_ball(x_new, l, log=log)
+        OB = np.sum(np.array(valid) == 0)
+        if OB > 0:
+            print(f"{OB}/{K} iter OB")
 
     total_budget = epsilon
     if not epsilon is None:
@@ -249,23 +257,6 @@ def exponential_mechanism(scores, epsilon, l, L1, n):
 
 
 ##### METHOD TWO #####
-
-def fwOracle(grad, l):
-    """
-    Oracle computes vertex that minimizes the dot product of gradient and s
-
-    Args:
-        grad (array-like): gradient of loss at current solution
-        l (float): constrain size
-
-    Returns:
-        array-like: update direction
-    """
-    # Simplified oracle computation without unnecessary allocations
-    i = np.argmax(np.abs(grad))
-    s = np.zeros_like(grad)
-    s[i] = -np.sign(grad[i]) * l
-    return s
 
 def LaplaceNoise(A, y, l=1.0, tol=0.0001, K=15000, delta=1e-6, epsilon=None, trace=True, normalize=True, clip_sd=np.inf, log=True):
     """
@@ -333,24 +324,34 @@ def LaplaceNoise(A, y, l=1.0, tol=0.0001, K=15000, delta=1e-6, epsilon=None, tra
         tK = int((L1**(2/3) * (n*epsilon)**(2/3)) / l**(2/3))
         K = max(min(tK, K), 1)
         t = K
-        print(f"Total iterations: {K}")
+        # print(f"Total iterations: {K}")
         # Compute per-iteration privacy budget
         noise_scale = (L1 * l * np.sqrt(8 * K * np.log(1/delta))) / (n * epsilon) # 1 for L of vertices in l1-ball
-        print(f"noise scale: {noise_scale:.3g}")
+        # print(f"noise scale: {noise_scale:.3g}")
     else:
         noise_scale=0
         L1 = 1 # benign
-    
+
+    S = np.append(np.repeat(l, p), np.repeat(-l, p))
+    valid = []
     for k in range(1, K):
         rho = 2 / (2 + k)
         grad = gradient(x_prev, A, y)
 
-        noise = rng.laplace(scale=noise_scale, size=p)#.reshape(p, 1)
-        s = fwOracle(grad+noise, l)
-        x_new = (1 - rho) * x_prev + rho * s
+        noise = rng.laplace(scale=noise_scale, size=2*p)#.reshape(p, 1)
+
+        if (k == 1 or k == K-1) and (np.max(noise) > 0.5* np.max(l*np.abs(grad))):
+            print("noise too large, will be choosing non-optimal scores")
+            print(np.max(noise), np.max(l*np.abs(grad)))
+        
+        # need to compute all 2*p since noise is unique for each, not very efficient
+        scores = S * np.append(grad, grad) + noise
+        selected_idx = np.argmax(scores)
+        
+        x_new = (1 - rho) * x_prev #+ rho * s on next line
+        x_new[selected_idx % p] += S[selected_idx]*rho
         f_new = f(x_new, A, y)
-        if k % int(K/10) == 0:
-            check_l_ball(x_new, l, log=log)
+        valid.append(check_l_ball(x_new, l, log=False))
         if trace:
             convergence_criteria.append(f_new)#grad @ x_new)
         # if  (k > 1) and (abs(f_new - f_prev) < tol):# or (grad @ x_new) < tol: #or np.linalg.norm(x_new - x_prev, ord=np.inf) < tol:
@@ -360,7 +361,11 @@ def LaplaceNoise(A, y, l=1.0, tol=0.0001, K=15000, delta=1e-6, epsilon=None, tra
         x_prev = x_new
         f_prev = f_new
 
-    # check_l_ball(x_new, l, log=True)
+    if log:
+        check_l_ball(x_new, l, log=log)
+        OB = np.sum(np.array(valid) == 0)
+        if OB > 0:
+            print(f"{OB}/{K} iter OB")
 
     total_budget = epsilon
     if not epsilon is None:
@@ -520,7 +525,7 @@ def FW_NonPrivate(A, y, l=1.0, K=15000, tol=1e-4, trace=False, normalize=False, 
         assert check_normalization(Ay)
     
     if normalize:
-        Ay, maxes = private_normalize_data(Ay)
+        Ay, _, maxes = private_normalize_data(Ay)
         assert check_normalization(Ay)
         A, y = Ay[:,:-1], Ay[:, -1]
         Ay = np.hstack((A, y.reshape(len(y), 1)))
@@ -531,29 +536,26 @@ def FW_NonPrivate(A, y, l=1.0, K=15000, tol=1e-4, trace=False, normalize=False, 
     x_prev = np.zeros(p, dtype=np.float32)
     f_prev = f(x_prev, A, y)
     
-    # Generate vertices once
-    vertices = get_vertices(p) * l
+    
+    valid = []
     
     # Privacy budget per iteration    
     for k in range(1, K+1):
         rho = 2 / (k + 2)
         grad = gradient(x_prev, A, y)
-        # Compute utility scores for each vertex
-        scores = vertices @ grad
-        selected_idx = np.argmax(scores)
-
-        # could also 
+        
+        # could also use Oracle approach
         selected_idx = np.argmax(np.abs(grad))
+        
         s = -np.sign(grad[selected_idx]) * l
 
-        # s = l if selected_idx < p else -l
         # if (grad != 0).sum() == 0:
         #     s = 0
         x_new = (1 - rho) * x_prev #+ rho * s on next line
         x_new[selected_idx % p] += s*rho
         f_new = f(x_new, A, y)
-        if k % int(K/10) == 0:
-            check_l_ball(x_new, l, log=log)
+        if log:
+            valid.append(check_l_ball(x_new, l, log=False))
         if trace:
             convergence_criteria.append(f_new)
         if (k > 1) and (abs(f_new - f_prev) < tol):
@@ -564,6 +566,12 @@ def FW_NonPrivate(A, y, l=1.0, K=15000, tol=1e-4, trace=False, normalize=False, 
 
         x_prev = x_new
         f_prev = f_new
+
+    if log:
+        check_l_ball(x_new, l, log=log)
+        OB = np.sum(np.array(valid) == 0)
+        if OB > 0:
+            print(f"{OB}/{K} iter OB")
 
     if normalize:
         # trained on small data so coef are too large, resizing

@@ -371,7 +371,7 @@ def research_plots(feat, correct_feats=None, methods='lasso', baseline=None, l=N
                         deltas = [delta] if delta is not None else [None]
                     for d in deltas:
                         current_run += 1
-                        if log and current_run % max(1, total_runs // 10) == 0:
+                        if log and current_run % max(1, total_runs // 5) == 0:
                             print(f"  Progress: {current_run}/{total_runs} runs completed ({current_run/total_runs*100:.1f}%)")
                         
                         parameters["method"].append(baseline)
@@ -464,8 +464,7 @@ def research_plots(feat, correct_feats=None, methods='lasso', baseline=None, l=N
             plt.figure(figsize=(12, 8))
             plt.suptitle(f'Training Convergence for {baseline}', fontsize=16)
 
-            maxys = []
-            maxs = []
+            
             # Training error vs iter for each epsilon
             plt.subplot(1, 2, 1)
             for i, eps_val in enumerate(sorted([e for e in set(parameters["eps"]) if e is not None])):
@@ -473,20 +472,13 @@ def research_plots(feat, correct_feats=None, methods='lasso', baseline=None, l=N
                 if eps_indices:
                     for idx in eps_indices:
                         if results["trace_f"][idx] is not None:
-                            maxys.append(max(results["trace_f"][idx]))
-                            maxs.append(len(results["trace_f"][idx]))
                             plt.plot(range(len(results["trace_f"][idx])), results["trace_f"][idx], color=color_map_green[str(eps_val)], label=f'ε={eps_val}')
             plt.xlabel('Iterations')
+            plt.ylim(bottom=0)
             plt.ylabel('Training Error')
-            plt.legend()
+            plt.legend() 
 
-            plt.ylim(0, 50)#max(maxys))
-            if maxs:
-                plt.xlim(0, max(maxs))
             
-
-            maxys = []
-            maxs = []
             # Training error vs iter for each l
             plt.subplot(1, 2, 2)
             for i, l_val in enumerate(sorted(set(parameters["l"]))):
@@ -499,9 +491,8 @@ def research_plots(feat, correct_feats=None, methods='lasso', baseline=None, l=N
             plt.ylabel('Training Error')
             plt.legend()
 
-            plt.ylim(0, 50)#max(maxys))
-            if maxs:
-                plt.xlim(0, max(maxs))
+            plt.ylim(bottom=0)
+        
             
             plt.tight_layout()
             # Save convergence plots
@@ -684,7 +675,7 @@ def research_plots(feat, correct_feats=None, methods='lasso', baseline=None, l=N
                         deltas = [delta] if delta is not None else [None]
                     for d in deltas:
                         current_run += 1
-                        if log and current_run % max(1, total_runs // 10) == 0:
+                        if log and current_run % max(1, total_runs // 5) == 0:
                             print(f"  Progress: {current_run}/{total_runs} runs completed ({current_run/total_runs*100:.1f}%)")
                         
                         parameters["method"].append(method)
@@ -710,7 +701,7 @@ def research_plots(feat, correct_feats=None, methods='lasso', baseline=None, l=N
                         results["trace_f"].append(model.get("plot"))
                         
                         # Track best model for this method
-                        if (test_mse < best_mse) and (eps <= target_eps) and (r2 > 0) and ((best_models.get(baseline) is None) or (sparsity <= 1.5 * best_models.get(baseline).get("data").get("sparsity"))):
+                        if (test_mse < best_mse): #and (eps <= target_eps) and (r2 > 0) and ((best_models.get(baseline) is None) or (sparsity <= 1.5 * best_models.get(baseline).get("data").get("sparsity"))):
                             best_mse = test_mse
                             best_config = {"l": li, "iter": niter, "eps": eps, "delta": d}
                             best_model_data = {
@@ -779,8 +770,8 @@ def research_plots(feat, correct_feats=None, methods='lasso', baseline=None, l=N
             # Training error vs iter for each epsilon @ best K / L
             plt.subplot(1, 2, 1)
             plt.title(f"Model Training Error at λ={best_config['l']}, K={best_config['iter']}")
-            if triv and "mse" in triv_metrics:
-                plt.axhline(y=triv_metrics["mse"], color='gray', linestyle='--', alpha=0.8, label='Trivial Model')
+            if triv and "mse" in triv_metrics: 
+                plt.axhline(y=triv_metrics["training_err"], color='gray', linestyle='--', alpha=0.8, label='Trivial Model')
             if baseline and not best_models[baseline]['data'].get("train_err") is None:
                 plt.axhline(y=best_models[baseline]['data'].get("train_err"), color='black', linestyle='--', alpha=0.8, label="Non-Private Baseline")
                 plt.plot(range(len(best_models[baseline]['data'].get("trace"))), best_models[baseline]['data'].get("trace"), color='black', alpha=0.7, label=f'Non-Private Model', lw=1)
@@ -1016,14 +1007,14 @@ def research_plots(feat, correct_feats=None, methods='lasso', baseline=None, l=N
             best_iter = best_models[method]["config"]["iter"] if method in best_models else None
             if best_l is not None and best_iter is not None:
                 filtered_data = method_data[(method_data["l"] == best_l) & (method_data["iter"] == best_iter)]
-                plt.plot(filtered_data["eps"], filtered_data["mse"], marker='o', color=method_colors[i], label=method)
+                plt.plot(filtered_data["eps"], filtered_data["training_err"], marker='o', color=method_colors[i], label=method)
         if triv and "mse" in triv_metrics:
             plt.axhline(y=triv_metrics["mse"], color='gray', linestyle='--', alpha=0.7, label='Trivial')
-        if baseline and not best_models[baseline]['data'].get("test_mse") is None:
-            plt.axhline(y=best_models[baseline]['data'].get("test_mse"), color='black', linestyle='--', alpha=0.8, label="Non-Private Baseline")
+        if baseline and not best_models[baseline]['data'].get("train_err") is None:
+            plt.axhline(y=best_models[baseline]['data'].get("train_err"), color='black', linestyle='--', alpha=0.8, label="Non-Private Baseline")
         plt.xlabel('ε')
         plt.xscale('log')
-        plt.ylabel('MSE')
+        plt.ylabel('Train MSE')
         plt.legend()
         
         plt.tight_layout(rect=[0, 0, 1, 0.95])  # Make room for the suptitle
@@ -1101,14 +1092,15 @@ def research_plots(feat, correct_feats=None, methods='lasso', baseline=None, l=N
             best_iter = best_models[method]["config"]["iter"] if method in best_models else None
             if best_l is not None and best_iter is not None:
                 filtered_data = method_data[(method_data["l"] == best_l) & (method_data["iter"] == best_iter)]
-                plt.plot(filtered_data["eps"], filtered_data["training_err"], marker='o', color=method_colors[i], label=method)
-        if triv and "training_err" in triv_metrics:
-            plt.axhline(y=triv_metrics["training_err"], color='gray', linestyle='--', alpha=0.7, label='Trivial')
-        if baseline and not best_models[baseline]['data'].get("train_err") is None:
-                plt.axhline(y=best_models[baseline]['data'].get("train_err"), color='black', linestyle='--', alpha=0.8, label="Non-Private Baseline")
+                plt.plot(filtered_data["eps"], filtered_data["mse"]**.5, marker='o', color=method_colors[i], label=method)
+        if triv and "mse" in triv_metrics:
+            plt.axhline(y=triv_metrics["mse"]**.5, color='gray', linestyle='--', alpha=0.7, label='Trivial')
+        if baseline and not best_models[baseline]['data'].get("test_mse") is None:
+                plt.axhline(y=best_models[baseline]['data'].get("test_mse")**.5, color='black', linestyle='--', alpha=0.8, label="Non-Private Baseline")
         plt.xlabel('ε')
         plt.xscale('log')
-        plt.ylabel('Training Error')
+        plt.ylim(bottom=0)
+        plt.ylabel('Test RMSE')
         plt.legend()
         
         plt.tight_layout(rect=[0, 0, 1, 0.95])  # Make room for the suptitle

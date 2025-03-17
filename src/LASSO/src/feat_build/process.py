@@ -6,18 +6,14 @@ from sklearn.preprocessing import StandardScaler
 from src.LASSO.src.feat_build import sysinfo_process
 from src.LASSO.src.feat_build.utils import software_categories
 
-def create_software_category_map(sw_raw):
-    # Read the CSV file
-
+def create_software_category_map(output_dir, sw_raw, log=True):
     def categorize_process(name):
         name = name.lower()
         if pd.isna(name):
             return 'Unknown'
-        
         for category, keywords in software_categories.items():
             if any(keyword in name for keyword in keywords):
                 return category
-                
         return 'Other'
     
     # Handle missing values and convert to string
@@ -29,9 +25,10 @@ def create_software_category_map(sw_raw):
     software_mapping = sw_raw[['frgnd_proc_name', 'Category']].set_index('frgnd_proc_name').to_dict()['Category']
 
     # Save to pickle
-    with open(os.join(raw_dir, 'software_data.pkl'), 'wb') as f:
+    with open(os.join(output_dir, 'software_data.pkl'), 'wb') as f:
         pickle.dump(software_mapping, f)
-        print(f'Software category mapping saved to {raw_dir}/software_data.pkl')
+        if log:
+            print(f'Software category mapping saved to {output_dir}/software_data.pkl')
     f.close()
     return
 
@@ -90,7 +87,7 @@ def proc_temp(df):
 
     return df.groupby(['guid', 'dt'])[['prod']].sum().reset_index().rename(columns={'prod': 'temp_avg'})
 
-def main(raw_dir, proc_dir, proc_sysinfo=False):
+def main(raw_dir, proc_dir, proc_sysinfo=False, log=True):
     """
     main function to featureize non-sysinfo data
     
@@ -100,28 +97,29 @@ def main(raw_dir, proc_dir, proc_sysinfo=False):
     """
 
     # load raw sample data
-    print('Loading raw data...')
+    if log:
+        print('Loading raw data...')
     sw_raw = pd.read_parquet(proc_dir / 'sw_usage')  # software usage
     web_raw = pd.read_parquet(proc_dir / 'web_usage')  # web usage
     temp_raw = pd.read_parquet(proc_dir / 'temp')  # temperature
     cpu_raw = pd.read_parquet(proc_dir / 'cpu_util')  # temperature
     power_raw = pd.read_parquet(proc_dir / 'power')  # power (predictor variable)
 
-    if not os.path.exists(raw_dir / 'software_data.pkl'):
-        print('Creating software category mapping pickle')
+    if not os.path.exists(proc_dir / 'software_data.pkl'):
+        if log:
+            print('Creating software category mapping pickle')
         # creates mapping file
-        create_software_category_map(sw_raw)
+        create_software_category_map(proc_dir, sw_raw, log)
 
-    print('Processing raw data...')
+    if log:
+        print('Processing raw data...')
 
     # load software category data (mapping vocab from ChatGPT)
-    with open(raw_dir / 'software_data.pkl', 'rb') as file:
+    with open(proc_dir / 'software_data.pkl', 'rb') as file:
         sw_cat = pickle.load(file)
 
     # process software usage data for pivoting
-    sw_raw['sw_category'] = sw_raw['frgnd_proc_name'].map(sw_cat)  # map software names to categories
-    sw_raw['sw_category'] = sw_raw['sw_category'].fillna('Other')  # fill missing values with 'Other'
-    
+    sw_raw['sw_category'] = sw_raw['frgnd_proc_name'].map(sw_cat).fillna('Other')  # map software names to categories    
     sw_proc = process_raw(sw_raw, 'frgnd_proc_duration_ms', ['sw_category', 'sw_event_name'])
     web_proc = process_raw(web_raw, 'duration_ms', ['web_parent_category', 'web_sub_category'])
     temp_proc = proc_temp(temp_raw)
@@ -130,17 +128,19 @@ def main(raw_dir, proc_dir, proc_sysinfo=False):
     cpu_raw.rename(columns={'norm_usage': 'cpu_norm_usage'}, inplace=True)
 
     # rename columns in power data
-    power_raw.rename(columns={'mean': 'power_mean', 'nrs_sum': 'power_nrs_sum'}, inplace=True)
-    power_raw.drop(columns='power_nrs_sum', inplace=True)
+    power_raw.rename(columns={'mean': 'power_mean'}, inplace=True)
+    power_raw.drop(columns='nrs_sum', inplace=True)
 
     # sysinfo one-hot encoding if not already done
-    if 'sysinfo_ohe.parquet' not in os.listdir(global_data) or proc_sysinfo:
-        print('Processing sysinfo data...')
-        sysinfo_process.main()
-        
-    sysinfo = pd.read_parquet(global_data / 'sysinfo_ohe.parquet')
+    if 'sysinfo_ohe.parquet' not in os.listdir(proc_dir) or proc_sysinfo:
+        if log:
+            print('Processing sysinfo data...')
+        sysinfo_process.main(raw_dir, proc_dir)
+    
+    sysinfo = pd.read_parquet(proc_dir / 'sysinfo_ohe.parquet')
 
-    print('Joining and standardizing data...')
+    if log:
+        print('Joining and standardizing data...')
     # merge dataframes (except power -- will merge last)
     merged_df = pd.merge(sw_proc, temp_proc, on=['guid', 'dt'], how='inner')
     merged_df = pd.merge(merged_df, web_proc, on=['guid', 'dt'], how='left')
@@ -149,6 +149,8 @@ def main(raw_dir, proc_dir, proc_sysinfo=False):
     # standardize numerical columns
     scaler = StandardScaler()
     numeric_cols = merged_df.select_dtypes(include=['int', 'float']).columns.to_list()
+    if log:
+        print("Standardize:", numeric_cols)
     merged_df[numeric_cols] = scaler.fit_transform(merged_df[numeric_cols])
 
     # don't standardize power columns
@@ -169,6 +171,8 @@ def main(raw_dir, proc_dir, proc_sysinfo=False):
     final_df.drop(columns=['dt', 'guid'], inplace=True)
 
     # save final featureized data (including target)
-    print('Writing features to disk...')
-    final_df.to_parquet(data_folder / 'out' / 'feat.parquet')
-    print(f'Feature processing complete! feat.parquet saved to {data_folder / "out"}')
+    if log:
+        print('Writing features to disk...')
+    final_df.to_parquet(proc_dir / 'feat.parquet')
+    if log:
+        print(f'Feature processing complete! feat.parquet saved to {proc_dir}')

@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-#from pathlib import Path
+
 import duckdb
 import pyarrow.parquet as pq
 from src.LASSO.src.feat_build.utils import table_names
@@ -15,6 +15,21 @@ def condense_parquet_files(input_directory, output_file):
 
 
 def sample_raw(raw_dir, sample_guids_parquet, output_dir, directories, per_thread=True, row_group_size=100000):
+    """
+    Create new raw directories taking only samples and columns needed from database.
+
+    Args:
+        raw_dir (Path/str): raw folder where directories are stored
+        sample_guids_parquet (Path/str): name of parquet with sample GUID's to take from database
+        output_dir (Path/str): destination for sampled data parquets
+        directories (array-like): list follows same order as util.table_names, each contains parquets of raw data
+        per_thread (bool, optional): saving new parquets to disk, duckdb param. Defaults to True.
+        row_group_size (int, optional): saving new parquets to disk, duckdb param. Defaults to 100000.
+
+    Returns:
+        bool: files saved successful.
+    """    
+
     con = duckdb.connect()
     con.execute("""-- Set memory limits before running query
                     SET memory_limit='16GB';
