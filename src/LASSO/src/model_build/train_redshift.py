@@ -1,3 +1,9 @@
+"""
+File: train_redshift.py
+Author: Cheon
+Date: 
+Description: train regression model of choice
+"""
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression, Lasso
 from sklearn.metrics import mean_squared_error

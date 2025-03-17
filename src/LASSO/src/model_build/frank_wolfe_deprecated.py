@@ -1,8 +1,12 @@
-"""Frank-Wolfe Lasso implementation (non-private only) [USE NEW frankWolfeLASSO.py]"""
-# This code is copied from frank_wolfe.py from public repository: 
-# "Frank-Wolfe Algorithm in Python" by Le Anh DUNG and Paul MELKI (Toulouse School of Economics)
-# https://github.com/paulmelki/Frank-Wolfe-Algorithm-Python
-
+"""
+File: frankWolfeLASSO_deprecated.py
+Author: Trey Scheid
+Date: last modified 03/2025
+Description: Frank-Wolfe Lasso implementation (non-private only) [USE NEW frankWolfeLASSO.py], 
+This code is copied from frank_wolfe.py from public repository: 
+"Frank-Wolfe Algorithm in Python" by Le Anh DUNG and Paul MELKI (Toulouse School of Economics)
+https://github.com/paulmelki/Frank-Wolfe-Algorithm-Python
+"""
 import numpy as np
 
 # %% Define the function f(x)

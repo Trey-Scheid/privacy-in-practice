@@ -1,3 +1,9 @@
+"""
+File: frankWolfeLASSO.py
+Author: Trey Scheid
+Date: last modified 03/2025
+Description: 3 Frank-Wolfe model solvers for lasso regression: two private implementations (supposed to be equivalent but in practice are not), and a traditional, used by train.py
+"""
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -9,13 +15,33 @@ from autodp.mechanism_zoo import ExactGaussianMechanism
 ##### HELPER FUNCTIONS #####
 
 def f(x, A, y):
-    """Loss Function for Lasso Regression, weights x"""
+    """
+    Loss function for lasso regression
+
+    Args:
+        x (array-like): weight vector to evaluate loss function at
+        A (np.ndarray of shape (n_samples, n_features)): Data
+        y (array-like): correct outcomes
+
+    Returns:
+        float: mean square error
+    """         
     Ax = A @ x
     diff = Ax - y
     return np.dot(diff.ravel(), diff.ravel()) / A.shape[0]
 
 def gradient(x, A, y):
-    """Gradient wrt x of the Loss function of Lasso Regression"""
+    """
+    Gradient wrt x of the Loss function of Lasso Regression
+
+    Args:
+        x (array-like): weight vector to evaluate loss function at
+        A (np.ndarray of shape (n_samples, n_features)): Data
+        y (array-like): correct outcomes
+
+    Returns:
+        nd.array: gradient
+    """
     Ax = A @ x
     diff = Ax - y
     return 2 * (A.T @ diff) / A.shape[0]
@@ -24,12 +50,12 @@ def check_l_ball(x, l, log=False):
     """
     Check if vector x is within the L1 ball of radius l.
     
-    Parameters:
-    x (numpy.ndarray): The vector to check
-    l (float): The radius of the L1 ball
+    Args:
+        x (numpy.ndarray): The vector to check
+        l (float): The radius of the L1 ball
     
     Returns:
-    bool: True if x is within the L1 ball, False otherwise
+        bool: True if x is within the L1 ball, False otherwise
     """
     l1_norm = np.linalg.norm(x, ord=1)
     if log:
@@ -38,6 +64,16 @@ def check_l_ball(x, l, log=False):
     return l1_norm <= l
 
 def find_L1(X, l):
+    """
+    Computes Estimate of the l1-lipschitz of lasso loss
+
+    Args:
+        X (array-like): 2D data
+        l (float): regularization strength, constrain set size
+
+    Returns:
+        L1: estimated lipschitz constant
+    """
     n = X.shape[0]
     X_spectral_norm = np.linalg.svd(X, compute_uv=False)[0]
     L = (4 * l / n) * X_spectral_norm**2
@@ -45,11 +81,36 @@ def find_L1(X, l):
 
 ###### METHOD ONE #######
 
-def ExponentialMechanism(A, y, l=1.0, tol=1e-4, epsilon=None, delta=1e-6, K=15000, trace=True, normalize=True, clip_sd=np.inf):
+def ExponentialMechanism(A, y, l=1.0, tol=1e-4, epsilon=None, delta=1e-6, K=15000, trace=True, normalize=True, clip_sd=np.inf, log=True):
+    """
+    Private Frank-Wolfe Lasso Regression model using the exponential mechanism for vertex selection.
+
+    Args:
+        A (array-like): 2D Data
+        y (array-like): outcomes
+        l (float, optional): regularization by constrianing solution to l1-ball with radius l. Defaults to 1.0.
+        tol (float, optional): Desired optimality guarantee instead of K. Defaults to 1e-4.
+        epsilon (float, optional): Privacy budget for model training (instead of K). Defaults to None.
+        delta (float, optional): Privacy bias term. Defaults to 1e-6.
+        K (int, optional): maximum number of iterations unless budget used first. Defaults to 15000.
+        trace (bool, optional): save training information to ExponentialMechanism.plot. Defaults to True.
+        normalize (bool, optional): Use 20% budget to normalize data (necessary for noise size). Defaults to True.
+        clip_sd (float, optional): value to cut off outliers for noise scaling efficacy. Defaults to np.inf.
+
+    Returns:
+        output["model"]: coefficients (no intercept added)
+        output["plot"]: values for each iteration
+        output["total_budget"]: privacy budget used
+    """
     if isinstance(A, pd.DataFrame):
         A = A.to_numpy()
+    elif isinstance(A, list):
+        A = np.array(A)
     if isinstance(y, (pd.DataFrame, pd.Series)):
         y = y.to_numpy()
+    elif isinstance(y, list):
+        y = np.array(y)
+    
     convergence_criteria = []
     n, p = A.shape
     if y.shape[0] != n:
@@ -84,8 +145,9 @@ def ExponentialMechanism(A, y, l=1.0, tol=1e-4, epsilon=None, delta=1e-6, K=1500
         # L1 = np.max(np.linalg.norm(Ay, ord=1, axis=0))
         L1 = find_L1(A, l)
         # print("L1:", L1)
-        tK = int((L1**(2/3) * (n*epsilon)**(2/3)) / l**(2/3))
-        if tK < K: print(tK, "iterations is more optimal")
+        Tl = 4 * l**2 * np.max(A) **2
+        tK = int((Tl**(2/3) * (n*epsilon)**(2/3)) / (L1*l)**(2/3))
+        if tK < K: print(tK, f"iterations is more optimal than {K} for eps:{epsilon}&l:{l}")
         K = max(min(tK, K), 1)
         t = K
     else:
@@ -99,7 +161,9 @@ def ExponentialMechanism(A, y, l=1.0, tol=1e-4, epsilon=None, delta=1e-6, K=1500
     vertices = get_vertices(p) * l
     
     # Privacy budget per iteration
-    # epsilon_t = epsilon / K if not epsilon is None else None
+    epsilon_t = epsilon / np.sqrt(8 * K * np.log(1/delta)) if not epsilon is None else None
+
+    valid = []
     
     for k in range(1, K+1):
         rho = 2 / (k + 2)
@@ -108,14 +172,14 @@ def ExponentialMechanism(A, y, l=1.0, tol=1e-4, epsilon=None, delta=1e-6, K=1500
         scores = vertices @ grad
         
         # Select vertex using exponential mechanism
-        selected_idx = exponential_mechanism(scores, epsilon, l, L1, n)
+        selected_idx = exponential_mechanism(scores, epsilon_t, l, L1, n)
     
-        # x_new = (1 - rho) * x_prev + rho * vertices[selected_idx, :]
         s = l if selected_idx < p else -l
         x_new = (1 - rho) * x_prev #+ rho * s on next line
         x_new[selected_idx % p] += s*rho
         f_new = f(x_new, A, y)
-        check_l_ball(x_new, l, log=True)
+        if log:
+            valid.append(check_l_ball(x_new, l, log=False))
         if trace:
             convergence_criteria.append(f_new)#grad @ x_new)
         # if (k > 1) and (abs(f_new - f_prev) < tol):# or (grad @ x_new) < tol: #or np.linalg.norm(x_new - x_prev, ord=np.inf) < tol:
@@ -125,6 +189,12 @@ def ExponentialMechanism(A, y, l=1.0, tol=1e-4, epsilon=None, delta=1e-6, K=1500
 
         x_prev = x_new
         f_prev = f_new
+
+    if log:
+        check_l_ball(x_new, l, log=log)
+        OB = np.sum(np.array(valid) == 0)
+        if OB > 0:
+            print(f"{OB}/{K} iter OB")
 
     total_budget = epsilon
     if not epsilon is None:
@@ -143,14 +213,30 @@ def ExponentialMechanism(A, y, l=1.0, tol=1e-4, epsilon=None, delta=1e-6, K=1500
     return {"model":x_new, "plot":convergence_criteria, "total_budget":total_budget}
 
 def get_vertices(p):
-    """Generate all vertices of L1 ball: {±1, 0, ..., 0} vectors"""
+    """
+    Generate all vertices of L1 ball: {±1, 0, ..., 0} vectors
+
+    Args:
+        p (int): dimension of constraint set, dimension of data
+
+    Returns:
+        array-like: 2D array, each row is a vertex +-e_i
+    """
     return np.vstack([np.eye(p), -np.eye(p, dtype=int)])
 
 def exponential_mechanism(scores, epsilon, l, L1, n):
     """
-    Select vertex using exponential mechanism
-    scores: utility scores for each vertex
-    epsilon: privacy parameter
+    select index of vertex with exponential mechanism
+
+    Args:
+        scores (array-like): 2D array stores utility at each vertex
+        epsilon (float): privacy parameter for this iteration
+        l (float): size of constraint
+        L1 (float): l1-lipschitz for Loss
+        n (int): size of data for sensitivity
+
+    Returns:
+        int: index of scores which minimizes inner product of gradient and s
     """
     if not epsilon is None:
         # Normalize scores to sensitivity 1
@@ -162,22 +248,37 @@ def exponential_mechanism(scores, epsilon, l, L1, n):
         # Compute probabilities with numerical stability
         log_prob = -epsilon * scores / (2 * sensitivity)
         log_prob = log_prob - np.max(log_prob)  # Prevent underflow
-        prob = np.exp(log_prob)
-        prob = prob / np.sum(prob) 
+        prob = np.exp(log_prob) # exponential mech
+        prob = prob / np.sum(prob)
+        # maximal p at negative of utility function
         return np.random.choice(scores.shape[0], p=prob)
+    # non-private, always choose the best
     return np.argmin(scores)
 
 
 ##### METHOD TWO #####
 
-def fwOracle(grad, l):
-    # Simplified oracle computation without unnecessary allocations
-    i = np.argmax(np.abs(grad))
-    s = np.zeros_like(grad)
-    s[i] = -np.sign(grad[i]) * l
-    return s
+def LaplaceNoise(A, y, l=1.0, tol=0.0001, K=15000, delta=1e-6, epsilon=None, trace=True, normalize=True, clip_sd=np.inf, log=True):
+    """
+    Private Frank-Wolfe Lasso Regression model adding Laplace noise to gradient before oracle selection
 
-def LaplaceNoise(A, y, l=1.0, tol=0.0001, K=15000, delta=1e-6, epsilon=None, trace=True, normalize=True, clip_sd=np.inf):
+    Args:
+        A (array-like): 2D Data
+        y (array-like): outcomes
+        l (float, optional): regularization by constrianing solution to l1-ball with radius l. Defaults to 1.0.
+        tol (float, optional): Desired optimality guarantee instead of K. Defaults to 1e-4.
+        epsilon (float, optional): Privacy budget for model training (instead of K). Defaults to None.
+        delta (float, optional): Privacy bias term. Defaults to 1e-6.
+        K (int, optional): maximum number of iterations unless budget used first. Defaults to 15000.
+        trace (bool, optional): save training information to ExponentialMechanism.plot. Defaults to True.
+        normalize (bool, optional): Use 20% budget to normalize data (necessary for noise size). Defaults to True.
+        clip_sd (float, optional): value to cut off outliers for noise scaling efficacy. Defaults to np.inf.
+
+    Returns:
+        output["model"]: coefficients (no intercept added)
+        output["plot"]: values for each iteration
+        output["total_budget"]: privacy budget used
+    """
     if isinstance(A, pd.DataFrame):
         A = A.to_numpy()
     if isinstance(y, (pd.DataFrame, pd.Series)):
@@ -223,23 +324,34 @@ def LaplaceNoise(A, y, l=1.0, tol=0.0001, K=15000, delta=1e-6, epsilon=None, tra
         tK = int((L1**(2/3) * (n*epsilon)**(2/3)) / l**(2/3))
         K = max(min(tK, K), 1)
         t = K
-        print(f"Total iterations: {K}")
+        # print(f"Total iterations: {K}")
         # Compute per-iteration privacy budget
         noise_scale = (L1 * l * np.sqrt(8 * K * np.log(1/delta))) / (n * epsilon) # 1 for L of vertices in l1-ball
-        print(f"noise scale: {noise_scale:.3g}")
+        # print(f"noise scale: {noise_scale:.3g}")
     else:
         noise_scale=0
         L1 = 1 # benign
-    
+
+    S = np.append(np.repeat(l, p), np.repeat(-l, p))
+    valid = []
     for k in range(1, K):
         rho = 2 / (2 + k)
         grad = gradient(x_prev, A, y)
 
-        noise = rng.laplace(scale=noise_scale, size=p)#.reshape(p, 1)
-        s = fwOracle(grad+noise, l)
-        x_new = (1 - rho) * x_prev + rho * s
+        noise = rng.laplace(scale=noise_scale, size=2*p)#.reshape(p, 1)
+
+        if (k == 1 or k == K-1) and (np.max(noise) > 0.5* np.max(l*np.abs(grad))):
+            print("noise too large, will be choosing non-optimal scores")
+            print(np.max(noise), np.max(l*np.abs(grad)))
+        
+        # need to compute all 2*p since noise is unique for each, not very efficient
+        scores = S * np.append(grad, grad) + noise
+        selected_idx = np.argmax(scores)
+        
+        x_new = (1 - rho) * x_prev #+ rho * s on next line
+        x_new[selected_idx % p] += S[selected_idx]*rho
         f_new = f(x_new, A, y)
-        check_l_ball(x_new, l, log=True)
+        valid.append(check_l_ball(x_new, l, log=False))
         if trace:
             convergence_criteria.append(f_new)#grad @ x_new)
         # if  (k > 1) and (abs(f_new - f_prev) < tol):# or (grad @ x_new) < tol: #or np.linalg.norm(x_new - x_prev, ord=np.inf) < tol:
@@ -249,7 +361,11 @@ def LaplaceNoise(A, y, l=1.0, tol=0.0001, K=15000, delta=1e-6, epsilon=None, tra
         x_prev = x_new
         f_prev = f_new
 
-    # check_l_ball(x_new, l, log=True)
+    if log:
+        check_l_ball(x_new, l, log=log)
+        OB = np.sum(np.array(valid) == 0)
+        if OB > 0:
+            print(f"{OB}/{K} iter OB")
 
     total_budget = epsilon
     if not epsilon is None:
@@ -270,6 +386,17 @@ def LaplaceNoise(A, y, l=1.0, tol=0.0001, K=15000, delta=1e-6, epsilon=None, tra
 #### CLIPPING AND NORMALIZING ####
 
 def private_normalize_data(data, epsilon=None, delta=1e-6):
+    """
+    use privacy budget to normalize the data -1, 1
+
+    Args:
+        data (array-like): data
+        epsilon (float, optional): privacy budget for this task. Defaults to None.
+        delta (float, optional): privacy parameter. Defaults to 1e-6.
+
+    Returns:
+        array-like: normalized data
+    """
     if isinstance(data, pd.DataFrame):
         data = data.to_numpy()
     
@@ -311,7 +438,17 @@ def private_normalize_data(data, epsilon=None, delta=1e-6):
     return normalized_data, used_epsilon, col_maxes
 
 def clip_normalize_data(data, sd=None):
-    """sd == None just normalizes, not sure this method is DP"""
+    """
+    clip data to sd, then normalize (all non-private). if sd == None just normalizes
+
+    Args:
+        data (array-like): data
+        sd (float, optional): abs clipping value. Defaults to None.
+
+    Returns:
+        normalized_data: normalized data
+        col_maxes: columnwise maximums for rescaling data
+    """
     if isinstance(data, pd.DataFrame):
         data = data.to_numpy()
     
@@ -330,6 +467,15 @@ def clip_normalize_data(data, sd=None):
     return normalized_data, col_maxes
 
 def check_normalization(X):
+    """
+    check X is normal, no abs(values) > 1
+
+    Args:
+        X (array-like): data
+
+    Returns:
+        bool: whether X is normal
+    """
     if np.any(np.abs(X) > 1):
         print("Warning: Some values have absolute value greater than 1")
         return False
@@ -337,7 +483,30 @@ def check_normalization(X):
 
 #### FOR NON PRIVATE ####
 
-def FW_NonPrivate(A, y, l=1.0, K=15000, tol=1e-4, trace=False, normalize=False, clip_sd=None, epsilon=None, delta=None):
+def FW_NonPrivate(A, y, l=1.0, K=15000, tol=1e-4, trace=False, normalize=False, clip_sd=None, epsilon=None, delta=None, log=True):
+    """
+    Frank-Wolfe Lasso Regression model.
+
+    Args:
+        A (array-like): data
+        y (array-like): outcomes
+        l (float, optional): regularization parameter, constrain size. Defaults to 1.0.
+        K (int, optional): maximum iterations. Defaults to 15000.
+        tol (float, optional): optional stopping condition. Defaults to 1e-4.
+        trace (bool, optional): save plot values. Defaults to False.
+        normalize (bool, optional): normalize the input before training. Defaults to False.
+        clip_sd (float, optional): clip data before processing. Defaults to None.
+        epsilon (float, optional): for train compatibility, not used. Defaults to None.
+        delta (float, optional): for train compatibility, not used. Defaults to None.
+
+    Raises:
+        ValueError: Dimension of A and y must match
+
+    Returns:
+        output["model"]: coefficients (no intercept added)
+        output["plot"]: values for each iteration
+        output["total_budget"]: privacy budget used
+    """
     if isinstance(A, pd.DataFrame):
         A = A.to_numpy()
     if isinstance(y, (pd.DataFrame, pd.Series)):
@@ -356,7 +525,7 @@ def FW_NonPrivate(A, y, l=1.0, K=15000, tol=1e-4, trace=False, normalize=False, 
         assert check_normalization(Ay)
     
     if normalize:
-        Ay, maxes = private_normalize_data(Ay)
+        Ay, _, maxes = private_normalize_data(Ay)
         assert check_normalization(Ay)
         A, y = Ay[:,:-1], Ay[:, -1]
         Ay = np.hstack((A, y.reshape(len(y), 1)))
@@ -367,37 +536,40 @@ def FW_NonPrivate(A, y, l=1.0, K=15000, tol=1e-4, trace=False, normalize=False, 
     x_prev = np.zeros(p, dtype=np.float32)
     f_prev = f(x_prev, A, y)
     
-    # Generate vertices once
-    vertices = get_vertices(p) * l
     
-    # Privacy budget per iteration    
+    valid = []
     for k in range(1, K+1):
         rho = 2 / (k + 2)
         grad = gradient(x_prev, A, y)
-        # Compute utility scores for each vertex
-        scores = vertices @ grad
-        selected_idx = np.argmax(scores)
-
-        # could also 
+        
+        # could also use Oracle approach
         selected_idx = np.argmax(np.abs(grad))
+        
         s = -np.sign(grad[selected_idx]) * l
 
-        # s = l if selected_idx < p else -l
-        # if (grad != 0).sum() == 0:
-        #     s = 0
+        if (grad != 0).sum() == 0:
+            s = 0
         x_new = (1 - rho) * x_prev #+ rho * s on next line
         x_new[selected_idx % p] += s*rho
         f_new = f(x_new, A, y)
-        check_l_ball(x_new, l, log=True)
+        if log:
+            valid.append(check_l_ball(x_new, l, log=False))
         if trace:
             convergence_criteria.append(f_new)
         if (k > 1) and (abs(f_new - f_prev) < tol):
             t = k
-            print(f"converged at: {t}")
+            if log:
+                print(f"converged at: {t}")
             break
 
         x_prev = x_new
         f_prev = f_new
+
+    if log:
+        check_l_ball(x_new, l, log=log)
+        OB = np.sum(np.array(valid) == 0)
+        if OB > 0:
+            print(f"{OB}/{K} iter OB")
 
     if normalize:
         # trained on small data so coef are too large, resizing

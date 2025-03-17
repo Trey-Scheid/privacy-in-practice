@@ -7,77 +7,76 @@ import json
 from src.LASSO.src.model_build import train
 from src.LASSO.src.feat_build import main
 
-def main(**params):
+
+def main(**data_params):
     # read in parameters from command line
-    data_params = params
-    eps_vals = data_params["eps_vals"]
-    data_fp = data_params.get("fp")
+    eps_vals = data_params["epsilons"]
+    data_fp = data_params.get("data")
     output_fp = data_params.get("output")
+    target_eps = data_params.get("single_epsilon")
+    delta = data_params.get("delta")
+    v = data_params.get("verbose")
 
     lasso_params = data_params["lasso-params"]
     
     l = lasso_params.get("l")
     tol = lasso_params.get("tol")
     max_iter = lasso_params.get("max_iter")
+    baseline = lasso_params.get("baseline")
+    normalize = lasso_params.get("normalize")
+    clip = lasso_params.get("clip")
+    triv = lasso_params.get("triv")
     c = lasso_params.get("c")
     directories = lasso_params.get("directories")
     sample_guids_parquet = lasso_params.get("sample_guids_parquet")
+    feat_parquet = lasso_params.get("feat_parquet")
+    sys_info = lasso_params.get("system_info_parquet")
     model = lasso_params.get("model")
-    # else:
-    #     eps_vals = None
-    #     l = None
-    #     tol = None
-    #     max_iter = None
-    #     c = None
-    #     directories = None
-    #     sample_guids_parquet = None
-    #     model = None
-    #     feat_parquet = None
-    #     directories = None
-    #     sample_guids_parquet = None
+
     # set default values if not specified
-    if eps_vals is None: epss = [0.01, 0.1, 1, 10, 100]
+    if eps_vals is None: eps_vals = [0.01, 0.1, 1, 10, 100]
     if l is None: l=10
     if tol is None: tol=1e-4
     if max_iter is None: max_iter=2500
-    if c is None: c=0.1
+    if baseline is None: baseline=0.1
     if model is None: model='fw-lasso-exp'
+    if normalize is None: normalize=False
+    if clip is None: clip=None
+    if triv is None: triv=False
+    if c is None: c=0
     if feat_parquet is None: feat_parquet = 'feat.parquet'
+    if sys_info is None: sys_info = "system_sysinfo_unique_normalized"
     if directories is None: directories = ["frgnd_backgrnd_apps_v4_hist", "web_cat_usage_v2","power_acdc_usage_v4_hist","os_c_state", "hw_pack_run_avg_pwr"]
     if sample_guids_parquet is None: sample_guids_parquet = 'sample_guids.parquet'
 
-    inv_dir = Path(data_fp)
-    #proj_dir = inv_dir.parent
+    data_dir = Path(data_fp)
+    processed_dir = data_dir / 'processed' / 'LASSO'
+    raw_dir = data_dir / 'raw'
 
     # create feat.parquet if it doesn't exist
-    if feat_parquet not in os.listdir(data_fp / 'out'):
-        main.generate_features(inv_dir / sample_guids_parquet, inv_dir, directories)
-    else:
-        print('Features already generated')
+    if feat_parquet not in os.listdir(processed_dir):
+        status = main.generate_features(raw_dir / sample_guids_parquet, raw_dir, processed_dir, directories, sys_info)
+        if v:
+            print(f"Features saved to {feat_parquet}") if status else print("unknown failure")
+    elif v:
+        print(f'{feat_parquet} being used as model features...')
 
     # read data
-    feat = pd.read_parquet(os.path.join(data_fp / 'out', feat_parquet))
+    feat = pd.read_parquet(processed_dir / feat_parquet)
 
-    # run model on each epsilon value
-    epsresults = []
-    for eps in epss:
-        test_mse, feat_dict, r2 = train.train(feat, model, tol=tol, l=l, epsilon=eps, max_iter=max_iter, plot=Path(output_fp) / f'{model}_{eps}_convergence.png')
-        
-        epsresults.append(test_mse)
+    output_fp = Path(os.path.join(*output_fp)) / 'LASSO'
+    if not output_fp.exists():
+        os.mkdir(output_fp)
     
-    # convert mse to utility
-    rmses = np.sqrt(np.array(epsresults))
-    max_rmse = np.max(rmses)
-    # for higher values of c, punish rmse more. c in (0, inf)
-    utility = 2 / (1 + np.exp(c * rmses / max_rmse)) # use sigmoid function to normalize
-    
-    # pretty task name for paper
-    if model == 'fw-lasso-exp':
-        model = 'LASSO'
+    if v:
+        print(f"Training {len(eps_vals)} {model}(s)")
+    task_utility = train.train_run_eps(eps_vals, model, feat, delta, tol, l, max_iter, output_fp, baseline, normalize, clip, triv, c, v)
+    if v:
+        print("Lasso Complete")
+    # train.research_plots()
 
-    return pd.DataFrame({'task': [model for i in range(len(epss))], 
-                         'epsilon': epss, 
-                         'utility': utility.tolist()})
+    return task_utility
+
 
 if __name__ == "__main__":
     with open("config/run.json") as fh:
