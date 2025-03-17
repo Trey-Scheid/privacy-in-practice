@@ -788,7 +788,7 @@ def research_plots(feat, correct_feats=None, methods='lasso', baseline=None, l=N
             plt.ylabel('Training Error')
             plt.legend()
 
-            plt.ylim(0, 20)#max(maxys))
+            plt.ylim(bottom=0)#max(maxys))
             if maxs:
                 plt.xlim(0, max(maxs))
             
@@ -814,7 +814,7 @@ def research_plots(feat, correct_feats=None, methods='lasso', baseline=None, l=N
             plt.ylabel('Training Error')
             plt.legend()
 
-            plt.ylim(0, 20)#max(maxys))
+            plt.ylim(bottom=0)#max(maxys))
             if maxs:
                 plt.xlim(0, max(maxs))
             

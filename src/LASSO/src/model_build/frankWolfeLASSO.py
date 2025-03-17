@@ -538,8 +538,6 @@ def FW_NonPrivate(A, y, l=1.0, K=15000, tol=1e-4, trace=False, normalize=False, 
     
     
     valid = []
-    
-    # Privacy budget per iteration    
     for k in range(1, K+1):
         rho = 2 / (k + 2)
         grad = gradient(x_prev, A, y)
@@ -549,8 +547,8 @@ def FW_NonPrivate(A, y, l=1.0, K=15000, tol=1e-4, trace=False, normalize=False, 
         
         s = -np.sign(grad[selected_idx]) * l
 
-        # if (grad != 0).sum() == 0:
-        #     s = 0
+        if (grad != 0).sum() == 0:
+            s = 0
         x_new = (1 - rho) * x_prev #+ rho * s on next line
         x_new[selected_idx % p] += s*rho
         f_new = f(x_new, A, y)
