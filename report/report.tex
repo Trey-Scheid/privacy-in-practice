@@ -115,7 +115,7 @@ Another concept is device power usage, this is the rate of energy consumption by
 
 \subsection{Applications}
 
-Telemetry is one narrow domain which privacy is a concern, many other types of data require sensitive handling and sharing practices. For example the US Census \footnote{https://www.census.gov/about/policies/privacy/privacy-policy.html}. 
+Telemetry is one narrow domain which privacy is a concern, many other types of data require sensitive handling and sharing practices. For example the US Census \footnote{\url{https://www.census.gov/about/policies/privacy/privacy-policy.html}}. 
 
 We will get into the specifics of each task, however note that each one can be applied to datasets in any domain. Probabilities of political party affiliation, Lasso/kmeans for gene identification, or correlation for stock prices. 
 
@@ -198,7 +198,13 @@ We defined our utility metric as the set intersection over union of the top 29 u
 This metric has a range of 0 to 1, where 0 is no intersection and 1 is full intersection,
 meaning that the higher the utility, the more similar the two results are.
 
+<<<<<<< HEAD
 \subsection{KMEANS: Private Clustering (DP-Lloyd's)}
+=======
+
+\subsection{KMEANS: Private Clustering (DP-Lloyd's)}
+
+>>>>>>> 7f0a51cd1994e15b0a6f25755f9b436e15913010
 K-Means clustering (Lloyd's Algorithm) is applied to group devices based on similarities in their usage patterns. The method leverages Z-scores for standardizing the usage data and calculates L1 distances between weekly usage patterns to identify trends over time. Lloyd's Algorithm clusters devices by assigning them to centroids based on their usage patterns, recalculating the centroids as the mean of assigned points after each iteration. 
 
 Differentially Private Lloyd's Algorithm (DP-Lloyd's)\footnote{\url{https://arxiv.org/pdf/1504.05998}} modifies the standard K-Means clustering by adding Laplacian noise during the iterative centroid update step to ensure privacy. It introduces noise to both the sum of coordinates and the count of points within clusters, with the amount of noise controlled by the number of iterations and the sensitivity of the data. This is applied after clipping the data, to for ensure that the impact of any single data point is limited. 
@@ -253,6 +259,121 @@ $$\Delta f = \max_{D, D'} ||f(x) - f(x')|| = 1$$ \\
 To calculate the utility for the Conditional Probability task, we defined the loss for each epsilon as the Mean Absolute error between the Noisy and Original Histograms. We then normalized the loss so that each loss value fell between 0 and 1 and defined the utility as 1/loss. 
 
 \subsection{LASSO Private $\ell$1 Regularized Regression (via DP-Frank-Wolfe)}
+<<<<<<< HEAD
+
+\subsubsection{Non-private Lasso Regression}
+
+Lasso Regression (Least Absolute Shrinkage and Selection Operator) is a variant of linear regression which penalizes the size of the solution by its $\ell$1-norm. This means the model balances fitting the data with the size of the weights. It is known that depending on the level of regulation this results in a sparse solution, meaning many features are given no weight. This can be advantageous in many settings, it is used in an Intel Telemetry paper by \cite{lassocarbon} to identify key features that contribute to the response variable: cpu average power (Watts). 
+
+The model is typically trained by solving the linear optimization problem Eq \ref{eq:estimator} with a penalty term added, iterative methods can approximate the solution very quickly.
+
+Lasso regression minimizes the residual sum of squares Eq \ref{eq:Risk} subject to a constraint on the sum of the absolute values of the coefficients ($\ell$1 penalty). This penalty can shrink some coefficients exactly to zero, effectively removing irrelevant features from the model, making it particularly useful for high-dimensional data where feature selection is desired. The $\ell$1 regularization in Lasso encourages sparse models, unlike $\ell$2 regularization (Ridge regression) which merely shrinks coefficients without eliminating them.
+
+Given a dataset $D = \{(x_1, y_1), \ldots, (x_n, y_n)\}$ of $n$ samples where $x_i \in \mathbb{R}^p$, $y_i \in \mathbb{R}$, and loss function:
+\begin{equation}
+    \label{eq:Loss}
+    \mathcal{L}(\theta; D) = \frac{1}{n}\sum_{i=1}^{n}(x_i \cdot \theta - y_i)^2
+\end{equation}
+
+the LASSO estimator solves:
+\begin{equation}
+    \label{eq:estimator}
+    \theta^* = {\arg \min}_{\theta: \space \|\theta\|_1 \leq \ell} \mathcal{L}(\theta; D)
+\end{equation}
+
+Minimizing the excess empirical risk:
+\begin{equation}
+    \label{eq:Risk}
+    R(\theta; D) \stackrel{\text{def}}{=} \frac{1}{n}\sum_{i=1}^{n}\mathcal{L}(\theta; d_i) - \min_{\theta \in \mathcal{C}}\frac{1}{n}\sum_{i=1}^{n}\mathcal{L}(\theta; d_i)
+\end{equation}
+
+
+\subsubsection{Private Lasso Regression}
+
+To solve the Lasso optimization problem while ensuring differential privacy, we implemented the Frank-Wolfe algorithm Alg \ref{alg:DP-FW} as described in the Nearly-Optimal Private Lasso paper \cite{NIPS2015_52d080a3}. The standard (not privatized) Frank-Wolfe algorithm Alg \ref{alg:FW} is an iterative, first-order optimization method for constrained convex optimization. In each iteration, it considers a linear approximation of the objective function and traverses along this over the same domain. Unlike gradient descent methods that require projection steps, Frank-Wolfe naturally stays within the feasible set, making it particularly suitable for problems with $\ell$1 constraints like Eq \ref{eq:Loss}. The algorithm iteratively computes the gradient of the loss function at the current point, finds the vertex of the constraint set that minimizes the inner product with this gradient, and then takes a convex combination of the current point and this vertex.
+
+% Algorithm 1: Frank-Wolfe algorithm
+\begin{algorithm}[H]
+    \DontPrintSemicolon
+    \caption{Frank-Wolfe algorithm}
+    \label{alg:FW}
+    % \KwIn{$\mathcal{C} \subseteq \mathbb{R}^{p}$, $\mathcal{L}: \mathcal{C} \rightarrow \mathbb{R}$, $\mu_{t}$}
+    Choose an arbitrary $\theta_{1}$ from $\mathcal{C}$\;
+    \For{$t=1$ \KwTo $T-1$}{
+        Compute $\widetilde{\theta}_{t}=\operatorname{argmin}_{\theta \in \mathcal{C}}\left\langle\nabla \mathcal{L}\left(\theta_{t}\right),\left(\theta-\theta_{t}\right)\right\rangle$\;
+        Set $\theta_{t+1}=\theta_{t}+\mu_{t}\left(\widetilde{\theta}_{t}-\theta_{t}\right)$\;
+    }
+    \KwRet{$\theta_{T}$}\;
+\end{algorithm}
+
+To privatize the Frank-Wolfe algorithm, we incorporated the exponential mechanism. The exponential mechanism Def \ref{def:ExpMech} (\cite{ExpMech}) selects an output with probability proportional to the exponential of a utility function, which measures the quality of each possible output. In our implementation, at each iteration of Frank-Wolfe, instead of deterministically selecting the vertex that minimizes the inner product with the gradient, we use the exponential mechanism to probabilistically select a vertex, adding noise proportional to the sensitivity of the selection process Thm \ref{thm:dp}. The exponential mechanism tends to select outputs with higher utility scores with higher probability. The resulting algorithm achieves an excess risk of approximately $O(1/n^{(2/3)})$, proven to be nearly optimal for private Lasso regression Thm \ref{thm:NearOpt}.
+
+% 2
+\begin{algorithm}[H]
+    \DontPrintSemicolon
+    \caption{Differentially Private Frank-Wolfe Algorithm via Exponential Mechanism}
+    \label{alg:DP-FW}
+    %Data set: $\mathcal{D}=\left\{d_{1}, \cdots, d_{n}\right\}$, loss function: $\mathcal{L}(\theta; D)=\frac{1}{n} \sum_{i=1}^{n} \mathcal{L}\left(\theta; d_{i}\right)$ 
+    \KwIn{$L_{1}$: $\ell_{1}$-Lipschitz constant  for $\mathcal{L}$, convex set: $\mathcal{C}=\operatorname{conv}(S)$ with $\|S\|_{1}$ denoting $\max_{s \in S}\|s\|_{1}$}
+    
+    Choose an arbitrary $\theta_{1}$ from $\mathcal{C}$\;
+    
+    \For{$t=1$ \KwTo $T-1$}{
+        Compute gradient $g_t = \nabla \mathcal{L}(\theta_t; D)$\;
+        
+        \tcc{Exponential Mechanism to select vertex}
+        \For{each vertex $s \in S$}{
+            Compute quality score $q_s = -\langle s, g_t \rangle$\;
+            \tcc{Higher quality = lower inner product with gradient}
+        }
+        
+        Set sensitivity $\Delta = \frac{L_1\|S\|_1}{n}$\;
+        
+        Sample $\widetilde{\theta}_t$ from $S$ with probability proportional to:\;
+        $\Pr[\widetilde{\theta}_t = s] \propto \exp\left(\frac{\epsilon q_s}{2\Delta\sqrt{8T\log(1/\delta)}}\right)$\;
+        
+        $\theta_{t+1} \leftarrow (1-\mu_t)\theta_t + \mu_t\widetilde{\theta}_t$, where $\mu_t = \frac{2}{t+2}$\;
+    }
+    
+    \KwRet{$\theta^{\text{priv}} = \theta_T$}\;
+\end{algorithm}
+
+\cite{NIPS2015_52d080a3} Private Frank-Wolfe Lasso Alg \ref{alg:DP-FW} limits excess risk (worse performance compared to non-private baseline) according to Thm \ref{thm:utilcor} for lasso regression with bounded features ($\|x\|_{\infty} \leq 1$ and $|y| \leq 1$). (See \cite{lassocarbon} for proofs)
+
+
+\subsubsection{Telemetry Application}
+
+\citeauthor{lassocarbon} analyzed the telemetry data to help Intel lower their carbon emissions. To target their development on areas of highest impact, lasso is used to identify features that best predict high power usage. Features include user behavior variables, such as software categories, web usage categories, and user personas. Features also has device properties like number of cores, device age, screen size, model vendor and manufacturer. Each device is given an internal identification number (GUID). Features for this task are normalized and aggregated to be one stat per device per day. See their work for more details. 
+
+Response Variable is a weighted average of signals:
+
+\[power\_mean = \frac{\text{SUM}(\text{nrs} \cdot \text{mean})}{\text{SUM}(\text{nrs})}\]
+
+From the database nrs is the number of samples and mean is the power signal. 
+
+\subsubsection{Utility}
+
+To analyze private performance across many tasks, we transform the prediction error into a normalized utility metric. Lasso regression naturally reports mean square error on a test set of data. Error therefore falls in the domain $(0, \infty)$, so we set a reasonable maximum error we expect would be considered a model with 0 utility. 
+
+\begin{definition}[Jaccard Similarity (Intersection / Union)]
+    \label{def:sim}
+    $J(A, B)$ is the Jaccard similarity between sets $A$ and $B$, measuring overlap from 0 (no overlap) to 1 (identical sets).
+    \[J(A, B) = \frac{|A \cap B|}{|A \cup B|} \]
+\end{definition}
+
+\begin{definition}[Correlation Coefficient]
+    \label{def:r2}
+    $\rho_{xy}$ is the Pearson correlation coefficient between variables $x$ and $y$, ranging from -1 (perfect negative correlation) to 1 (perfect positive correlation).
+    \[\rho_{xy} = \frac{\text{Cov}(x,y)}{\sigma_x \sigma_y}\]
+\end{definition}
+
+\begin{definition}[Sparsity]
+    \label{def:sparsity}
+    $\|x\|_0$ counts non-zero elements in vector $x$ of length $n$. Higher values indicate more zeros.
+    \[\text{Sparsity} = \frac{\text{Number of zero elements}}{\text{Total number of elements}} = 1 - \frac{\|x\|_0}{n}\]
+\end{definition}
+=======
+>>>>>>> 7f0a51cd1994e15b0a6f25755f9b436e15913010
 
 \subsubsection{Non-private Lasso Regression}
 
@@ -366,7 +487,6 @@ To analyze private performance across many tasks, we transform the prediction er
     \[\text{Sparsity} = \frac{\text{Number of zero elements}}{\text{Total number of elements}} = 1 - \frac{\|x\|_0}{n}\]
 \end{definition}
 
-
 %%%%%%%%%%%%%%%%%%%
 %%%% RESULTS  %%%%%%%%%
 %%%%%%%%%%%%%%%%%%%
@@ -374,19 +494,25 @@ To analyze private performance across many tasks, we transform the prediction er
 \section{Results}
 
 Using the source code in our repository\footnote{\url{https://github.com/Trey-Scheid/privacy-in-practice}} on the Intel Telemetry database we find the following results. Most are task evaluations at various $\epsilon$-levels on a logarithmic scale.
+<<<<<<< HEAD
+=======
 
-\subsection{All Tasks}
+>>>>>>> 7f0a51cd1994e15b0a6f25755f9b436e15913010
 
-Follow the utility method for each task to combine all the results in one plot. 
+\subsection{Cross-Task Privacy-Utility Evaluation}
+
+Figure \ref{fig:meta} composes the performance of each task to conclude the findings of the study. Results from each method are uniquely transformed to a normalized utility metric. This allows even comparisons of Pareto curves at all privacy budgets from highly private $\epsilon=0.01$ to a weaker guarantee at $\epsilon=100$.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.6\textwidth]{figure/meta.png}
-  \caption{Privacy vs Normalized Utility for all tasks. Non-private models have a utility of 1.}
+  \caption{Comparative Utility Analysis Across Privacy Budget ($\epsilon$) Levels. Non-private baselines for each task determines the maximum utility.}
   \label{fig:meta}
 \end{figure}
 
 \subsection{COND\_PROB}
+
+Figure \ref{fig:histoeps} compares differences in private and non-private release of proportions for two error codes. Privacy budget total for this task was set to $\epsilon=1$. Uncorrected errors are coded 41, corrected errors are coded 1001. 
 
 \begin{figure}[H]
     \centering
@@ -394,6 +520,8 @@ Follow the utility method for each task to combine all the results in one plot.
     \caption{Corrected Error Count vs Uncorrected Error Probability at $\epsilon$ = 1 (with and without noise)}
     \label{fig:histoeps}
 \end{figure}
+
+Before transforming to utility, the conditional probabilities from Figure \ref{fig:histoeps} and releases at many other epsilons are measured in Mean Absolute Error. Figure \ref{fig:epsilon_vs_loss} shows a clear exponential decay even on log scaled epsilons, this indicates a super-exponential relationship between release error and budget. 
 
 \begin{figure}[H]
     \centering
@@ -413,12 +541,17 @@ Our main method of comparing against the baseline was by calculating the set int
 \end{figure}
 
 \subsection{KMEANS}
+
+Recreating the cluster visual from a previous study, in Figure \ref{fig:centroids} we display clusters of high dimensional data in terms of their scaled $L1$ Distance. There are three centers chosen for this model and they are spread in relation to data point densities.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{figure/1d_clusters.png}
     \caption{Centroid locations overlaid over data points $\epsilon=1$}
     \label{fig:centroids}
 \end{figure}
+
+The model training evaluation at many privacy budgets is computed in Figure \ref{fig:epsilon_inertia}. Inertia measures total data spread from centroids and can fluctuate when any point is reassigned.
 
 \begin{figure}[H]
     \centering
@@ -453,7 +586,10 @@ Figure \ref{fig:lasso_results} shows the performance of the models by viewing pr
 
 The Top row varies regularization $\lambda$ which is the penalty applied to the loss function; smaller lambda constrains the model more, resulting in more sparse solutions (column 4). The bottom row varies the number of iterations the algorithm is performed on, K=200 is the only viable solution since the sparsity as small as the non-private solution (at the target budget $\epsilon=1$).
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7f0a51cd1994e15b0a6f25755f9b436e15913010
 
 %%%%%%%%%%%%%%%%%%%
 %%%% DISCUSSION  %%%%%%%
@@ -533,7 +669,7 @@ The applicability of our study as a commentary of the feasibility of DP methods 
 Replicating papers contains many of its own challenges. Obscurity in their writing, or lack of information about methods and data used leads to guessing. A common pitfall was not knowing exactly which "temperature" a paper was referring to. One of us had to assess several papers before being able to find one that would be replicable.
 
 
-\subsection{The State of DP}
+\subsection{The State of Differential Privacy}
 The field of differential privacy is rapidly growing as more organizations and governments recognize the importance of protecting individuals' data in an increasingly data-driven world. It is crucial to be knowledgeable about this field as it equips us with the understanding of how to protect sensitive data while enabling meaningful analysis. Therefore it can be difficult to ensure your implementation has the best method, best budget and best interpretation for your task. Fortunately, even if your formulation is outdated, the guarantees will still hold and you will only be missing some marginal utility. 
 
 %%%%%%%%%%%%%%%%%%%
@@ -566,16 +702,45 @@ Another promising direction is leveraging off-the-shelf differential privacy pac
 Beyond technical advancements, think-aloud studies and longitudinal research could provide valuable insights into how users interact with differentially private systems in real-world settings. By observing users over time, we can refine privacy mechanisms to better align with practical workflows. Finally, validating utility results through alternative testing methods would help ensure that privacy-preserving models maintain effectiveness across different evaluation metrics, strengthening confidence in their real-world applicability
 
 
+\subsection{Acknowledgments}
+
+We would like to recognize the support of our instructor, Yu-Xiang Wang, for his guidance and feedback throughout the project. We would also like to thank the teaching staff Umesh Bellur and Shriniwas Kulkarni for their support and feedback. The tasks database was a foundational part of our work and was created by another student researcher: Qiyu Li. We also attended a workshop called "Workshop on Defining Holistic Private Data Science for Practice" hosted by ENCORE at UC San Diego, which helped greatly with our broad understanding of the state of the field of differential privacy in practice.
+
+We also would like to thank the authors of the papers we referenced in our literature review. Their work was instrumental in our understanding of the topic and the development of our project. Our understandings of differential privacy has been built on the work of many researchers in the field. Especially those which engaged in discussion with us about the field (Smith, Ulman, Kamath and others). We are grateful for their passion and for making their work freely accessible.
+
+% COMMENT THIS BEFORE RENDERING
+%\input{example_tex_section_6.tex}
+% COMMENT THIS BEFORE RENDERING
+
+%%%%%%%%%%%%%%%%%%%
+%%%% REFERENCES%%%%%%%
+%%%%%%%%%%%%%%%%%%%
+\makereference
+
+\bibliographystyle{style/dsc180bibstyle}
+
+
+\bibliography{reference}
+% To edit the contents of the ``References" section, edit \texttt{reference.bib}. Many conference websites format citations in BibTeX that you can copy into \texttt{reference.bib} directly; you can also search for the paper on Google Scholar, click ``Cite", and then click ``BibTeX" (\href{https://scholar.google.com/scholar?hl=en&as_sdt=0%2C23&q=attention+is+all+you+need&btnG=#d=gs_cit&t=1700436667623&u=%2Fscholar%3Fq%3Dinfo%3A5Gohgn6QFikJ%3Ascholar.google.com%2F%26output%3Dcite%26scirp%3D0%26hl%3Den}{here}'s an example).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% Appendix
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\clearpage
+\makeappendix
+
 %%%%%%%%%%%%%%%%%%%%%%
 %%%% CONTRIBUTIONS %%%
 %%%%%%%%%%%%%%%%%%%%%%
 
-\section{Contributions}
+\subsection{Contributions}
 
-\subsection{Author Contributions}:
-T.S. focused on LASSO Regression to highlight the exploratory capabilities of private data while implementing a previously theoretical framework (Private Franke-Wolfe \cite{NIPS2015_52d080a3}). C.L. focused on private logistic regression to be able to do Wald tests to asses the relationship between input and target variables. B.N. analyzed and implemented non-private and private K-Means clustering. T.K. analyzed the experimental results of applying privacy mechanisms to a conditional probability histogram. Y.W. supervised the research and provided guidance on the mathematical foundations. All authors contributed to writing and reviewing the manuscript.
+\subsubsection{Author Contributions}
+T.S. focused on lasso regression to highlight the exploratory capabilities of private data while implementing a previously theoretical framework (private Franke-Wolfe \cite{NIPS2015_52d080a3}). C.L. focused on private logistic regression to be able to do Wald tests to asses the relationship between input and target variables. B.N. analyzed and implemented non-private and private K-Means clustering. T.K. analyzed the experimental results of applying privacy mechanisms to a conditional probability histogram. Y.W. supervised the research and provided guidance on the mathematical foundations. All authors contributed to writing and reviewing the manuscript.
 
-\subsection{Task Details}
+\subsubsection{Task Details}
 
 Trey Scheid
 \begin{itemize}
@@ -612,37 +777,9 @@ Yu-Xiang Wang
 \end{itemize}
 
 
-\subsection{Acknowledgements}
-
-We would like to recognize the support of our instructor, Yu-Xiang Wang, for his guidance and feedback throughout the project. We would also like to thank the teaching staff Umesh Bellur and Shriniwas Kulkarni for their support and feedback. The tasks database was a foundational part of our work and was created by another student researcher: Qiyu Li. We also attended a workshop called "Workshop on Defining Holistic Private Data Science for Practice" hosted by ENCORE at UC San Diego, which helped greatly with our broad understanding of the state of the field of differential privacy in practice.
-
-We also would like to thank the authors of the papers we referenced in our literature review. Their work was instrumental in our understanding of the topic and the development of our project. Our understandings of differential privacy has been built on the work of many researchers in the field. Especially those which engaged in discussion with us about the field (Smith, Ulman, Guatam et al.). We are grateful for their contributions.
-
-% COMMENT THIS BEFORE RENDERING
-%\input{example_tex_section_6.tex}
-% COMMENT THIS BEFORE RENDERING
-
-%%%%%%%%%%%%%%%%%%%
-%%%% REFERENCES%%%%%%%
-%%%%%%%%%%%%%%%%%%%
-\makereference
-
-\bibliographystyle{style/dsc180bibstyle}
-
-
-\bibliography{reference}
-% To edit the contents of the ``References" section, edit \texttt{reference.bib}. Many conference websites format citations in BibTeX that you can copy into \texttt{reference.bib} directly; you can also search for the paper on Google Scholar, click ``Cite", and then click ``BibTeX" (\href{https://scholar.google.com/scholar?hl=en&as_sdt=0%2C23&q=attention+is+all+you+need&btnG=#d=gs_cit&t=1700436667623&u=%2Fscholar%3Fq%3Dinfo%3A5Gohgn6QFikJ%3Ascholar.google.com%2F%26output%3Dcite%26scirp%3D0%26hl%3Den}{here}'s an example).
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%% Appendix
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\clearpage
-\makeappendix
-
 \subsection{Project Proposal}
 
+\textit{Proposed in coordination with mentor Yu-Xiang to the capstone faculty on 04 December, 2024.}
 
 % style bad
 % \input{project_proposal.tex}
@@ -684,11 +821,15 @@ The other requirements for this project rely on data access and task availabilit
 
 Lastly, although we have not reviewed the dataset and tasks yet (no access), the intel program is sharing genuine telemetry information from devices with given consent as part of their program. Additionally, this HDSI-Intel partnership has been cooperating since 2020 and HDSI has used hundreds of terabytes of information.
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7f0a51cd1994e15b0a6f25755f9b436e15913010
 \subsection{Additional Materials}
 
 \subsubsection{Privacy Theorems and Definitions}
 
-\begin{definition}[Exponential Mechanism]
+\begin{definition}[\cite{ExpMech} Exponential Mechanism]
     \label{def:ExpMech}
     Let $\mathcal{D}$ be a domain of datasets, $\mathcal{R}$ be a range of possible outputs, and $q: \mathcal{D} \times \mathcal{R} \rightarrow \mathbb{R}$ be a quality function that maps dataset-output pairs to real-valued scores. The sensitivity of $q$ is defined as:
     \[
@@ -706,8 +847,9 @@ Lastly, although we have not reviewed the dataset and tasks yet (no access), the
     \]
 \end{definition}
 
-\begin{theorem}[Privacy Guarantee]
-\label{thm:dp}
+
+\begin{theorem}[\cite{NIPS2015_52d080a3} Privacy Guarantee]
+    \label{thm:dp}
     The Private Frank-Wolfe Algorithm is $(\epsilon, \delta)$-differentially private.
     Since each data item is assumed to have bounded $\ell_{\infty}$ norm, for two neighboring databases $D$ and $D'$ and any $\theta \in \mathcal{C}$, $s \in S$, we have that
     \[
@@ -715,7 +857,8 @@ Lastly, although we have not reviewed the dataset and tasks yet (no access), the
     \]
 \end{theorem}
 
-\begin{theorem}[Utility Guarantee]
+
+\begin{theorem}[\cite{NIPS2015_52d080a3} Utility Guarantee]
     \label{thm:util}
     Let $L_1$, $S$ and $\|\mathcal{C}\|_1$ be defined as in the algorithm. Let $\Gamma_{\mathcal{L}}$ be an upper bound on the curvature constant for the loss function $\mathcal{L}(\cdot; d)$ that holds for all $d \in \mathcal{D}$. If we set $T = \frac{\Gamma_{\mathcal{L}}^{2/3}(n\epsilon)^{2/3}}{(L_1\|\mathcal{C}\|_1)^{2/3}}$, then:
     \[
@@ -726,7 +869,8 @@ Lastly, although we have not reviewed the dataset and tasks yet (no access), the
 
 For the specific case of LASSO with bounded features ($\|x\|_{\infty} \leq 1$ and $|y| \leq 1$), this simplifies to:
 
-\begin{corollary}[Lasso Utility]
+
+\begin{corollary}[\cite{NIPS2015_52d080a3} Lasso Utility]
     \label{thm:utilcor}
     For the LASSO problem with $\|x\|_{\infty} \leq 1$ and $|y| \leq 1$, the output $\theta^{\text{priv}}$ ensures:
     \[
@@ -736,15 +880,19 @@ For the specific case of LASSO with bounded features ($\|x\|_{\infty} \leq 1$ an
 
 This algorithm reaches near optimal private performance: 
 
-\begin{theorem}[Near-Optimality]
+
+\begin{theorem}[\cite{NIPS2015_52d080a3} Near-Optimality]
     \label{thm:NearOpt}
     For the sparse linear regression problem where $\|x_i\|_{\infty} \leq 1$, for $\epsilon = 0.1$ and $\delta = o(1/n^2)$, any $(\epsilon, \delta)$-differentially private algorithm $\mathcal{A}$ must have:
     \[
     \mathbb{E}[\mathcal{L}(\mathcal{A}(D); D) - \min_{\theta \in \mathcal{C}}\mathcal{L}(\theta; D)] = \Omega\left(\frac{1}{(n\log n)^{2/3}}\right)
     \]
 \end{theorem}
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 7f0a51cd1994e15b0a6f25755f9b436e15913010
 
 
 \end{document}
