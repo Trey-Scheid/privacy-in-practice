@@ -20,7 +20,7 @@ def generate_features(sample_guids_parquet, raw_data_dir, proc_data_dir, directo
             raise ValueError(f"{sys_info} must be in {raw_data_dir} to create sysinfo.parquet.")
 
     if sample_guids_parquet not in os.listdir(raw_data_dir):
-        load_data.condense_parquet_files(raw_data_dir / sample_guids_parquet.replace(".parquet", ""), proc_data_dir / f'{sample_guids_parquet}.parquet')
+        load_data.condense_parquet_files(raw_data_dir / sample_guids_parquet.replace(".parquet", ""), raw_data_dir / sample_guids_parquet)
 
     # download raw data for chosen sample table
     load_data.sample_raw(raw_data_dir, sample_guids_parquet, proc_data_dir, directories)

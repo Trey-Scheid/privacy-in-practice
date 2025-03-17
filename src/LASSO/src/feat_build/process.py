@@ -25,7 +25,7 @@ def create_software_category_map(output_dir, sw_raw, log=True):
     software_mapping = sw_raw[['frgnd_proc_name', 'Category']].set_index('frgnd_proc_name').to_dict()['Category']
 
     # Save to pickle
-    with open(os.join(output_dir, 'software_data.pkl'), 'wb') as f:
+    with open(os.path.join(output_dir, 'software_data.pkl'), 'wb') as f:
         pickle.dump(software_mapping, f)
         if log:
             print(f'Software category mapping saved to {output_dir}/software_data.pkl')
@@ -83,7 +83,7 @@ def process_raw(df, piv_val, cols=None, agg='sum'):
     return proc_df
 
 def proc_temp(df):
-    df['prod'] = (df['nrs'] * df['avg_val']) / df.groupby(['guid', 'dt'])['nrs'].transform('sum')
+    df['prod'] = (df['temp_nrs'] * df['avg_val']) / df.groupby(['guid', 'dt'])['temp_nrs'].transform('sum')
 
     return df.groupby(['guid', 'dt'])[['prod']].sum().reset_index().rename(columns={'prod': 'temp_avg'})
 
@@ -149,8 +149,9 @@ def main(raw_dir, proc_dir, proc_sysinfo=False, log=True):
     # standardize numerical columns
     scaler = StandardScaler()
     numeric_cols = merged_df.select_dtypes(include=['int', 'float']).columns.to_list()
-    if log:
-        print("Standardize:", numeric_cols)
+    # if log:
+        # print("Standardized:", numeric_cols)
+        # print("Not Standardized:", set(merged_df.columns.to_list()).difference(set(numeric_cols)))
     merged_df[numeric_cols] = scaler.fit_transform(merged_df[numeric_cols])
 
     # don't standardize power columns

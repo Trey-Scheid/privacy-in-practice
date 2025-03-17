@@ -70,7 +70,7 @@ def sample_raw(raw_dir, sample_guids_parquet, output_dir, directories, per_threa
                 SELECT guid, dt, event_name AS temp_event_name, 
                         duration_ms, metric_name, 
                         attribute_metric_level1 AS temp_attribute_metric_level1, 
-                        nrs, avg_val
+                        nrs AS temp_nrs, avg_val
                 FROM {table_name}
                 WHERE metric_name LIKE '%TEMPERATURE%'
             )
@@ -90,13 +90,13 @@ def sample_raw(raw_dir, sample_guids_parquet, output_dir, directories, per_threa
             cpu_usage AS (
                 SELECT c.guid, dt, 
                         SUM(sample_count * average) / SUM(sample_count) AS usage, 
-                        SUM(sample_count) AS nrs
+                        SUM(sample_count) AS cpu_nrs
                 FROM {table_name} c
                 JOIN sample_guids s ON c.guid = s.guid
                 WHERE c.cpu_id = '_TOTAL'
                 GROUP BY c.guid, dt
             )
-            SELECT cu.guid, cu.dt, cc.cores * cu.usage AS norm_usage, nrs
+            SELECT cu.guid, cu.dt, cc.cores * cu.usage AS norm_usage, cpu_nrs
             FROM core_count cc
             JOIN cpu_usage cu ON cc.guid = cu.guid
         """,
