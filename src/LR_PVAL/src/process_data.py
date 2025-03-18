@@ -5,7 +5,6 @@ import duckdb
 import glob
 import os
 import json
-from dotenv import load_dotenv
 from src.LR_PVAL.src.utils import sample_table
 
 
@@ -194,12 +193,4 @@ def main(
 
 
 if __name__ == "__main__":
-    load_dotenv()
-
-    item_dir = os.getenv("ITEM_DIR")
-    header_dir = os.getenv("HEADER_DIR")
-    checkpoint_file = os.getenv("CHECKPOINT_FILE")
-    duck_temp_dir = os.getenv("DUCK_TEMP_DIR")
-    output_dir = os.getenv("OUTPUT_DIR")
-
-    main(item_dir, header_dir, output_dir, checkpoint_file, duck_temp_dir)
+    main()
